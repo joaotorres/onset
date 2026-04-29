@@ -1,10 +1,11 @@
+workspace: My Workspace
 services:
   - type: web
     name: setgame
     runtime: ruby
     plan: free
     buildCommand: ./bin/render-build.sh
-    startCommand: ./bin/rails server
+    startCommand: ./bin/render-start.sh
     envVars:
       - key: RAILS_MASTER_KEY
         sync: false
