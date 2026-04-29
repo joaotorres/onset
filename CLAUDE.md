@@ -21,8 +21,13 @@ The spec is intentionally minimal. Do not add the following without flagging in 
 - esbuild, webpack, bun, or any JS bundler. Stay on Importmap.
 - React, Vue, or any SPA framework. Hotwire (Turbo + Stimulus) is the rule.
 - View component libraries (ViewComponent, Phlex). Plain ERB partials.
-- RSpec. Minitest is the framework.
 - Sass, PostCSS plugins, etc. Tailwind only.
+
+## Testing
+
+- Use RSpec (`rspec-rails`) for all tests: unit, request, and system specs.
+- Specs live in `spec/`. Run with `bundle exec rspec`.
+- System specs use the default headless Chrome driver (Capybara + Selenium).
 
 ## Rails 8 conventions
 
@@ -30,7 +35,7 @@ The spec is intentionally minimal. Do not add the following without flagging in 
 - Stimulus controllers in `app/javascript/controllers/`, auto-registered.
 - Turbo Stream broadcasts via `broadcasts_to` model callbacks per §7. Avoid custom Action Cable channels unless §7 says otherwise.
 - ERB partials in `app/views/<resource>/_partial.html.erb`. Cards in `app/views/cards/_card.html.erb` per §10.
-- System tests with the default headless Chrome driver. They're worth writing for the realtime sync step (Step 9).
+- System specs (RSpec + Capybara) with the default headless Chrome driver. Worth writing for the realtime sync step (Step 9).
 
 ## Code style
 
