@@ -470,20 +470,160 @@ Brute-force solver runs in `Card.any_set_on?` already. A "bot player" is a `Play
 
 ---
 
-## 15. Suggested implementation order
+## 15. Implementation plan (vertical slices)
 
-1. **App skeleton.** `rails new setgame -j importmap -c tailwind --database=sqlite3`, add Hotwire (default), `solid_cable`, `solid_queue`, `rqrcode`.
-2. **Pure-Ruby game logic.** `Card`, deck shuffle, set validation, board manipulation. Unit tests with Minitest. This is the only part with non-trivial algorithms and the only part worth testing exhaustively.
-3. **Models.** `Game`, `Player`, `Claim` with migrations and validations from §4.
-4. **State machine methods.** `Game#try_claim!(player)`, `#submit_claim!(claim, card_ids)`, `#call_no_set!(player)`, `#join_no_set!(player)`, `#deal_more!`, `#deal_replacements!`, `#end?`. All operate inside transactions. Unit-test these.
-5. **Controllers and views.** Routes from §5. Lobbies, board view, phone landing, phone controller. ERB partials only.
-6. **Card SVG partial.** Palette from §10. Render to confirm visually before continuing.
-7. **Turbo Streams.** Add `broadcasts_to` callbacks. Wire `turbo_stream_from` in views.
-8. **Stimulus controllers.** Card-selection on phone, countdown rings, button states.
-9. **Background jobs.** Claim/no-set expiry, idle game cleanup. Configure Solid Queue in `recurring.yml`.
-10. **Polish.** Card deal/remove animations (CSS only). Claim countdown ring (CSS @keyframes driven by data attribute). Sound effects? (defer.)
-11. **Render deploy.** `render.yaml`, build script, env vars. First push, debug, iterate.
-12. **Real-game test.** Get 3 friends on a real TV. Watch what breaks. Fix.
+Each step delivers a **small but end-to-end-working** increment. The app should be deployable and demoable after every step. One commit per step, pushed to `main`, deployed to Render automatically. Sections referenced by number are normative; do not re-derive their content here.
+
+> Step 0 has already been done manually outside Claude Code: `rails new . --database=sqlite3 --css=tailwind --javascript=importmap` produced the vanilla skeleton committed as the first commit on `main`. Steps below build on that.
+
+### Step 1 — Walking skeleton on Render
+**Goal:** the app is publicly reachable on a Render free-tier URL before any feature code is written.
+
+- Add gems: `solid_cable`, `solid_queue`, `solid_cache`, `rqrcode`, `standard`. Run `bundle install`.
+- Configure Action Cable to use the `solid_cable` adapter (`config/cable.yml`).
+- Configure SQLite paths for primary, cable, queue, cache per §3 and §13.
+- Set `SOLID_QUEUE_IN_PUMA=true` so we don't run a second worker service.
+- Add `render.yaml` and `bin/render-build.sh` per §13.
+- Replace the default root with a placeholder `LobbiesController#new` that renders a single page reading "Set" and the Rails version.
+- **Acceptance:** `https://<name>.onrender.com` loads in production.
+
+### Step 2 — Card primitives (pure Ruby + tests)
+**Goal:** the only algorithmically interesting part of the app is correct and exhaustively tested.
+
+- Implement `app/models/card.rb` (PORO) per §4.
+- Minitest coverage:
+  - For every pair of distinct cards, exactly one third card completes a Set.
+  - The canonical 20-card cap set (any documented one) contains no Set.
+  - `valid_set?` smoke tests on hand-picked positive and negative trios.
+- **Acceptance:** `bin/rails test` passes. No UI changes.
+
+### Step 3 — Game and Player models
+**Goal:** rooms exist as DB records, but no game logic yet.
+
+- Migrations for `games` and `players` per §4. **Skip** claim/no-set columns for now — added in Step 7.
+- Validations, the `code` generator (uppercase, 6 chars, excludes confusable glyphs).
+- Model tests covering invariants only (uniqueness, format, name length, name-uniqueness-within-game).
+- **Acceptance:** in `bin/rails console`, `Game.create!` returns a game with a 6-letter code; duplicate codes are impossible by construction.
+
+### Step 4 — Create-and-show a game (no realtime)
+**Goal:** a host can create a game and see a placeholder board at a public URL.
+
+- Routes: `root`, `POST /games`, `GET /games/:code`.
+- `LobbiesController#new`, `GamesController#create`, `GamesController#show`.
+- Board view: room code in big type, placeholder card boxes (text labels like "1·blue·oval·solid"), no SVG yet.
+- **Acceptance:** visit `/`, click "Start a game", land on `/games/ABC123` with a static placeholder board.
+
+### Step 5 — Phone joins via QR
+**Goal:** two devices can sit in the same room.
+
+- Render QR on the board view via `rqrcode`, linking to `/games/:code/players/join`.
+- Phone landing: name input + 8 color swatches.
+- `PlayersController#new` and `#create`; cookie-based session token; redirect to `/games/:code/controller`.
+- Phone controller view: shows player's name and a placeholder "SET!" button. No game state yet.
+- **Acceptance:** scan QR, join with a name, see your controller view; refresh the board and your name appears in the (still-static) scoreboard.
+
+### Step 6 — SVG card rendering
+**Goal:** the board *looks* like Set.
+
+- `app/views/cards/_card.html.erb` per §10. IBM colorblind-safe palette. Stripe pattern. Three shapes.
+- Replace placeholder boxes with the real partial.
+- **Acceptance:** a freshly created game shows 12 visually correct Set cards on the board.
+
+### Step 7 — Game lifecycle: deal 12 cards
+**Goal:** a host can start a game and the deck is dealt.
+
+- Add `Game#status` enum (`waiting`, `playing`, `ended`) and `Game#deck`, `#board`, `#discard` JSON columns. Migration.
+- `POST /games/:code/start` (host only): shuffle deck, deal 12 cards into `board`.
+- "Start" button on the board view, host-only.
+- **Acceptance:** create game, host clicks Start, board shows 12 real cards.
+
+### Step 8 — Claim flow (single device, full-page reload)
+**Goal:** one player can call SET, pick 3 cards, and score — even if other devices need to refresh to see updates.
+
+- Migration: claim/no-set columns on `games`, `claims` table, `Player#locked_until`, `Player#score`.
+- `Game#try_claim!(player)` (atomic, with `lock!`) per §6.
+- `Claim#submit!(card_ids)` validates the Set, updates score, replaces cards.
+- Phone controller states from §8: idle, claim-active-mine (12-card grid). Auto-submit on third tap (with the 250ms delay from §11).
+- **Acceptance:** one phone calls SET, picks 3, sees score change after refresh. Wrong picks lower the score. The board reflects updates after refresh.
+
+### Step 9 — Realtime sync via Turbo Streams
+**Goal:** updates propagate instantly to every connected device. No more refreshes.
+
+- `Game.broadcasts_to` and `Player.broadcasts_to` per §7.
+- `turbo_stream_from "game:#{code}"` in board and controller views; `turbo_stream_from "player:#{id}"` in controller view.
+- `bin/rails test:system` covering: claim on one phone updates the board on another within 1 second.
+- **Acceptance:** with two phones and a board open, action on any device propagates live everywhere.
+
+### Step 10 — Claim timeout (5s)
+**Goal:** a held claim that doesn't submit auto-expires server-side.
+
+- `ExpireClaimJob` enqueued on claim creation (`set(wait: 5.seconds)`). Idempotent: re-checks state on run.
+- Countdown ring on phone (CSS animation driven by `data-claim-started-at`).
+- Phone state from §8: claim-active-others ("Alex is calling SET! 4… 3…").
+- **Acceptance:** call SET, ignore the timer, watch it auto-expire and unfreeze the board within 1s of the deadline.
+
+### Step 11 — Wrong-claim lockout
+**Goal:** a wrong submission penalizes the player and bars them for 5s.
+
+- On wrong claim, set `Player#locked_until = 5.seconds.from_now` inside the same transaction.
+- Server rejects further claims from a locked player.
+- Phone state: locked-out (SET button greyed out with countdown ring).
+- **Acceptance:** deliberately submit a wrong Set, see your SET button disabled for 5s while others remain free.
+
+### Step 12 — No-Set mechanic
+**Goal:** the table can collectively decide there is no Set, draw 3 more cards.
+
+- "No Set" button in the controller's idle state.
+- `Game#call_no_set!`, `#join_no_set!`, `#cancel_no_set!`. New SET claim cancels an active No-Set.
+- `ExpireNoSetJob` (`wait: 15.seconds`); resolves immediately if all currently active players have joined.
+- On resolution: deal 3 more cards (cap at 18 per §2).
+- **Acceptance:** with a contrived board having no Set, call No Set, watch 3 cards deal at expiry. With multiple players, joining the call all-around resolves immediately.
+
+### Step 13 — Game end + Play again
+**Goal:** the game has a clean stop and restart.
+
+- `Game#ended?` per §6 (deck empty AND no Set on board).
+- End screen on board (final scoreboard, top-3 podium); end screen on phone ("Game over — final score: X").
+- `POST /games/:code/restart` resets deck/scores, status → `playing`.
+- "Play again" button (host only).
+- **Acceptance:** play to deck exhaustion, see end screen, click Play Again, new game starts in the same room with fresh state.
+
+### Step 14 — Stimulus polish
+**Goal:** phone interactions feel instant and forgiving.
+
+- `card_selection_controller` — local highlight state, deselect on re-tap, auto-submit at 3 with 250ms grace window.
+- `countdown_ring_controller` — smooth visual, decoupled from server tick rate.
+- Button enable/disable transitions tied to data attributes the server already broadcasts.
+- **Acceptance:** misclicks during selection are recoverable; countdown rings render smoothly across devices.
+
+### Step 15 — Idle game cleanup
+**Goal:** dead rooms don't accumulate forever.
+
+- `CleanupIdleGamesJob` per §12, scheduled hourly via `config/recurring.yml`.
+- Cascading destroy on Game removes Players and Claims.
+- **Acceptance:** in console, `Game.first.update(last_activity_at: 25.hours.ago)`, run the job, the game is gone.
+
+### Step 16 — Visual + UX polish (real screens)
+**Goal:** the game looks and feels correct on a TV across the room and on a phone in hand.
+
+- Card deal/remove CSS transitions.
+- Tune palette saturation, stripe density, type sizes for TV viewing distance.
+- Mobile layout tuning with a real phone, not just devtools.
+- Cold-start mitigation: optional "Wake server" splash on the landing page (§16-decisions).
+- **Acceptance:** subjective — sit on a couch with the board on a TV and a phone in hand; if it feels right, ship.
+
+### Step 17 — Real-game test with humans
+**Goal:** find the bugs only real play surfaces.
+
+- 3+ friends, real TV, real phones, real network.
+- Document what breaks; open issues, fix, re-test.
+- **Acceptance:** a full game finishes without intervention.
+
+### Conventions for every step
+
+- Commit message starts with `Step N:` and references the step's goal.
+- Tests added or updated as part of the step (not deferred to a "tests later" pass).
+- After every step, `bin/rails test` passes locally and the deploy succeeds on Render.
 
 ---
 
