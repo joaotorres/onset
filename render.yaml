@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: setgame
+    runtime: ruby
+    plan: free
+    buildCommand: ./bin/render-build.sh
+    startCommand: ./bin/rails server
+    envVars:
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: RAILS_ENV
+        value: production
+      - key: SOLID_QUEUE_IN_PUMA
+        value: "true"
+    healthCheckPath: /up
