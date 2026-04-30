@@ -60,4 +60,53 @@ RSpec.describe Game do
       expect(games.map(&:code).uniq.size).to eq(10)
     end
   end
+
+  describe "#start!" do
+    let(:game) { Game.create! }
+
+    it "sets status to playing" do
+      game.start!
+      expect(game.reload).to be_playing
+    end
+
+    it "puts 12 cards on the board" do
+      game.start!
+      expect(game.reload.board.size).to eq(12)
+    end
+
+    it "puts the remaining 69 cards in the deck" do
+      game.start!
+      expect(game.reload.deck.size).to eq(69)
+    end
+
+    it "uses all 81 unique card ids across board and deck" do
+      game.start!
+      game.reload
+      expect((game.board + game.deck).sort).to eq((0..80).to_a)
+    end
+
+    it "sets discard to empty" do
+      game.start!
+      expect(game.reload.discard).to be_empty
+    end
+
+    it "shuffles differently each time" do
+      game.start!
+      first_board = game.board.dup
+      game2 = Game.create!
+      game2.start!
+      expect(game2.board).not_to eq(first_board)
+    end
+  end
+
+  describe "#board_cards" do
+    it "returns Card objects for each board id" do
+      game = Game.create!
+      game.start!
+      cards = game.board_cards
+      expect(cards.size).to eq(12)
+      expect(cards).to all(be_a(Card))
+      expect(cards.map(&:id)).to eq(game.board)
+    end
+  end
 end

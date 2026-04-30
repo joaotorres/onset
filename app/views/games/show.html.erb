@@ -38,15 +38,20 @@
     </div>
 
     <div class="grid grid-cols-4 gap-3">
-      <% @placeholder_cards.each do |card| %>
+      <% @board_cards.each do |card| %>
         <div class="aspect-[5/7]">
           <%= render "cards/card", card: card %>
         </div>
       <% end %>
     </div>
 
-    <div class="mt-6 text-center text-gray-600 text-sm">
-      Scan the QR code to join on your phone
+    <div class="mt-6">
+      <% if @is_host && @game.waiting? %>
+        <%= button_to "Start game", start_game_path(@game.code), method: :post,
+              class: "w-full py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
+      <% else %>
+        <p class="text-center text-gray-600 text-sm">Scan the QR code to join on your phone</p>
+      <% end %>
     </div>
 
   </div>
