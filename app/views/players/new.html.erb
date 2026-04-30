@@ -1,0 +1,39 @@
+<div class="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+  <div class="w-full max-w-sm">
+    <h1 class="text-3xl font-bold text-white text-center mb-2">Join Game</h1>
+    <p class="text-gray-400 text-center mb-8 tracking-widest text-sm"><%= @game.code %></p>
+
+    <%= form_with model: [@game, @player], url: game_players_path(@game.code), class: "space-y-6" do |f| %>
+      <% if @player.errors.any? %>
+        <div class="bg-red-900/50 border border-red-700 rounded-xl p-3 text-red-300 text-sm">
+          <%= @player.errors.full_messages.to_sentence %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :name, "Your name", class: "block text-gray-300 text-sm mb-2" %>
+        <%= f.text_field :name,
+              maxlength: 20,
+              autofocus: true,
+              autocomplete: "off",
+              placeholder: "Enter your name",
+              class: "w-full px-4 py-3 bg-gray-800 text-white rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500" %>
+      </div>
+
+      <div>
+        <p class="text-gray-300 text-sm mb-3">Pick a color</p>
+        <div class="grid grid-cols-4 gap-3">
+          <% PlayersController::PRESET_COLORS.each_with_index do |hex, i| %>
+            <label class="cursor-pointer">
+              <%= f.radio_button :color, hex, id: "color_#{i}", class: "sr-only peer" %>
+              <span class="block w-full aspect-square rounded-xl border-4 border-transparent peer-checked:border-white transition-all"
+                    style="background-color: <%= hex %>;"></span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <%= f.submit "Join", class: "w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-lg font-semibold rounded-xl transition-colors cursor-pointer" %>
+    <% end %>
+  </div>
+</div>

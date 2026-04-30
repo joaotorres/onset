@@ -1,0 +1,22 @@
+<div class="min-h-screen bg-gray-950 text-white flex flex-col p-4">
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center gap-3">
+      <span class="w-4 h-4 rounded-full inline-block" style="background-color: <%= @player.color %>;"></span>
+      <span class="font-semibold text-lg"><%= @player.name %></span>
+    </div>
+    <div class="text-right">
+      <p class="text-gray-400 text-xs uppercase tracking-widest">Score</p>
+      <p class="text-2xl font-bold">0</p>
+    </div>
+  </div>
+
+  <div class="flex-1 flex items-center justify-center">
+    <button class="w-64 h-64 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-4xl font-bold tracking-widest transition-all shadow-2xl">
+      SET!
+    </button>
+  </div>
+
+  <div class="text-center text-gray-600 text-sm pb-4">
+    Room <span class="tracking-widest"><%= @game.code %></span>
+  </div>
+</div>
