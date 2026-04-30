@@ -1,22 +1,68 @@
 <div class="min-h-screen bg-gray-950 text-white flex flex-col p-4">
-  <div class="flex items-center justify-between mb-8">
+  <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
       <span class="w-4 h-4 rounded-full inline-block" style="background-color: <%= @player.color %>;"></span>
       <span class="font-semibold text-lg"><%= @player.name %></span>
     </div>
     <div class="text-right">
       <p class="text-gray-400 text-xs uppercase tracking-widest">Score</p>
-      <p class="text-2xl font-bold">0</p>
+      <p class="text-2xl font-bold"><%= @player.score %></p>
     </div>
   </div>
 
-  <div class="flex-1 flex items-center justify-center">
-    <button class="w-64 h-64 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-4xl font-bold tracking-widest transition-all shadow-2xl">
-      SET!
-    </button>
-  </div>
+  <% if @my_claim %>
+    <%# State 2: claim active — mine. Show card grid for selection. %>
+    <div class="mb-4 text-center">
+      <p class="text-yellow-400 font-semibold">Pick 3 cards — tap to select</p>
+    </div>
 
-  <div class="text-center text-gray-600 text-sm pb-4">
+    <%= form_with url: game_claim_path(@game.code, @my_claim.id), method: :patch,
+          data: {controller: "card-selection", "card-selection-target": "form"} do |f| %>
+      <%= f.hidden_field :card_ids, value: "[]",
+            data: {"card-selection-target": "input"} %>
+
+      <div class="grid grid-cols-4 gap-2">
+        <% @game.board_cards.each do |card| %>
+          <div class="aspect-[5/7] cursor-pointer rounded-xl transition-all"
+               data-controller-target="card"
+               data-card-id="<%= card.id %>"
+               data-action="click->card-selection#toggle">
+            <%= render "cards/card", card: card %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+  <% elsif @game.claim_active? %>
+    <%# State 3: claim active — someone else's %>
+    <div class="flex-1 flex items-center justify-center">
+      <div class="text-center">
+        <p class="text-2xl font-bold text-yellow-400 mb-2">
+          <%= @game.claiming_player.name %> is calling SET!
+        </p>
+        <p class="text-gray-400">Waiting…</p>
+      </div>
+    </div>
+
+  <% elsif @game.playing? %>
+    <%# State 1: idle %>
+    <div class="flex-1 flex flex-col items-center justify-center gap-6">
+      <%= button_to "SET!", game_claims_path(@game.code), method: :post,
+            disabled: @player.locked?,
+            class: "w-64 h-64 rounded-full text-white text-4xl font-bold tracking-widest transition-all shadow-2xl #{ @player.locked? ? "bg-gray-700 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-500 active:scale-95" }" %>
+
+      <% if @player.locked? %>
+        <p class="text-red-400 text-sm">Locked out — wait a moment</p>
+      <% end %>
+    </div>
+
+  <% else %>
+    <div class="flex-1 flex items-center justify-center">
+      <p class="text-gray-500 italic">Waiting for the game to start…</p>
+    </div>
+  <% end %>
+
+  <div class="text-center text-gray-600 text-sm pb-4 mt-4">
     Room <span class="tracking-widest"><%= @game.code %></span>
   </div>
 </div>

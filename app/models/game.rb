@@ -5,7 +5,9 @@ class Game < ApplicationRecord
   enum :status, {waiting: 0, playing: 1, ended: 2}, default: :waiting
 
   has_many :players, dependent: :destroy
+  has_many :claims, dependent: :destroy
   belongs_to :host_player, class_name: "Player", optional: true
+  belongs_to :claiming_player, class_name: "Player", foreign_key: :claim_player_id, optional: true
 
   validates :code, presence: true, uniqueness: true, format: {with: CODE_FORMAT}
 
@@ -18,6 +20,26 @@ class Game < ApplicationRecord
 
   def board_cards
     board.map { |id| Card.new(id) }
+  end
+
+  def claim_active?
+    claim_player_id.present?
+  end
+
+  def try_claim!(player)
+    with_lock do
+      return nil unless playing?
+      return nil if claim_active?
+      return nil if player.locked?
+
+      claim = claims.create!(player: player, started_at: Time.current, result: :pending)
+      update!(claim_player_id: player.id, claim_started_at: Time.current)
+      claim
+    end
+  end
+
+  def release_claim!
+    update!(claim_player_id: nil, claim_started_at: nil)
   end
 
   private

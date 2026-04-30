@@ -14,6 +14,8 @@ class Player < ApplicationRecord
 
   def host? = game.host_player_id == id
 
+  def locked? = locked_until.present? && locked_until > Time.current
+
   private
 
   def generate_session_token

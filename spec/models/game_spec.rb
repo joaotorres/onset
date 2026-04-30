@@ -109,4 +109,32 @@ RSpec.describe Game do
       expect(cards.map(&:id)).to eq(game.board)
     end
   end
+
+  describe "#try_claim!" do
+    let(:game) { Game.create!.tap(&:start!) }
+    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C") }
+
+    it "returns a pending claim and locks the game" do
+      claim = game.try_claim!(player)
+      expect(claim).to be_a(Claim)
+      expect(claim).to be_pending
+      expect(game.reload.claim_player_id).to eq(player.id)
+    end
+
+    it "returns nil when game is not playing" do
+      game.update!(status: :waiting)
+      expect(game.try_claim!(player)).to be_nil
+    end
+
+    it "returns nil when another claim is already active" do
+      game.try_claim!(player)
+      other = game.players.create!(name: "Bob", color: "#2ECC71")
+      expect(game.try_claim!(other)).to be_nil
+    end
+
+    it "returns nil when the player is locked out" do
+      player.update!(locked_until: 5.seconds.from_now)
+      expect(game.try_claim!(player)).to be_nil
+    end
+  end
 end
