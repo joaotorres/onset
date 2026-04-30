@@ -1,6 +1,18 @@
-<div class="min-h-screen flex items-center justify-center">
-  <div class="text-center">
-    <h1 class="text-4xl font-bold tracking-tight">Set</h1>
-    <p class="mt-2 text-sm text-gray-500">Rails <%= Rails.version %></p>
+<div class="min-h-screen flex items-center justify-center bg-gray-950">
+  <div class="text-center space-y-8">
+    <h1 class="text-6xl font-bold tracking-tight text-white">Set</h1>
+
+    <%= button_to "Start a game", games_path, method: :post,
+          class: "px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-xl font-semibold rounded-xl transition-colors" %>
+
+    <div class="text-gray-400 text-sm">or</div>
+
+    <%= form_with url: "#", method: :get, class: "flex gap-2 justify-center" do |f| %>
+      <%= f.text_field :code,
+            placeholder: "Room code",
+            maxlength: 6,
+            class: "px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-500 uppercase tracking-widest text-center w-36 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <%= f.submit "Join", class: "px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors cursor-pointer" %>
+    <% end %>
   </div>
 </div>

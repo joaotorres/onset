@@ -1,0 +1,39 @@
+<% card_numbers = %w[1 2 3] %>
+<% card_colors  = %w[blue orange magenta] %>
+<% card_shapes  = %w[oval squiggle diamond] %>
+<% card_shades  = %w[solid striped outline] %>
+
+<div class="min-h-screen bg-gray-950 text-white p-6">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="flex justify-between items-start mb-8">
+      <div>
+        <p class="text-gray-400 text-sm uppercase tracking-widest mb-1">Room</p>
+        <p class="text-5xl font-bold tracking-widest"><%= @game.code %></p>
+      </div>
+
+      <div class="text-right">
+        <p class="text-gray-400 text-sm uppercase tracking-widest mb-2">Players</p>
+        <p class="text-gray-500 italic">Waiting for players…</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-3">
+      <% @placeholder_cards.each do |card| %>
+        <div class="aspect-[5/7] bg-gray-800 rounded-xl border border-gray-700 flex items-center justify-center p-2">
+          <p class="text-xs text-gray-400 text-center leading-relaxed">
+            <%= card_numbers[card.number] %><br>
+            <%= card_colors[card.color] %><br>
+            <%= card_shapes[card.shape] %><br>
+            <%= card_shades[card.shading] %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-8 text-center text-gray-500 text-sm">
+      Waiting for players…
+    </div>
+
+  </div>
+</div>
