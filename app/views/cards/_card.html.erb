@@ -1,0 +1,63 @@
+<%
+  palette_hex  = %w[#648FFF #FE6100 #DC267F]
+  palette_name = %w[blue orange magenta]
+  hex   = palette_hex[card.color]
+  cname = palette_name[card.color]
+  count = card.number + 1
+  step     = 72           # 56px shape + 16px gap
+  first_cy = 140 - (count - 1) * step / 2
+  cx = 100; hw = 55; hh = 28
+  fill = case card.shading
+         when 0 then hex
+         when 1 then "url(#stripes-#{cname})"
+         else        "none"
+         end
+  sw = [0, 2, 5][card.shading]  # stroke-width per shading
+%>
+<svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-sm">
+  <defs>
+    <pattern id="stripes-<%= cname %>" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(40)">
+      <rect width="3.5" height="7" fill="<%= hex %>"/>
+    </pattern>
+  </defs>
+
+  <rect width="200" height="280" rx="12" ry="12" fill="#FAFAFA" stroke="#E5E5E5" stroke-width="2"/>
+
+  <% count.times do |i| %>
+    <% cy = first_cy + i * step %>
+
+    <% if card.shape == 0 %>
+      <%# oval %>
+      <ellipse cx="<%= cx %>" cy="<%= cy %>" rx="<%= hw %>" ry="<%= hh %>"
+               fill="<%= fill %>" stroke="<%= hex %>" stroke-width="<%= sw %>"/>
+
+    <% elsif card.shape == 1 %>
+      <%# squiggle: closed S-shaped bezier, left half bulges up, right half bulges down %>
+      <path fill="<%= fill %>" stroke="<%= hex %>" stroke-width="<%= sw %>"
+            d="M <%= cx - hw %> <%= cy %>
+               C <%= cx - hw - 10 %> <%= cy - 25 %>
+                 <%= cx - hw + 10 %> <%= cy - hh %>
+                 <%= cx - hw + 35 %> <%= cy - hh %>
+               C <%= cx + 5 %> <%= cy - hh %>
+                 <%= cx + 20 %> <%= cy - 12 %>
+                 <%= cx + 35 %> <%= cy - 12 %>
+               C <%= cx + 50 %> <%= cy - 12 %>
+                 <%= cx + hw + 10 %> <%= cy - 25 %>
+                 <%= cx + hw %> <%= cy %>
+               C <%= cx + hw + 10 %> <%= cy + 25 %>
+                 <%= cx + 50 %> <%= cy + hh %>
+                 <%= cx + 35 %> <%= cy + hh %>
+               C <%= cx + 20 %> <%= cy + hh %>
+                 <%= cx + 5 %> <%= cy + 12 %>
+                 <%= cx - hw + 35 %> <%= cy + 12 %>
+               C <%= cx - hw + 10 %> <%= cy + 12 %>
+                 <%= cx - hw - 10 %> <%= cy + 25 %>
+                 <%= cx - hw %> <%= cy %> Z"/>
+
+    <% else %>
+      <%# diamond %>
+      <polygon fill="<%= fill %>" stroke="<%= hex %>" stroke-width="<%= sw %>"
+               points="<%= cx %>,<%= cy - hh %> <%= cx + hw %>,<%= cy %> <%= cx %>,<%= cy + hh %> <%= cx - hw %>,<%= cy %>"/>
+    <% end %>
+  <% end %>
+</svg>

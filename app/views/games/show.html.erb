@@ -1,12 +1,8 @@
-<% card_numbers = %w[1 2 3] %>
-<% card_colors  = %w[blue orange magenta] %>
-<% card_shapes  = %w[oval squiggle diamond] %>
-<% card_shades  = %w[solid striped outline] %>
 <% join_url = join_game_players_url(@game.code) %>
 <% qr_svg = RQRCode::QRCode.new(join_url).as_svg(
      offset: 0, color: "fff", shape_rendering: "crispEdges",
      module_size: 4, standalone: true, use_path: true,
-     viewbox: true, svg_attributes: { class: "w-full h-full" }
+     viewbox: true, svg_attributes: {class: "w-full h-full"}
    ) %>
 
 <div class="min-h-screen bg-gray-950 text-white p-6">
@@ -43,13 +39,8 @@
 
     <div class="grid grid-cols-4 gap-3">
       <% @placeholder_cards.each do |card| %>
-        <div class="aspect-[5/7] bg-gray-800 rounded-xl border border-gray-700 flex items-center justify-center p-2">
-          <p class="text-xs text-gray-400 text-center leading-relaxed">
-            <%= card_numbers[card.number] %><br>
-            <%= card_colors[card.color] %><br>
-            <%= card_shapes[card.shape] %><br>
-            <%= card_shades[card.shading] %>
-          </p>
+        <div class="aspect-[5/7]">
+          <%= render "cards/card", card: card %>
         </div>
       <% end %>
     </div>
