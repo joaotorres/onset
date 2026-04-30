@@ -10,13 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_30_000248) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_30_004212) do
   create_table "games", force: :cascade do |t|
+    t.json "board", default: []
     t.string "code", limit: 6, null: false
     t.datetime "created_at", null: false
+    t.json "deck", default: []
+    t.json "discard", default: []
     t.datetime "ended_at"
     t.bigint "host_player_id"
     t.datetime "last_activity_at"
+    t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_games_on_code", unique: true
   end
