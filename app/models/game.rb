@@ -1,7 +1,7 @@
 class Game < ApplicationRecord
   CODE_ALPHABET = (("A".."Z").to_a - %w[I O]) + %w[2 3 4 5 6 7 8 9]
   CODE_FORMAT = /\A[A-HJ-NP-Z2-9]{6}\z/
-  CLAIM_TIMEOUT = 10
+  CLAIM_TIMEOUT = 15
 
   enum :status, {waiting: 0, playing: 1, ended: 2}, default: :waiting
 
