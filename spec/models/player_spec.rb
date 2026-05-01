@@ -12,7 +12,7 @@ RSpec.describe Player do
 
     it "generates unique session tokens" do
       p1 = Player.create!(valid_attrs)
-      p2 = Player.create!(valid_attrs.merge(name: "Bob"))
+      p2 = Player.create!(valid_attrs.merge(name: "Bob", color: "#2ECC71"))
       expect(p1.session_token).not_to eq(p2.session_token)
     end
   end
@@ -56,6 +56,17 @@ RSpec.describe Player do
     it "is valid with a lowercase hex color" do
       expect(Player.new(valid_attrs.merge(color: "#fe6100"))).to be_valid
     end
+
+    it "rejects a duplicate color in the same game" do
+      Player.create!(valid_attrs)
+      expect(Player.new(valid_attrs.merge(name: "Bob"))).not_to be_valid
+    end
+
+    it "allows the same color in different games" do
+      Player.create!(valid_attrs)
+      other_game = Game.create!
+      expect(Player.new(valid_attrs.merge(game: other_game))).to be_valid
+    end
   end
 
   describe "#active?" do
@@ -84,7 +95,7 @@ RSpec.describe Player do
 
     it "returns false when the player is not the host" do
       player = Player.create!(valid_attrs)
-      other = Player.create!(valid_attrs.merge(name: "Bob"))
+      other = Player.create!(valid_attrs.merge(name: "Bob", color: "#2ECC71"))
       game.update!(host_player_id: other.id)
       expect(player.host?).to be false
     end

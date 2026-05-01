@@ -29,6 +29,13 @@ RSpec.describe "Players" do
       post game_players_path(game.code), params: {player: {name: "", color: "#E74C3C"}}
       expect(response).to have_http_status(:unprocessable_content)
     end
+
+    it "rejects a duplicate color in the same game" do
+      Player.create!(name: "Alice", color: "#E74C3C", game: game)
+      post game_players_path(game.code), params: {player: {name: "Bob", color: "#E74C3C"}}
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("has already been taken in this game")
+    end
   end
 
   describe "GET /games/:code/controller" do

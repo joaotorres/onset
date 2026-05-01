@@ -24,8 +24,9 @@
         <p class="text-gray-300 text-sm mb-3">Pick a color</p>
         <div class="grid grid-cols-4 gap-3">
           <% PlayersController::PRESET_COLORS.each_with_index do |hex, i| %>
-            <label class="cursor-pointer">
-              <%= f.radio_button :color, hex, id: "color_#{i}", class: "sr-only peer" %>
+            <% taken = @taken_colors.include?(hex) %>
+            <label class="<%= taken ? 'cursor-not-allowed opacity-40' : 'cursor-pointer' %>">
+              <%= f.radio_button :color, hex, id: "color_#{i}", disabled: taken, class: "sr-only peer" %>
               <span class="block w-full aspect-square rounded-xl border-4 border-transparent peer-checked:border-white transition-all"
                     style="background-color: <%= hex %>;"></span>
             </label>

@@ -4,7 +4,7 @@ class Player < ApplicationRecord
   belongs_to :game
 
   validates :name, presence: true, length: {maximum: 20}
-  validates :color, presence: true, format: {with: COLOR_FORMAT}
+  validates :color, presence: true, format: {with: COLOR_FORMAT}, uniqueness: {scope: :game_id, message: "has already been taken in this game"}
   validates :session_token, presence: true, uniqueness: true
   validate :name_unique_within_game
 
