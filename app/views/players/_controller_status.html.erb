@@ -15,9 +15,23 @@
   </div>
 
   <% if my_claim %>
-    <%# State 2: claim active — mine. Show card grid for selection. %>
-    <div class="mb-4 text-center">
-      <p class="text-yellow-400 font-semibold">Pick 3 cards — tap to select</p>
+    <%# State 2: claim active — mine. Show card grid with countdown ring. %>
+    <div class="mb-4 text-center"
+         data-controller="countdown"
+         data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
+         data-countdown-duration-value="5">
+      <p class="text-yellow-400 font-semibold mb-2">Pick 3 cards — tap to select</p>
+      <div class="flex items-center justify-center gap-2">
+        <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="#FBBF24" stroke-width="8"
+                  stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
+                  stroke-linecap="round"
+                  data-countdown-target="ring"/>
+        </svg>
+        <span class="text-2xl font-bold text-yellow-400" data-countdown-target="display">5</span>
+        <span class="text-gray-400">s</span>
+      </div>
     </div>
 
     <%= form_with url: game_claim_path(game.code, my_claim.id), method: :patch,
@@ -39,12 +53,17 @@
 
   <% elsif game.claim_active? %>
     <%# State 3: claim active — someone else's %>
-    <div class="flex-1 flex items-center justify-center">
+    <div class="flex-1 flex items-center justify-center"
+         data-controller="countdown"
+         data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
+         data-countdown-duration-value="5">
       <div class="text-center">
         <p class="text-2xl font-bold text-yellow-400 mb-2">
           <%= game.claiming_player.name %> is calling SET!
         </p>
-        <p class="text-gray-400">Waiting…</p>
+        <p class="text-gray-400 text-xl">
+          <span data-countdown-target="display">5</span>…
+        </p>
       </div>
     </div>
 

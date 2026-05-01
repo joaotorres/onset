@@ -35,6 +35,7 @@ class Game < ApplicationRecord
 
       claim = claims.create!(player: player, started_at: Time.current, result: :pending)
       update!(claim_player_id: player.id, claim_started_at: Time.current)
+      ExpireClaimJob.set(wait: 5.seconds).perform_later(claim)
       claim
     end
   end

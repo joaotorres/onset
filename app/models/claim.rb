@@ -7,6 +7,11 @@ class Claim < ApplicationRecord
   validates :started_at, presence: true
   validate :card_ids_valid, if: -> { card_ids.present? }
 
+  def expire!
+    game.release_claim!
+    update!(result: :expired, resolved_at: Time.current)
+  end
+
   def submit!(submitted_ids)
     game.with_lock do
       return unless pending?
