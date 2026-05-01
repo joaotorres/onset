@@ -31,6 +31,17 @@ RSpec.describe "Claims" do
       post game_claims_path(game.code)
       expect(response).to have_http_status(:conflict)
     end
+
+    it "returns 409 when the player is locked out after a wrong claim" do
+      player = sign_in
+      claim = game.try_claim!(player)
+      non_set_ids = game.board_cards.combination(3).find { |trio| !Card.valid_set?(*trio) }.map(&:id)
+      claim.submit!(non_set_ids)
+      expect(player.reload).to be_locked
+
+      post game_claims_path(game.code)
+      expect(response).to have_http_status(:conflict)
+    end
   end
 
   describe "PATCH /games/:code/claims/:id" do

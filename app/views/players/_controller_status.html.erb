@@ -68,15 +68,32 @@
     </div>
 
   <% elsif game.playing? %>
-    <%# State 1: idle %>
+    <%# State 1: idle (or locked out) %>
     <div class="flex-1 flex flex-col items-center justify-center gap-6">
+      <% if player.locked? %>
+        <%# State 5: locked out — show countdown ring, grey button %>
+        <div class="text-center"
+             data-controller="countdown"
+             data-countdown-started-at-value="<%= (player.locked_until - 5.seconds).iso8601 %>"
+             data-countdown-duration-value="5">
+          <p class="text-red-400 font-semibold mb-3">Locked out</p>
+          <div class="flex items-center justify-center gap-2">
+            <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
+              <circle cx="50" cy="50" r="45" fill="none" stroke="#EF4444" stroke-width="8"
+                      stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
+                      stroke-linecap="round"
+                      data-countdown-target="ring"/>
+            </svg>
+            <span class="text-2xl font-bold text-red-400" data-countdown-target="display">5</span>
+            <span class="text-gray-400">s</span>
+          </div>
+        </div>
+      <% end %>
+
       <%= button_to "SET!", game_claims_path(game.code), method: :post,
             disabled: player.locked?,
-            class: "w-64 h-64 rounded-full text-white text-4xl font-bold tracking-widest transition-all shadow-2xl #{player.locked? ? "bg-gray-700 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
-
-      <% if player.locked? %>
-        <p class="text-red-400 text-sm">Locked out — wait a moment</p>
-      <% end %>
+            class: "w-64 h-64 rounded-full text-white text-4xl font-bold tracking-widest transition-all shadow-2xl #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
     </div>
 
   <% else %>
