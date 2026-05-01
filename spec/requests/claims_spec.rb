@@ -48,7 +48,7 @@ RSpec.describe "Claims" do
     it "resolves a correct claim and redirects" do
       player = sign_in
       claim = game.try_claim!(player)
-      patch game_claim_path(game.code, claim.id), params: {card_ids: valid_set_ids}
+      patch game_claim_path(game.code, claim.id), params: {card_ids: valid_set_ids.to_json}
       expect(claim.reload).to be_correct
       expect(response).to redirect_to(game_controller_path(game.code))
     end
@@ -57,7 +57,7 @@ RSpec.describe "Claims" do
       player = sign_in(name: "Alice")
       claim = game.try_claim!(player)
       sign_in(name: "Bob", color: "#2ECC71")  # switch cookie to Bob
-      patch game_claim_path(game.code, claim.id), params: {card_ids: valid_set_ids}
+      patch game_claim_path(game.code, claim.id), params: {card_ids: valid_set_ids.to_json}
       expect(response).to have_http_status(:forbidden)
     end
   end

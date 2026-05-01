@@ -18,7 +18,16 @@ class ClaimsController < ApplicationController
       head :forbidden and return
     end
 
-    submitted_ids = Array(params[:card_ids]).map(&:to_i)
+    raw = params[:card_ids]
+    submitted_ids = if raw.is_a?(String)
+      begin
+        JSON.parse(raw).map(&:to_i)
+      rescue
+        []
+      end
+    else
+      Array(raw).map(&:to_i)
+    end
     claim.submit!(submitted_ids)
     redirect_to game_controller_path(@game.code)
   end
