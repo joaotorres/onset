@@ -7,12 +7,17 @@ export default class extends Controller {
   static values = { startedAt: String, duration: Number }
 
   connect() {
-    this.update()
-    this.timer = setInterval(() => this.update(), 200)
+    this.rafId = null
+    this.tick()
   }
 
   disconnect() {
-    clearInterval(this.timer)
+    cancelAnimationFrame(this.rafId)
+  }
+
+  tick() {
+    this.update()
+    this.rafId = requestAnimationFrame(() => this.tick())
   }
 
   update() {

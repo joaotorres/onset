@@ -5,9 +5,16 @@ export default class extends Controller {
 
   connect() {
     this.selected = []
+    this.submitTimer = null
+  }
+
+  disconnect() {
+    clearTimeout(this.submitTimer)
   }
 
   toggle(event) {
+    if (this.submitTimer) return // grace window in progress, ignore taps
+
     const card = event.currentTarget
     const id = parseInt(card.dataset.cardId)
 
@@ -19,8 +26,12 @@ export default class extends Controller {
       card.classList.add("ring-4", "ring-blue-400", "scale-95")
 
       if (this.selected.length === 3) {
-        this.inputTarget.value = JSON.stringify(this.selected)
-        setTimeout(() => this.formTarget.requestSubmit(), 250)
+        this.formTarget.classList.add("opacity-50", "pointer-events-none")
+        const snapshot = [...this.selected]
+        this.submitTimer = setTimeout(() => {
+          this.inputTarget.value = JSON.stringify(snapshot)
+          this.formTarget.requestSubmit()
+        }, 250)
       }
     }
   }

@@ -52,7 +52,7 @@
       <div class="grid grid-cols-4 gap-2">
         <% game.board_cards.each do |card| %>
           <div class="aspect-[5/7] cursor-pointer rounded-xl transition-all"
-               data-controller-target="card"
+               data-card-selection-target="card"
                data-card-id="<%= card.id %>"
                data-action="click->card-selection#toggle">
             <%= render "cards/card", card: card %>
@@ -109,7 +109,7 @@
 
       <%= button_to "SET!", game_claims_path(game.code), method: :post,
             disabled: player.locked?,
-            class: "w-40 h-16 rounded-full text-white font-bold tracking-widest transition-all shadow #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
+            class: "w-40 h-16 rounded-full text-white font-bold tracking-widest transition-all duration-300 shadow #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
     </div>
 
   <% elsif game.playing? %>
@@ -138,7 +138,7 @@
 
       <%= button_to "SET!", game_claims_path(game.code), method: :post,
             disabled: player.locked?,
-            class: "w-64 h-64 rounded-full text-white text-4xl font-bold tracking-widest transition-all shadow-2xl #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
+            class: "w-64 h-64 rounded-full text-white text-4xl font-bold tracking-widest transition-all duration-300 shadow-2xl #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
 
       <%= button_to "No Set", game_no_set_path(game.code), method: :post,
             class: "w-40 py-3 rounded-2xl bg-gray-700 hover:bg-gray-600 active:scale-95 text-gray-300 font-semibold transition-all shadow" %>
