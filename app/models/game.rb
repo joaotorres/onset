@@ -20,6 +20,24 @@ class Game < ApplicationRecord
     update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [])
   end
 
+  def restart!
+    with_lock do
+      shuffled = (0..80).to_a.shuffle
+      players.each { |p| p.update!(score: 0, locked_until: nil) }
+      update!(
+        status: :playing,
+        board: shuffled.first(12),
+        deck: shuffled.drop(12),
+        discard: [],
+        claim_player_id: nil,
+        claim_started_at: nil,
+        no_set_caller_id: nil,
+        no_set_started_at: nil,
+        no_set_voters: []
+      )
+    end
+  end
+
   def board_cards
     board.map { |id| Card.new(id) }
   end

@@ -266,4 +266,75 @@ RSpec.describe Game do
       expect(game.deck).to be_empty
     end
   end
+
+  describe "#restart!" do
+    let(:game) { Game.create!.tap(&:start!) }
+    let(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+    let(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current) }
+
+    before do
+      alice.update!(score: 3, locked_until: 1.minute.from_now)
+      bob.update!(score: -1)
+      game.update!(
+        status: :ended,
+        claim_player_id: alice.id,
+        claim_started_at: Time.current,
+        no_set_caller_id: bob.id,
+        no_set_started_at: Time.current,
+        no_set_voters: [bob.id]
+      )
+    end
+
+    it "sets status to playing" do
+      game.restart!
+      expect(game.reload).to be_playing
+    end
+
+    it "deals 12 cards to the board" do
+      game.restart!
+      expect(game.reload.board.size).to eq(12)
+    end
+
+    it "puts 69 cards in the deck" do
+      game.restart!
+      expect(game.reload.deck.size).to eq(69)
+    end
+
+    it "uses all 81 unique card ids across board and deck" do
+      game.restart!
+      game.reload
+      expect((game.board + game.deck).sort).to eq((0..80).to_a)
+    end
+
+    it "resets discard to empty" do
+      game.restart!
+      expect(game.reload.discard).to be_empty
+    end
+
+    it "resets all player scores to 0" do
+      game.restart!
+      expect(alice.reload.score).to eq(0)
+      expect(bob.reload.score).to eq(0)
+    end
+
+    it "clears player lockouts" do
+      game.restart!
+      expect(alice.reload.locked_until).to be_nil
+    end
+
+    it "clears claim state" do
+      game.restart!
+      game.reload
+      expect(game.claim_player_id).to be_nil
+      expect(game.claim_started_at).to be_nil
+    end
+
+    it "clears no-set state" do
+      game.restart!
+      game.reload
+      expect(game.no_set_caller_id).to be_nil
+      expect(game.no_set_started_at).to be_nil
+      expect(game.no_set_voters).to be_empty
+    end
+  end
 end

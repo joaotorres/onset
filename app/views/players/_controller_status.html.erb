@@ -14,7 +14,17 @@
     </div>
   </div>
 
-  <% if my_claim %>
+  <% if game.ended? %>
+    <%# Game over state %>
+    <div class="flex-1 flex items-center justify-center">
+      <div class="text-center">
+        <p class="text-3xl font-bold text-white mb-2">Game Over</p>
+        <p class="text-gray-400 text-lg">Final score:</p>
+        <p class="text-5xl font-bold text-white mt-1"><%= player.score %></p>
+      </div>
+    </div>
+
+  <% elsif my_claim %>
     <%# State 2: claim active — mine. Show card grid with countdown ring. %>
     <div class="mb-4 text-center"
          data-controller="countdown"

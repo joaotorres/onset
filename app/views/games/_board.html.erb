@@ -1,8 +1,55 @@
-<div id="board" class="grid grid-cols-4 gap-3">
-  <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>
-  <% cards.each do |card| %>
-    <div class="aspect-[5/7]">
-      <%= render "cards/card", card: card %>
+<% if game.ended? %>
+  <div id="board" class="py-8">
+    <h2 class="text-center text-3xl font-bold text-white mb-8">Game Over</h2>
+
+    <%# Top-3 podium %>
+    <% top_players = game.players.order(score: :desc).first(3) %>
+    <% if top_players.any? %>
+      <div class="flex items-end justify-center gap-4 mb-10">
+        <% podium_order = [top_players[1], top_players[0], top_players[2]].compact %>
+        <% podium_order.each_with_index do |player, idx| %>
+          <% rank = top_players.index(player) + 1 %>
+          <% heights = {1 => "h-32", 2 => "h-20", 3 => "h-14"} %>
+          <% text_sizes = {1 => "text-2xl", 2 => "text-xl", 3 => "text-lg"} %>
+          <div class="flex flex-col items-center gap-2">
+            <% if rank == 1 %>
+              <span class="text-yellow-400 text-2xl">★</span>
+            <% end %>
+            <span class="<%= text_sizes[rank] %> font-bold text-white"><%= player.name %></span>
+            <span class="text-gray-400 font-semibold"><%= player.score %> pts</span>
+            <div class="<%= heights[rank] %> w-20 rounded-t-lg flex items-end justify-center pb-2"
+                 style="background-color: <%= player.color %>; opacity: 0.85;">
+              <span class="text-white font-bold text-lg">#<%= rank %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Full scoreboard %>
+    <div class="max-w-xs mx-auto mb-8">
+      <% game.players.order(score: :desc).each_with_index do |player, idx| %>
+        <div class="flex items-center justify-between py-2 border-b border-gray-800">
+          <div class="flex items-center gap-3">
+            <span class="text-gray-500 w-5"><%= idx + 1 %></span>
+            <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: <%= player.color %>;"></span>
+            <span class="text-white font-medium"><%= player.name %></span>
+          </div>
+          <span class="text-gray-300 font-semibold"><%= player.score %></span>
+        </div>
+      <% end %>
     </div>
-  <% end %>
-</div>
+
+    <%= button_to "Play Again", restart_game_path(game.code), method: :post,
+          class: "block mx-auto px-10 py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
+  </div>
+<% else %>
+  <div id="board" class="grid grid-cols-4 gap-3">
+    <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>
+    <% cards.each do |card| %>
+      <div class="aspect-[5/7]">
+        <%= render "cards/card", card: card %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

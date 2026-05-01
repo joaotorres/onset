@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [:show, :start]
+  before_action :set_game, only: [:show, :start, :restart]
 
   def create
     game = Game.create!
@@ -16,6 +16,14 @@ class GamesController < ApplicationController
       head :forbidden and return
     end
     @game.start!
+    redirect_to game_path(@game.code)
+  end
+
+  def restart
+    unless cookies.encrypted[:host_game] == @game.code
+      head :forbidden and return
+    end
+    @game.restart!
     redirect_to game_path(@game.code)
   end
 
