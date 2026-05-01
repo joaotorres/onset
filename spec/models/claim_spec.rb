@@ -57,8 +57,15 @@ RSpec.describe Claim do
     end
 
     it "decrements the player score by 1" do
+      player.update!(score: 3)
       expect { claim.submit!(find_non_set_on_board) }
         .to change { player.reload.score }.by(-1)
+    end
+
+    it "does not reduce score below zero" do
+      player.update!(score: 0)
+      claim.submit!(find_non_set_on_board)
+      expect(player.reload.score).to eq(0)
     end
 
     it "locks the player out for 5 seconds" do

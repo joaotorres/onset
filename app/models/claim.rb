@@ -59,7 +59,7 @@ class Claim < ApplicationRecord
 
   def resolve_wrong!
     game.release_claim!
-    player.update!(score: player.score - 1, locked_until: 5.seconds.from_now)
+    player.update!(score: [player.score - 1, 0].max, locked_until: 5.seconds.from_now)
     update!(result: :wrong, resolved_at: Time.current)
   end
 
