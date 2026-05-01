@@ -67,6 +67,41 @@
       </div>
     </div>
 
+  <% elsif game.no_set_active? %>
+    <%# State 4: No-Set countdown %>
+    <div class="flex-1 flex flex-col items-center justify-center gap-6"
+         data-controller="countdown"
+         data-countdown-started-at-value="<%= game.no_set_started_at.iso8601 %>"
+         data-countdown-duration-value="15">
+      <div class="text-center">
+        <p class="text-purple-400 font-semibold text-lg mb-1">No Set called by</p>
+        <p class="text-white font-bold text-2xl mb-4"><%= game.no_set_caller.name %></p>
+        <div class="flex items-center justify-center gap-2">
+          <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
+            <circle cx="50" cy="50" r="45" fill="none" stroke="#A855F7" stroke-width="8"
+                    stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
+                    stroke-linecap="round"
+                    data-countdown-target="ring"/>
+          </svg>
+          <span class="text-2xl font-bold text-purple-400" data-countdown-target="display">15</span>
+          <span class="text-gray-400">s</span>
+        </div>
+      </div>
+
+      <% already_voted = game.no_set_voters.include?(player.id) %>
+      <% if already_voted %>
+        <p class="text-green-400 font-semibold">You agreed — waiting for others…</p>
+      <% else %>
+        <%= button_to "I agree — No Set", game_no_set_path(game.code), method: :post,
+              class: "w-56 py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold text-lg transition-all shadow-xl" %>
+      <% end %>
+
+      <%= button_to "SET!", game_claims_path(game.code), method: :post,
+            disabled: player.locked?,
+            class: "w-40 h-16 rounded-full text-white font-bold tracking-widest transition-all shadow #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
+    </div>
+
   <% elsif game.playing? %>
     <%# State 1: idle (or locked out) %>
     <div class="flex-1 flex flex-col items-center justify-center gap-6">
@@ -94,6 +129,9 @@
       <%= button_to "SET!", game_claims_path(game.code), method: :post,
             disabled: player.locked?,
             class: "w-64 h-64 rounded-full text-white text-4xl font-bold tracking-widest transition-all shadow-2xl #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
+
+      <%= button_to "No Set", game_no_set_path(game.code), method: :post,
+            class: "w-40 py-3 rounded-2xl bg-gray-700 hover:bg-gray-600 active:scale-95 text-gray-300 font-semibold transition-all shadow" %>
     </div>
 
   <% else %>

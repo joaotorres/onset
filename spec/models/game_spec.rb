@@ -136,5 +136,134 @@ RSpec.describe Game do
       player.update!(locked_until: 5.seconds.from_now)
       expect(game.try_claim!(player)).to be_nil
     end
+
+    it "cancels an active No-Set when a claim is acquired" do
+      game.update!(no_set_caller_id: player.id, no_set_started_at: Time.current, no_set_voters: [player.id])
+      game.try_claim!(player)
+      expect(game.reload.no_set_active?).to be false
+    end
+  end
+
+  describe "#call_no_set!" do
+    let(:game) { Game.create!.tap(&:start!) }
+    let(:player) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+
+    it "sets no_set fields and returns the game" do
+      result = game.call_no_set!(player)
+      game.reload
+      expect(result).to eq(game)
+      expect(game.no_set_active?).to be true
+      expect(game.no_set_caller_id).to eq(player.id)
+      expect(game.no_set_voters).to eq([player.id])
+    end
+
+    it "returns nil when the game is not playing" do
+      game.update!(status: :waiting)
+      expect(game.call_no_set!(player)).to be_nil
+    end
+
+    it "returns nil when a claim is active" do
+      game.update!(claim_player_id: player.id, claim_started_at: Time.current)
+      expect(game.call_no_set!(player)).to be_nil
+    end
+
+    it "returns nil when a No-Set is already active" do
+      game.call_no_set!(player)
+      other = game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current)
+      expect(game.call_no_set!(other)).to be_nil
+    end
+  end
+
+  describe "#join_no_set!" do
+    let(:game) { Game.create!.tap(&:start!) }
+    let(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+    let(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current) }
+    let(:charlie) { game.players.create!(name: "Charlie", color: "#DC267F", last_seen_at: Time.current) }
+
+    before {
+      alice
+      bob
+      charlie
+      game.call_no_set!(alice)
+    }
+
+    it "adds the player to no_set_voters" do
+      game.join_no_set!(bob)
+      expect(game.reload.no_set_voters).to include(bob.id)
+    end
+
+    it "is idempotent — does not double-add a voter" do
+      game.join_no_set!(alice)
+      expect(game.reload.no_set_voters.count(alice.id)).to eq(1)
+    end
+
+    it "returns nil when no No-Set is active" do
+      game.cancel_no_set!
+      expect(game.join_no_set!(bob)).to be_nil
+    end
+
+    it "resolves immediately when all active players have voted" do
+      old_board_size = game.board.size
+      game.join_no_set!(bob)
+      game.join_no_set!(charlie)
+      game.reload
+      expect(game.no_set_active?).to be false
+      expect(game.board.size).to be > old_board_size
+    end
+  end
+
+  describe "#cancel_no_set!" do
+    let(:game) { Game.create!.tap(&:start!) }
+    let(:player) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+
+    it "clears all no_set fields" do
+      game.call_no_set!(player)
+      game.cancel_no_set!
+      game.reload
+      expect(game.no_set_active?).to be false
+      expect(game.no_set_caller_id).to be_nil
+      expect(game.no_set_voters).to be_empty
+    end
+  end
+
+  describe "#resolve_no_set!" do
+    let(:game) { Game.create!.tap(&:start!) }
+    let(:player) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+
+    before { game.call_no_set!(player) }
+
+    it "deals 3 more cards to the board" do
+      expect { game.resolve_no_set! }.to change { game.reload.board.size }.by(3)
+    end
+
+    it "removes dealt cards from the deck" do
+      expect { game.resolve_no_set! }.to change { game.reload.deck.size }.by(-3)
+    end
+
+    it "clears no_set fields" do
+      game.resolve_no_set!
+      game.reload
+      expect(game.no_set_active?).to be false
+    end
+
+    it "caps board at 18 cards" do
+      game.update!(board: (0..17).to_a, deck: (18..80).to_a)
+      game.resolve_no_set!
+      game.reload
+      expect(game.board.size).to eq(18)
+    end
+
+    it "does not deal past 18 when board is already at 18" do
+      game.update!(board: (0..17).to_a, deck: (18..80).to_a)
+      game.resolve_no_set!
+      expect(game.reload.board.size).to eq(18)
+    end
+
+    it "deals fewer than 3 cards when deck is nearly empty" do
+      game.update!(deck: [80])
+      game.resolve_no_set!
+      game.reload
+      expect(game.deck).to be_empty
+    end
   end
 end

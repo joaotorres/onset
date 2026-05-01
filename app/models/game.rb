@@ -8,6 +8,7 @@ class Game < ApplicationRecord
   has_many :claims, dependent: :destroy
   belongs_to :host_player, class_name: "Player", optional: true
   belongs_to :claiming_player, class_name: "Player", foreign_key: :claim_player_id, optional: true
+  belongs_to :no_set_caller, class_name: "Player", foreign_key: :no_set_caller_id, optional: true
 
   validates :code, presence: true, uniqueness: true, format: {with: CODE_FORMAT}
 
@@ -27,11 +28,17 @@ class Game < ApplicationRecord
     claim_player_id.present?
   end
 
+  def no_set_active?
+    no_set_started_at.present?
+  end
+
   def try_claim!(player)
     with_lock do
       return nil unless playing?
       return nil if claim_active?
       return nil if player.locked?
+
+      cancel_no_set! if no_set_active?
 
       claim = claims.create!(player: player, started_at: Time.current, result: :pending)
       update!(claim_player_id: player.id, claim_started_at: Time.current)
@@ -44,7 +51,58 @@ class Game < ApplicationRecord
     update!(claim_player_id: nil, claim_started_at: nil)
   end
 
+  def call_no_set!(player)
+    with_lock do
+      return nil unless playing?
+      return nil if claim_active?
+      return nil if no_set_active?
+
+      update!(no_set_caller_id: player.id, no_set_started_at: Time.current, no_set_voters: [player.id])
+      ExpireNoSetJob.set(wait: 15.seconds).perform_later(self)
+      self
+    end
+  end
+
+  def join_no_set!(player)
+    with_lock do
+      return nil unless no_set_active?
+      return self if no_set_voters.include?(player.id)
+
+      new_voters = no_set_voters + [player.id]
+      update!(no_set_voters: new_voters)
+      resolve_no_set! if all_active_players_voted?
+      self
+    end
+  end
+
+  def cancel_no_set!
+    update!(no_set_caller_id: nil, no_set_started_at: nil, no_set_voters: [])
+  end
+
+  def resolve_no_set!
+    can_add = [3, 18 - board.size, deck.size].min
+    drawn = deck.first(can_add)
+    new_board = board + drawn
+    new_deck = deck.drop(can_add)
+
+    game_ended = new_deck.empty? && !Card.any_set_on?(new_board.map { |id| Card.new(id) })
+
+    update!(
+      board: new_board,
+      deck: new_deck,
+      no_set_caller_id: nil,
+      no_set_started_at: nil,
+      no_set_voters: [],
+      status: game_ended ? :ended : :playing
+    )
+  end
+
   private
+
+  def all_active_players_voted?
+    active_ids = players.select(&:active?).map(&:id)
+    active_ids.any? && (active_ids - no_set_voters).empty?
+  end
 
   def broadcast_game_state
     broadcast_replace_to "game:#{code}",

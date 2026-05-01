@@ -3,6 +3,19 @@
     <p class="text-center text-yellow-400 text-lg font-semibold">
       <%= game.claiming_player.name %> is calling SET!
     </p>
+  <% elsif game.playing? && game.no_set_active? %>
+    <div class="text-center"
+         data-controller="countdown"
+         data-countdown-started-at-value="<%= game.no_set_started_at.iso8601 %>"
+         data-countdown-duration-value="15">
+      <p class="text-purple-400 text-lg font-semibold">
+        No Set called by <%= game.no_set_caller.name %> —
+        <span data-countdown-target="display">15</span>s
+      </p>
+      <p class="text-gray-500 text-sm">
+        <%= game.no_set_voters.size %> / <%= game.players.select(&:active?).size %> agreed
+      </p>
+    </div>
   <% elsif game.ended? %>
     <p class="text-center text-gray-300 text-xl font-bold">Game over!</p>
   <% else %>
