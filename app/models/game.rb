@@ -1,6 +1,7 @@
 class Game < ApplicationRecord
   CODE_ALPHABET = (("A".."Z").to_a - %w[I O]) + %w[2 3 4 5 6 7 8 9]
   CODE_FORMAT = /\A[A-HJ-NP-Z2-9]{6}\z/
+  CLAIM_TIMEOUT = 10
 
   enum :status, {waiting: 0, playing: 1, ended: 2}, default: :waiting
 
@@ -60,7 +61,7 @@ class Game < ApplicationRecord
 
       claim = claims.create!(player: player, started_at: Time.current, result: :pending)
       update!(claim_player_id: player.id, claim_started_at: Time.current)
-      ExpireClaimJob.set(wait: 5.seconds).perform_later(claim)
+      ExpireClaimJob.set(wait: CLAIM_TIMEOUT.seconds).perform_later(claim)
       claim
     end
   end

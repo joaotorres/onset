@@ -58,7 +58,7 @@ RSpec.describe "Stimulus polish", type: :system do
     setup_claim_state
 
     countdown = find("[data-controller='countdown']")
-    expect(countdown["data-countdown-duration-value"]).to eq("5")
+    expect(countdown["data-countdown-duration-value"]).to eq(Game::CLAIM_TIMEOUT.to_s)
     expect(countdown["data-countdown-started-at-value"]).to be_present
     expect(page).to have_css("[data-countdown-target='ring']")
     expect(page).to have_css("[data-countdown-target='display']")

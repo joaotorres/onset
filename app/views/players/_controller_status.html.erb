@@ -29,7 +29,7 @@
     <div class="mb-4 text-center"
          data-controller="countdown"
          data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
-         data-countdown-duration-value="5">
+         data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
       <p class="text-yellow-400 font-semibold mb-2">Pick 3 cards — tap to select</p>
       <div class="flex items-center justify-center gap-2">
         <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
@@ -39,7 +39,7 @@
                   stroke-linecap="round"
                   data-countdown-target="ring"/>
         </svg>
-        <span class="text-2xl font-bold text-yellow-400" data-countdown-target="display">5</span>
+        <span class="text-2xl font-bold text-yellow-400" data-countdown-target="display"><%= Game::CLAIM_TIMEOUT %></span>
         <span class="text-gray-400">s</span>
       </div>
     </div>
@@ -66,13 +66,13 @@
     <div class="flex-1 flex items-center justify-center"
          data-controller="countdown"
          data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
-         data-countdown-duration-value="5">
+         data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
       <div class="text-center">
         <p class="text-2xl font-bold text-yellow-400 mb-2">
           <%= game.claiming_player.name %> is calling SET!
         </p>
         <p class="text-gray-400 text-xl">
-          <span data-countdown-target="display">5</span>…
+          <span data-countdown-target="display"><%= Game::CLAIM_TIMEOUT %></span>…
         </p>
       </div>
     </div>
