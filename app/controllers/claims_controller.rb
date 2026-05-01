@@ -41,5 +41,6 @@ class ClaimsController < ApplicationController
   def set_player
     token = cookies.encrypted[:player_token]
     @player = @game.players.find_by!(session_token: token)
+    @player.touch(:last_seen_at)
   end
 end
