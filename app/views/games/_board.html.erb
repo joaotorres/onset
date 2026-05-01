@@ -1,0 +1,8 @@
+<div id="board" class="grid grid-cols-4 gap-3">
+  <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>
+  <% cards.each do |card| %>
+    <div class="aspect-[5/7]">
+      <%= render "cards/card", card: card %>
+    </div>
+  <% end %>
+</div>

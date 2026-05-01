@@ -9,7 +9,6 @@ class GamesController < ApplicationController
 
   def show
     @is_host = cookies.encrypted[:host_game] == @game.code
-    @board_cards = @game.board.present? ? @game.board_cards : Card.deck.first(12)
   end
 
   def start

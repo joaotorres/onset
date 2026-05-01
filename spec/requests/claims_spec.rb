@@ -1,7 +1,9 @@
 require "rails_helper"
 
 RSpec.describe "Claims" do
-  let(:game) { Game.create!.tap(&:start!) }
+  let(:game) {
+    Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
+  }
 
   # Sign in a player by going through the real join flow so the encrypted
   # cookie is set correctly in the Rack::Test session.

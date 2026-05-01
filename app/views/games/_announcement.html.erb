@@ -1,0 +1,11 @@
+<div id="announcement">
+  <% if game.playing? && game.claim_active? %>
+    <p class="text-center text-yellow-400 text-lg font-semibold">
+      <%= game.claiming_player.name %> is calling SET!
+    </p>
+  <% elsif game.ended? %>
+    <p class="text-center text-gray-300 text-xl font-bold">Game over!</p>
+  <% else %>
+    <p class="text-center text-gray-600 text-sm">Scan the QR code to join on your phone</p>
+  <% end %>
+</div>

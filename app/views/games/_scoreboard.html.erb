@@ -1,0 +1,16 @@
+<div id="scoreboard" class="text-right min-w-40">
+  <p class="text-gray-400 text-sm uppercase tracking-widest mb-3">Players</p>
+  <% if game.players.any? %>
+    <ul class="space-y-2">
+      <% game.players.order(score: :desc).each do |player| %>
+        <li class="flex items-center justify-end gap-2">
+          <span class="text-gray-400 text-sm w-6 text-right"><%= player.score %></span>
+          <span class="text-white font-medium <%= "text-yellow-400" if game.claim_player_id == player.id %>"><%= player.name %></span>
+          <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: <%= player.color %>;"></span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-gray-500 italic text-sm">Waiting for players…</p>
+  <% end %>
+</div>

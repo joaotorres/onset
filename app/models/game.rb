@@ -12,6 +12,7 @@ class Game < ApplicationRecord
   validates :code, presence: true, uniqueness: true, format: {with: CODE_FORMAT}
 
   before_validation :generate_code, on: :create
+  after_update_commit :broadcast_game_state
 
   def start!
     shuffled = (0..80).to_a.shuffle
@@ -43,6 +44,27 @@ class Game < ApplicationRecord
   end
 
   private
+
+  def broadcast_game_state
+    broadcast_replace_to "game:#{code}",
+      target: "board",
+      partial: "games/board",
+      locals: {game: self}
+    broadcast_replace_to "game:#{code}",
+      target: "scoreboard",
+      partial: "games/scoreboard",
+      locals: {game: self}
+    broadcast_replace_to "game:#{code}",
+      target: "announcement",
+      partial: "games/announcement",
+      locals: {game: self}
+    players.each do |player|
+      player.broadcast_replace_to "player:#{player.id}",
+        target: "controller_status",
+        partial: "players/controller_status",
+        locals: {player: player}
+    end
+  end
 
   def generate_code
     return if code.present?

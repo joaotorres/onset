@@ -40,6 +40,7 @@ class Claim < ApplicationRecord
 
     game_ended = drawn.size < needed && !Card.any_set_on?(new_board_final.map { |id| Card.new(id) })
 
+    player.increment!(:score)
     game.update!(
       board: new_board_final,
       deck: game.deck.drop(needed),
@@ -48,7 +49,6 @@ class Claim < ApplicationRecord
       claim_started_at: nil,
       status: game_ended ? :ended : :playing
     )
-    player.increment!(:score)
     update!(result: :correct, card_ids: submitted_ids, resolved_at: Time.current)
   end
 

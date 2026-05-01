@@ -9,12 +9,20 @@ class Player < ApplicationRecord
   validate :name_unique_within_game
 
   before_validation :generate_session_token, on: :create
+  after_update_commit :broadcast_controller_status
 
   def active? = last_seen_at.present? && last_seen_at > 30.seconds.ago
 
   def host? = game.host_player_id == id
 
   def locked? = locked_until.present? && locked_until > Time.current
+
+  def broadcast_controller_status
+    broadcast_replace_to "player:#{id}",
+      target: "controller_status",
+      partial: "players/controller_status",
+      locals: {player: self}
+  end
 
   private
 

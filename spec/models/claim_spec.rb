@@ -1,7 +1,9 @@
 require "rails_helper"
 
 RSpec.describe Claim do
-  let(:game) { Game.create!.tap(&:start!) }
+  let(:game) {
+    Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
+  }
   let(:player) { game.players.create!(name: "Alice", color: "#E74C3C") }
   let(:claim) { game.try_claim!(player) }
 
