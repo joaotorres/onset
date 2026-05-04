@@ -10,6 +10,7 @@ class Game < ApplicationRecord
   belongs_to :host_player, class_name: "Player", optional: true
   belongs_to :claiming_player, class_name: "Player", foreign_key: :claim_player_id, optional: true
   belongs_to :no_set_caller, class_name: "Player", foreign_key: :no_set_caller_id, optional: true
+  belongs_to :flash_claim, class_name: "Claim", optional: true
 
   validates :code, presence: true, uniqueness: true, format: {with: CODE_FORMAT}
 
@@ -124,6 +125,7 @@ class Game < ApplicationRecord
   end
 
   def broadcast_game_state
+    flash = flash_claim
     broadcast_replace_to "game:#{code}",
       target: "board",
       partial: "games/board",
@@ -135,12 +137,12 @@ class Game < ApplicationRecord
     broadcast_replace_to "game:#{code}",
       target: "announcement",
       partial: "games/announcement",
-      locals: {game: self}
+      locals: {game: self, flash_claim: flash}
     players.each do |player|
       player.broadcast_replace_to "player:#{player.id}",
         target: "controller_status",
         partial: "players/controller_status",
-        locals: {player: player}
+        locals: {player: player, flash_claim: flash}
     end
   end
 

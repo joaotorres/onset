@@ -22,7 +22,7 @@ class Claim < ApplicationRecord
       if Card.valid_set?(*cards)
         resolve_correct!(submitted_ids)
       else
-        resolve_wrong!
+        resolve_wrong!(submitted_ids)
       end
     end
   end
@@ -45,6 +45,7 @@ class Claim < ApplicationRecord
 
     game_ended = drawn.size < needed && !Card.any_set_on?(new_board_final.map { |id| Card.new(id) })
 
+    update!(result: :correct, card_ids: submitted_ids, resolved_at: Time.current)
     player.increment!(:score)
     game.update!(
       board: new_board_final,
@@ -52,15 +53,17 @@ class Claim < ApplicationRecord
       discard: game.discard + submitted_ids,
       claim_player_id: nil,
       claim_started_at: nil,
+      flash_claim_id: id,
       status: game_ended ? :ended : :playing
     )
-    update!(result: :correct, card_ids: submitted_ids, resolved_at: Time.current)
+    ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
   end
 
-  def resolve_wrong!
+  def resolve_wrong!(submitted_ids)
+    update!(result: :wrong, card_ids: submitted_ids, resolved_at: Time.current)
     player.update!(score: [player.score - 1, 0].max, locked_until: 5.seconds.from_now)
-    game.release_claim!
-    update!(result: :wrong, resolved_at: Time.current)
+    game.update!(claim_player_id: nil, claim_started_at: nil, flash_claim_id: id)
+    ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
   end
 
   def card_ids_valid
