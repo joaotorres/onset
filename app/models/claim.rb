@@ -64,6 +64,7 @@ class Claim < ApplicationRecord
     player.update!(score: [player.score - 1, 0].max, locked_until: 5.seconds.from_now)
     game.update!(claim_player_id: nil, claim_started_at: nil, flash_claim_id: id)
     ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
+    UnlockBroadcastJob.set(wait: 5.seconds).perform_later(player)
   end
 
   def card_ids_valid
