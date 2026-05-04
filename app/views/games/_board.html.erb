@@ -44,12 +44,15 @@
           class: "block mx-auto px-10 py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
   </div>
 <% else %>
-  <div id="board" class="grid grid-cols-4 gap-3">
-    <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>
-    <% cards.each do |card| %>
-      <div class="aspect-[5/7]">
-        <%= render "cards/card", card: card %>
-      </div>
-    <% end %>
+  <div id="board" class="overflow-x-auto">
+    <div class="grid grid-flow-col gap-3"
+         style="grid-template-rows: repeat(3, 11rem); grid-auto-columns: calc(11rem * 5 / 7)">
+      <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>
+      <% cards.each do |card| %>
+        <div>
+          <%= render "cards/card", card: card %>
+        </div>
+      <% end %>
+    </div>
   </div>
 <% end %>
