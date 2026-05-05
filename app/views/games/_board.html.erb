@@ -6,7 +6,7 @@
     <% top_players = game.players.order(score: :desc).first(3) %>
     <% if top_players.any? %>
       <div class="flex items-end justify-center gap-4 mb-10">
-        <% podium_order = [top_players[1], top_players[0], top_players[2]].compact %>
+        <% podium_order = top_players %>
         <% podium_order.each_with_index do |player, idx| %>
           <% rank = top_players.index(player) + 1 %>
           <% heights = {1 => "h-32", 2 => "h-20", 3 => "h-14"} %>
@@ -45,6 +45,9 @@
   </div>
 <% else %>
   <div id="board" class="overflow-x-auto">
+    <% if game.deck.empty? %>
+      <p class="text-center text-orange-400 font-semibold mb-4">Deck is empty — play out the remaining cards</p>
+    <% end %>
     <div class="grid grid-flow-col gap-3"
          style="grid-template-rows: repeat(3, 11rem); grid-auto-columns: calc(11rem * 5 / 7)">
       <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>

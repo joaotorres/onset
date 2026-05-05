@@ -35,7 +35,8 @@ class Game < ApplicationRecord
         claim_started_at: nil,
         no_set_caller_id: nil,
         no_set_started_at: nil,
-        no_set_voters: []
+        no_set_voters: [],
+        end_game_voters: []
       )
     end
   end
@@ -91,6 +92,20 @@ class Game < ApplicationRecord
       new_voters = no_set_voters + [player.id]
       update!(no_set_voters: new_voters)
       resolve_no_set! if all_active_players_voted?
+      self
+    end
+  end
+
+  def vote_end_game!(player)
+    with_lock do
+      return nil unless playing? && deck.empty?
+      return self if end_game_voters.include?(player.id)
+
+      new_voters = end_game_voters + [player.id]
+      active_ids = players.select(&:active?).map(&:id)
+      game_ends = active_ids.any? && (active_ids - new_voters).empty?
+
+      update!(end_game_voters: new_voters, status: game_ends ? :ended : :playing)
       self
     end
   end

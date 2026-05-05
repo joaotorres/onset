@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_161521) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_05_130029) do
   create_table "claims", force: :cascade do |t|
     t.json "card_ids"
     t.datetime "created_at", null: false
@@ -32,6 +32,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_161521) do
     t.datetime "created_at", null: false
     t.json "deck", default: []
     t.json "discard", default: []
+    t.json "end_game_voters", default: []
     t.datetime "ended_at"
     t.bigint "flash_claim_id"
     t.bigint "host_player_id"
