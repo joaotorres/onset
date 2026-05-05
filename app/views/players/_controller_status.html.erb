@@ -46,22 +46,20 @@
 
   <% elsif my_claim %>
     <%# State 2: claim active — mine. Show card grid with countdown ring. %>
-    <div class="mb-4 text-center"
+    <div class="flex items-center gap-3 mb-3"
          data-controller="countdown"
          data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
          data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
-      <p class="text-yellow-400 font-semibold mb-2">Pick 3 cards — tap to select</p>
-      <div class="flex items-center justify-center gap-2">
-        <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
-          <circle cx="50" cy="50" r="45" fill="none" stroke="#FBBF24" stroke-width="8"
-                  stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
-                  stroke-linecap="round"
-                  data-countdown-target="ring"/>
-        </svg>
-        <span class="text-2xl font-bold text-yellow-400" data-countdown-target="display"><%= Game::CLAIM_TIMEOUT %></span>
-        <span class="text-gray-400">s</span>
-      </div>
+      <svg class="w-8 h-8 flex-shrink-0 -rotate-90" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#FBBF24" stroke-width="8"
+                stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
+                stroke-linecap="round"
+                data-countdown-target="ring"/>
+      </svg>
+      <span class="text-xl font-bold text-yellow-400" data-countdown-target="display"><%= Game::CLAIM_TIMEOUT %></span>
+      <span class="text-gray-400 text-sm">s</span>
+      <p class="text-yellow-400 font-semibold text-sm ml-1">Pick 3 cards — tap to select</p>
     </div>
 
     <%= form_with url: game_claim_path(game.code, my_claim.id), method: :patch,
@@ -69,15 +67,18 @@
       <%= f.hidden_field :card_ids, value: "[]",
             data: {"card-selection-target": "input"} %>
 
-      <div class="grid grid-cols-4 gap-2">
-        <% game.board_cards.each do |card| %>
-          <div class="aspect-[5/7] cursor-pointer rounded-xl transition-all"
-               data-card-selection-target="card"
-               data-card-id="<%= card.id %>"
-               data-action="click->card-selection#toggle">
-            <%= render "cards/card", card: card %>
-          </div>
-        <% end %>
+      <div class="overflow-x-auto -mx-4 px-4">
+        <div class="grid grid-flow-col gap-2"
+             style="grid-template-rows: repeat(3, calc((100dvh - 11rem) / 3)); grid-auto-columns: calc((100dvh - 11rem) / 3 * 5 / 7)">
+          <% game.board_cards.each do |card| %>
+            <div class="cursor-pointer rounded-xl transition-all"
+                 data-card-selection-target="card"
+                 data-card-id="<%= card.id %>"
+                 data-action="click->card-selection#toggle">
+              <%= render "cards/card", card: card %>
+            </div>
+          <% end %>
+        </div>
       </div>
     <% end %>
 
