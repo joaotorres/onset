@@ -1,7 +1,6 @@
 <%
   game = player.game
   my_claim = game.claim_player_id == player.id ? game.claims.find_by(player: player, result: :pending) : nil
-  flash_claim = local_assigns[:flash_claim]
 %>
 <div id="controller_status" class="flex-1 flex flex-col">
   <div class="flex items-center justify-between mb-6">
@@ -22,25 +21,6 @@
         <p class="text-3xl font-bold text-white mb-2">Game Over</p>
         <p class="text-gray-400 text-lg">Final score:</p>
         <p class="text-5xl font-bold text-white mt-1"><%= player.score %></p>
-      </div>
-    </div>
-
-  <% elsif flash_claim %>
-    <%# Flash state: show what was just picked %>
-    <% flash_cards = flash_claim.card_ids.map { |cid| Card.new(cid) } %>
-    <% is_mine = flash_claim.player_id == player.id %>
-    <div class="flex-1 flex flex-col items-center justify-center gap-6">
-      <% if flash_claim.correct? %>
-        <p class="text-green-400 text-3xl font-bold"><%= is_mine ? "Correct! +1" : "#{flash_claim.player.name} — Correct!" %></p>
-      <% else %>
-        <p class="text-red-400 text-3xl font-bold"><%= is_mine ? "Wrong!" : "#{flash_claim.player.name} — Wrong!" %></p>
-      <% end %>
-      <div class="flex gap-3">
-        <% flash_cards.each do |card| %>
-          <div class="w-16 h-[90px]">
-            <%= render "cards/card", card: card %>
-          </div>
-        <% end %>
       </div>
     </div>
 
