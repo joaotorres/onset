@@ -1,1 +1,227 @@
 @import "tailwindcss";
+
+/* Portrait default: 3-row card grid sized to viewport height */
+.player-card-grid {
+  grid-template-rows: repeat(3, calc((100dvh - 11rem) / 3));
+  grid-auto-columns: calc((100dvh - 11rem) / 3 * 5 / 7);
+}
+
+/* Landscape-only elements: hidden in portrait */
+.player-idle-board,
+.player-idle-info,
+.player-claim-button-panel,
+.player-claim-side-panel,
+.player-no-set-info,
+.player-claim-active-info,
+.player-claim-active-set-wrap {
+  display: none;
+}
+
+/* State 2 claim content wrapper (portrait: flex-col stack) */
+.player-claim-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (orientation: landscape) {
+  /* ── States 1, 3 & 4: shared outer row layout ── */
+
+  .player-idle > .player-status-header,
+  .player-no-set > .player-status-header,
+  .player-claim-active > .player-status-header { display: none; }
+
+  .player-idle,
+  .player-no-set,
+  .player-claim-active { flex-direction: row; gap: 0.5rem; }
+
+  /* ── State 1: idle ── */
+
+  /* Left: read-only board cards */
+  .player-idle-board {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  /* Middle: SET! / No Set action column */
+  .player-idle-actions {
+    flex: 0 0 auto;
+    width: 7rem;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  /* Override portrait circle shape — tall rectangle in the column */
+  .player-idle-actions .player-idle-set-btn {
+    width: 100%;
+    height: auto;
+    padding: 2rem 0;
+    font-size: 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .player-idle-actions .player-idle-noset-btn {
+    width: 100%;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  /* Right: player name + score */
+  .player-idle-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 5rem;
+    flex-shrink: 0;
+  }
+
+  /* 3-row card grid filling full available height */
+  .player-idle .player-card-grid {
+    grid-template-rows: repeat(3, calc((100dvh - 5rem) / 3));
+    grid-auto-columns: calc((100dvh - 5rem) / 3 * 5 / 7);
+  }
+
+  /* ── State 2: claiming ── */
+
+  .player-claiming > .player-status-header { display: none; }
+  .player-claim-portrait-bar { display: none; }
+
+  /* Switch claim content to three-column row */
+  .player-claim-content { flex-direction: row; gap: 0.5rem; }
+  .player-claim-content > form { flex: 1; min-width: 0; }
+
+  /* Remove edge-to-edge portrait margins on the card overflow container */
+  .player-card-overflow {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Middle: SET! / No Set buttons */
+  .player-claim-button-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 7rem;
+    flex-shrink: 0;
+  }
+
+  /* Bigger claim buttons in landscape */
+  .player-claim-button-panel .player-claim-set-btn {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    font-size: 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .player-claim-button-panel .player-claim-noset-btn {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  /* Right: player info + countdown */
+  .player-claim-side-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 5rem;
+    flex-shrink: 0;
+  }
+
+  /* 3-row card grid, full height */
+  .player-claiming .player-card-grid {
+    grid-template-rows: repeat(3, calc((100dvh - 5rem) / 3));
+    grid-auto-columns: calc((100dvh - 5rem) / 3 * 5 / 7);
+  }
+
+  /* ── State 4: No-Set ── */
+
+  /* Hide portrait-only caller info; show landscape info panel */
+  .player-no-set-portrait-info { display: none; }
+
+  .player-no-set-actions {
+    flex: 0 0 auto;
+    width: 7rem;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .player-no-set-actions .player-no-set-set-btn {
+    width: 100%;
+    height: auto;
+    padding: 1.5rem 0;
+    font-size: 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .player-no-set-actions .player-no-set-agree-btn {
+    width: 100%;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .player-no-set-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 5rem;
+    flex-shrink: 0;
+  }
+
+  .player-no-set .player-card-grid {
+    grid-template-rows: repeat(3, calc((100dvh - 5rem) / 3));
+    grid-auto-columns: calc((100dvh - 5rem) / 3 * 5 / 7);
+  }
+
+  /* ── State 3: someone else's claim ── */
+
+  .player-claim-active-portrait-info { display: none; }
+
+  .player-claim-active-set-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .player-claim-active-actions {
+    flex: 0 0 auto;
+    width: 7rem;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .player-claim-active-actions .player-claim-active-set-btn {
+    width: 100%;
+    height: auto;
+    padding: 1.5rem 0;
+    font-size: 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .player-claim-active-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 5rem;
+    flex-shrink: 0;
+  }
+
+  .player-claim-active .player-card-grid {
+    grid-template-rows: repeat(3, calc((100dvh - 5rem) / 3));
+    grid-auto-columns: calc((100dvh - 5rem) / 3 * 5 / 7);
+  }
+}
