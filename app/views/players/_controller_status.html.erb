@@ -247,7 +247,9 @@
       </div>
 
       <% already_voted = game.no_set_voters.include?(player.id) %>
-      <% if already_voted %>
+      <% if game.no_set_caller == player %>
+        <p class="text-purple-400 font-semibold">You called 'No Set'</p>
+      <% elsif already_voted %>
         <p class="text-green-400 font-semibold">You agreed — waiting for others…</p>
       <% else %>
         <%= button_to "I agree — No Set", game_no_set_path(game.code), method: :post,

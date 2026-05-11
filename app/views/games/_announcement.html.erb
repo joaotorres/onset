@@ -1,17 +1,21 @@
 <% flash_claim = local_assigns[:flash_claim] %>
 <div id="announcement">
   <% if flash_claim %>
-    <% flash_cards = flash_claim.card_ids.map { |cid| Card.new(cid) } %>
+    <% flash_cards = flash_claim.card_ids&.map { |cid| Card.new(cid) } || [] %>
     <div class="flex items-center justify-center gap-6">
-      <div class="flex gap-2">
-        <% flash_cards.each do |card| %>
-          <div class="w-12 h-[67px]">
-            <%= render "cards/card", card: card %>
-          </div>
-        <% end %>
-      </div>
+      <% if flash_cards.any? %>
+        <div class="flex gap-2">
+          <% flash_cards.each do |card| %>
+            <div class="w-12 h-[67px]">
+              <%= render "cards/card", card: card %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
       <% if flash_claim.correct? %>
         <p class="text-green-400 text-xl font-bold"><%= flash_claim.player.name %> — Correct! +1</p>
+      <% elsif flash_claim.expired? %>
+        <p class="text-red-400 text-xl font-bold"><%= flash_claim.player.name %> — Time's up!</p>
       <% else %>
         <p class="text-red-400 text-xl font-bold"><%= flash_claim.player.name %> — Wrong!</p>
       <% end %>
