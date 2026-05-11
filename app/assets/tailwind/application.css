@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@keyframes found-set-fade-out {
+  0%, 50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.found-set-flash {
+  animation: found-set-fade-out 3s ease-in-out forwards;
+}
+
 /* Portrait default: 3-row card grid sized to viewport height */
 .player-card-grid {
   grid-template-rows: repeat(3, calc((100dvh - 11rem) / 3));

@@ -49,7 +49,7 @@ class Game < ApplicationRecord
 
       new_voters = start_voters + [player.id]
       update!(start_voters: new_voters)
-      start! if (players.pluck(:id) - new_voters).empty?
+      start! if players.count >= 2 && (players.pluck(:id) - new_voters).empty?
       self
     end
   end

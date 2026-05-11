@@ -1,6 +1,12 @@
 <div id="start_button">
   <% if game.waiting? %>
-    <%= button_to "Start game", start_game_path(game.code), method: :post,
-          class: "w-full py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
+    <% if game.players.count >= 2 %>
+      <%= button_to "Start game", start_game_path(game.code), method: :post,
+            class: "w-full py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
+    <% else %>
+      <button disabled class="w-full py-3 bg-gray-700 text-gray-500 text-lg font-semibold rounded-xl cursor-not-allowed">
+        Need at least 2 players
+      </button>
+    <% end %>
   <% end %>
 </div>

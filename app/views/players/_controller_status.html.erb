@@ -1,5 +1,6 @@
 <%
   game = local_assigns[:game] || player.game
+  flash_claim = local_assigns[:flash_claim]
   my_claim = game.claim_player_id == player.id ? game.claims.find_by(player: player, result: :pending) : nil
   state_class = if my_claim
     "player-claiming"
@@ -12,6 +13,17 @@
   end
 %>
 <div id="controller_status" class="flex-1 flex flex-col<%= " #{state_class}" if state_class %>">
+  <% if flash_claim&.correct? && flash_claim.card_ids.present? %>
+    <div class="found-set-flash fixed top-0 left-0 right-0 z-50 bg-gray-900/95 border-b border-green-600/40 py-2 px-4 flex items-center justify-center gap-3">
+      <% flash_claim.card_ids.map { |cid| Card.new(cid) }.each do |card| %>
+        <div style="width: calc(4.5rem * 5 / 7); height: 4.5rem;">
+          <%= render "cards/card", card: card %>
+        </div>
+      <% end %>
+      <p class="text-green-400 text-sm font-bold ml-2"><%= flash_claim.player.name %> +1</p>
+    </div>
+  <% end %>
+
   <div class="player-status-header flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
       <span class="w-4 h-4 rounded-full inline-block" style="background-color: <%= player.color %>;"></span>
@@ -43,7 +55,9 @@
       <% already_voted = game.start_voters.include?(player.id) %>
       <% total = game.players.count %>
       <% voted = game.start_voters.size %>
-      <% if already_voted %>
+      <% if total < 2 %>
+        <p class="text-center text-gray-500 text-sm">Waiting for more players to join…</p>
+      <% elsif already_voted %>
         <p class="text-center text-green-400 font-semibold mb-3">You're ready!</p>
         <p class="text-center text-gray-400 text-sm">Waiting for others… (<%= voted %>/<%= total %>)</p>
       <% else %>

@@ -15,6 +15,7 @@ class GamesController < ApplicationController
     unless cookies.encrypted[:host_game] == @game.code
       head :forbidden and return
     end
+    redirect_to(game_path(@game.code)) and return if @game.players.count < 2
     @game.start!
     redirect_to game_path(@game.code)
   end

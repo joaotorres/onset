@@ -71,16 +71,32 @@
           class: "block mx-auto px-10 py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
   </div>
 <% else %>
-  <div id="board" class="overflow-x-auto">
+  <div id="board">
     <% if game.deck.empty? %>
       <p class="text-center text-orange-400 font-semibold mb-4">Deck is empty — play out the remaining cards</p>
     <% end %>
-    <div class="grid grid-flow-col gap-3"
-         style="grid-template-rows: repeat(3, 11rem); grid-auto-columns: calc(11rem * 5 / 7)">
-      <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>
-      <% cards.each do |card| %>
-        <div>
-          <%= render "cards/card", card: card %>
+    <div class="flex items-start gap-3">
+      <div class="overflow-x-auto">
+        <div class="grid grid-flow-col gap-3"
+             style="grid-template-rows: repeat(3, 11rem); grid-auto-columns: calc(11rem * 5 / 7)">
+          <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>
+          <% cards.each do |card| %>
+            <div>
+              <%= render "cards/card", card: card %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% fc = game.flash_claim %>
+      <% if fc&.correct? && fc.card_ids.present? %>
+        <div class="found-set-flash flex-shrink-0 flex flex-col gap-2 items-center pl-2 border-l border-green-600/40">
+          <p class="text-green-400 text-xs font-bold text-center truncate max-w-[10rem]"><%= fc.player.name %></p>
+          <% fc.card_ids.map { |cid| Card.new(cid) }.each do |card| %>
+            <div style="width: calc(13rem * 5 / 7); height: 13rem;">
+              <%= render "cards/card", card: card %>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>
