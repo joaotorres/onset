@@ -19,7 +19,7 @@ class Game < ApplicationRecord
 
   def start!
     shuffled = (0..80).to_a.shuffle
-    update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [])
+    update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [], start_voters: [])
   end
 
   def restart!
@@ -36,8 +36,38 @@ class Game < ApplicationRecord
         no_set_caller_id: nil,
         no_set_started_at: nil,
         no_set_voters: [],
-        end_game_voters: []
+        end_game_voters: [],
+        start_voters: []
       )
+    end
+  end
+
+  def vote_start!(player)
+    with_lock do
+      return nil unless waiting?
+      return self if start_voters.include?(player.id)
+
+      new_voters = start_voters + [player.id]
+      update!(start_voters: new_voters)
+      start! if (players.pluck(:id) - new_voters).empty?
+      self
+    end
+  end
+
+  def broadcast_lobby_state
+    broadcast_replace_to "game:#{code}",
+      target: "board",
+      partial: "games/board",
+      locals: {game: self}
+    broadcast_replace_to "game:#{code}",
+      target: "scoreboard",
+      partial: "games/scoreboard",
+      locals: {game: self}
+    players.each do |p|
+      p.broadcast_replace_to "player:#{p.id}",
+        target: "controller_status",
+        partial: "players/controller_status",
+        locals: {player: p, game: self, flash_claim: nil}
     end
   end
 
@@ -157,7 +187,7 @@ class Game < ApplicationRecord
       player.broadcast_replace_to "player:#{player.id}",
         target: "controller_status",
         partial: "players/controller_status",
-        locals: {player: player, flash_claim: flash}
+        locals: {player: player, game: self, flash_claim: flash}
     end
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_05_130029) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_11_143658) do
   create_table "claims", force: :cascade do |t|
     t.json "card_ids"
     t.datetime "created_at", null: false
@@ -40,6 +40,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_130029) do
     t.integer "no_set_caller_id"
     t.datetime "no_set_started_at"
     t.json "no_set_voters", default: []
+    t.json "start_voters", default: []
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_games_on_code", unique: true

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     member do
       post :start
       post :restart
+      post :ready
     end
     resources :players, only: [:new, :create] do
       collection { get :join }

@@ -5,11 +5,13 @@ RSpec.describe "Claims" do
     Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
   }
 
-  # Sign in a player by going through the real join flow so the encrypted
-  # cookie is set correctly in the Rack::Test session.
   def sign_in(name: "Alice", color: "#E74C3C")
+    # Temporarily reset to waiting so the join HTTP flow is accepted, then restore
+    was_playing = game.playing?
+    game.update_columns(status: 0) if was_playing
     post game_players_path(game.code), params: {player: {name: name, color: color}}
-    game.players.find_by!(name: name)
+    game.update_columns(status: 1) if was_playing
+    game.reload.players.find_by!(name: name)
   end
 
   def valid_set_ids

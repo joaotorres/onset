@@ -100,4 +100,39 @@ RSpec.describe "Games" do
       end
     end
   end
+
+  describe "POST /games/:code/ready" do
+    let(:game) { Game.create! }
+
+    def sign_in_player(name: "Alice", color: "#E74C3C")
+      post game_players_path(game.code), params: {player: {name: name, color: color}}
+      game.players.find_by!(name: name)
+    end
+
+    it "records the player's vote without starting the game when others haven't voted" do
+      player = sign_in_player
+      game.players.create!(name: "Bob", color: "#2ECC71")
+      post ready_game_path(game.code)
+      expect(game.reload.start_voters).to include(player.id)
+      expect(game.reload).to be_waiting
+    end
+
+    it "starts the game when all players have voted" do
+      sign_in_player
+      post ready_game_path(game.code)
+      expect(game.reload).to be_playing
+    end
+
+    it "does not start the game when only some players have voted" do
+      sign_in_player
+      game.players.create!(name: "Bob", color: "#2ECC71")
+      post ready_game_path(game.code)
+      expect(game.reload).to be_waiting
+    end
+
+    it "returns 403 without a valid player cookie" do
+      post ready_game_path(game.code)
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 end
