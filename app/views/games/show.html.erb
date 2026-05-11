@@ -27,10 +27,7 @@
     <%= render "board", game: @game %>
 
     <div class="mt-6">
-      <% if @is_host && @game.waiting? %>
-        <%= button_to "Start game", start_game_path(@game.code), method: :post,
-              class: "w-full py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
-      <% end %>
+      <%= render "start_button", game: @game %>
 
       <%= render "announcement", game: @game, flash_claim: @game.flash_claim %>
     </div>

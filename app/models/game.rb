@@ -183,6 +183,10 @@ class Game < ApplicationRecord
       target: "announcement",
       partial: "games/announcement",
       locals: {game: self, flash_claim: flash}
+    broadcast_replace_to "game:#{code}",
+      target: "start_button",
+      partial: "games/start_button",
+      locals: {game: self}
     players.each do |player|
       player.broadcast_replace_to "player:#{player.id}",
         target: "controller_status",

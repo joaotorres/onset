@@ -1,0 +1,6 @@
+<div id="start_button">
+  <% if game.waiting? %>
+    <%= button_to "Start game", start_game_path(game.code), method: :post,
+          class: "w-full py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
+  <% end %>
+</div>
