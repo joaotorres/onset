@@ -50,6 +50,7 @@ class Claim < ApplicationRecord
 
     update!(result: :correct, card_ids: submitted_ids, resolved_at: Time.current)
     player.increment!(:score)
+    quick_ended = game.quick? && player.score >= Game::QUICK_WIN_SCORE
     game.update!(
       board: new_board_final,
       deck: game.deck.drop(needed),
@@ -57,7 +58,7 @@ class Claim < ApplicationRecord
       claim_player_id: nil,
       claim_started_at: nil,
       flash_claim_id: id,
-      status: game_ended ? :ended : :playing
+      status: (game_ended || quick_ended) ? :ended : :playing
     )
     ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
   end

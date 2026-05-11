@@ -4,6 +4,9 @@ class Game < ApplicationRecord
   CLAIM_TIMEOUT = 15
 
   enum :status, {waiting: 0, playing: 1, ended: 2}, default: :waiting
+  enum :mode, {standard: 0, quick: 1}, default: :standard
+
+  QUICK_WIN_SCORE = 5
 
   has_many :players, dependent: :destroy
   has_many :claims, dependent: :destroy

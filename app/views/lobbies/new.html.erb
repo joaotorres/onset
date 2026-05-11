@@ -5,6 +5,11 @@
     <%= button_to "Start a game", games_path, method: :post,
           class: "px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-xl font-semibold rounded-xl transition-colors" %>
 
+    <%= button_to "Start quick game", games_path, method: :post, params: {mode: "quick"},
+          class: "px-8 py-4 bg-violet-600 hover:bg-violet-500 text-white text-xl font-semibold rounded-xl transition-colors" %>
+
+    <p class="text-gray-500 text-sm">Quick game: first to 5 points wins</p>
+
     <div class="text-gray-400 text-sm">or</div>
 
     <%= form_with url: "#", method: :get, class: "flex gap-2 justify-center" do |f| %>

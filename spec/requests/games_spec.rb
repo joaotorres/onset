@@ -11,6 +11,16 @@ RSpec.describe "Games" do
       post games_path
       expect(cookies[:host_game]).to be_present
     end
+
+    it "creates a standard game by default" do
+      post games_path
+      expect(Game.last).to be_standard
+    end
+
+    it "creates a quick game when mode=quick" do
+      post games_path, params: {mode: "quick"}
+      expect(Game.last).to be_quick
+    end
   end
 
   describe "GET /games/:code" do
@@ -35,6 +45,8 @@ RSpec.describe "Games" do
       before do
         post games_path  # sets host cookie
         @game = Game.last
+        @game.players.create!(name: "Alice", color: "#648FFF", session_token: SecureRandom.hex)
+        @game.players.create!(name: "Bob", color: "#FE6100", session_token: SecureRandom.hex)
       end
 
       it "transitions the game to playing" do
@@ -119,7 +131,9 @@ RSpec.describe "Games" do
 
     it "starts the game when all players have voted" do
       sign_in_player
-      post ready_game_path(game.code)
+      bob = game.players.create!(name: "Bob", color: "#2ECC71", session_token: SecureRandom.hex)
+      post ready_game_path(game.code)  # Alice votes via cookie
+      game.vote_start!(bob)            # Bob votes directly
       expect(game.reload).to be_playing
     end
 

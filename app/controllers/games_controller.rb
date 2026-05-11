@@ -2,7 +2,7 @@ class GamesController < ApplicationController
   before_action :set_game, only: [:show, :start, :restart, :ready]
 
   def create
-    game = Game.create!
+    game = Game.create!(mode: (params[:mode] == "quick") ? :quick : :standard)
     cookies.encrypted[:host_game] = {value: game.code, httponly: true, same_site: :lax}
     redirect_to game_path(game.code)
   end

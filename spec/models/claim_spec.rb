@@ -120,6 +120,24 @@ RSpec.describe Claim do
     end
   end
 
+  describe "#submit! in quick mode" do
+    let(:game) {
+      Game.create!(mode: :quick).tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
+    }
+
+    it "ends the game when a player reaches 5 points" do
+      player.update!(score: 4)
+      claim.submit!(find_set_on_board)
+      expect(game.reload).to be_ended
+    end
+
+    it "does not end the game if the player has fewer than 5 points" do
+      player.update!(score: 2)
+      claim.submit!(find_set_on_board)
+      expect(game.reload).to be_playing
+    end
+  end
+
   describe "#submit! with invalid input" do
     it "ignores a submission with the wrong number of cards" do
       expect { claim.submit!([0, 1]) }.not_to change { claim.reload.result }
