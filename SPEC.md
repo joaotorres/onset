@@ -10,7 +10,7 @@ This document is the source of truth for the v1 MVP. It is intentionally tight; 
 
 **What it is.** Real-time multiplayer Set. One device acts as the **board** (rendering the 12+ cards, scores, and announcements). Each player connects a **phone** (the controller) to claim Sets and pick the three cards.
 
-**Stack.** Ruby on Rails 8, SQLite, Hotwire (Turbo + Stimulus), Action Cable with Solid Cable adapter, Solid Queue, Tailwind CSS, deployed to Render's free tier.
+**Stack.** Ruby on Rails 8, SQLite, Hotwire (Turbo + Stimulus), Action Cable with Solid Cable adapter, Solid Queue, Tailwind CSS, deployed with Kamal to a VPS.
 
 **Non-goals for v1.** No accounts, no AI opponent, no solo/practice mode, no cross-room matchmaking, no native apps.
 
@@ -62,12 +62,12 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 
 ### High-level
 
-- **One Rails process.** Serves HTML, JSON, WebSockets, and background jobs from a single Render web service.
+- **One Rails process.** Serves HTML, JSON, WebSockets, and background jobs from a single container.
 - **SQLite** for primary, cable (Solid Cable), queue (Solid Queue), and cache (Solid Cache) databases. All four files live on the mounted persistent disk.
 - **Turbo Streams** drive realtime UI. The server renders ERB partials and broadcasts diffs over Action Cable. Minimal custom JS.
 - **Stimulus** for client-only interactions: the 3-card selection on the phone, button countdown timers, the QR widget.
 
-### Why this works on Render free
+### Why this works in one container
 
 Solid Cable removes the Redis dependency. SQLite removes the managed Postgres dependency. The whole app is one process, one disk, one deploy.
 
@@ -399,49 +399,28 @@ All jobs are idempotent: they re-check the relevant state inside a transaction a
 
 ---
 
-## 13. Deployment (Render)
+## 13. Deployment (Kamal to the Hostinger VPS)
 
-### `render.yaml`
+The app deploys with Kamal to the Hostinger VPS shared with the other joaotorr.es apps, as `onset.joaotorr.es`. The runbook is `docs/deploy.md`.
 
-```yaml
-services:
-  - type: web
-    name: setgame
-    runtime: ruby
-    plan: free
-    buildCommand: ./bin/render-build.sh
-    startCommand: ./bin/rails server
-    envVars:
-      - key: RAILS_MASTER_KEY
-        sync: false
-      - key: RAILS_ENV
-        value: production
-      - key: SOLID_QUEUE_IN_PUMA
-        value: "true"
-      - key: DATABASE_URL
-        value: sqlite3:///var/data/production.sqlite3
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
-    healthCheckPath: /up
-```
+### `config/deploy.yml`
 
-### `bin/render-build.sh`
+- One `web` server, the VPS. kamal-proxy, already on the host, terminates SSL with a Let's Encrypt certificate and routes by hostname. Rails runs with `assume_ssl` and `force_ssl`, `/up` excluded from the redirect for the proxy health check.
+- Image on GitHub Container Registry as `joaotorres/onset`, built for amd64.
+- Env: `RAILS_MASTER_KEY` (secret), `SOLID_QUEUE_IN_PUMA: true` (clear).
+- Volume `onset_storage:/rails/storage` holds the four SQLite files.
+- No accessories.
 
-```bash
-#!/usr/bin/env bash
-set -o errexit
-bundle install
-./bin/rails assets:precompile
-./bin/rails db:prepare
-```
+### `.kamal/secrets`
+
+Reads the registry token from the macOS Keychain and `RAILS_MASTER_KEY` from `config/master.key`. Nothing is stored in the file.
 
 ### Notes
 
-- `database.yml` uses four SQLite files all under `/var/data/`: `production.sqlite3`, `cable.sqlite3`, `queue.sqlite3`, `cache.sqlite3`.
-- Render free tier sleeps after 15 minutes of no inbound traffic (HTTP **or** WebSocket messages). Once a game is active, the WebSocket pings keep it warm; first visitor of the day eats a ~60s cold start. Acceptable for MVP; document in the README.
-- No Redis, no Postgres, no separate worker service. All four storage concerns share one disk.
+- `database.yml` uses four SQLite files under `storage/`: `production.sqlite3`, `production_cable.sqlite3`, `production_queue.sqlite3`, `production_cache.sqlite3`. The container entrypoint runs `db:prepare` on boot.
+- The container runs Thruster in front of Puma. Solid Queue runs inside Puma, so one container serves HTML, WebSockets and jobs.
+- No Redis, no Postgres, no separate worker service. All four storage concerns share one volume.
+- Always on: no cold starts, unlike the Render free tier this app started on.
 
 ---
 
@@ -472,20 +451,20 @@ Brute-force solver runs in `Card.any_set_on?` already. A "bot player" is a `Play
 
 ## 15. Implementation plan (vertical slices)
 
-Each step delivers a **small but end-to-end-working** increment. The app should be deployable and demoable after every step. One commit per step, pushed to `main`, deployed to Render automatically. Sections referenced by number are normative; do not re-derive their content here.
+Each step delivers a **small but end-to-end-working** increment. The app should be deployable and demoable after every step. One commit per step, pushed to `main`, deployed with `bin/kamal deploy`. Sections referenced by number are normative; do not re-derive their content here.
 
 > Step 0 has already been done manually outside Claude Code: `rails new . --database=sqlite3 --css=tailwind --javascript=importmap` produced the vanilla skeleton committed as the first commit on `main`. Steps below build on that.
 
-### Step 1 — Walking skeleton on Render
-**Goal:** the app is publicly reachable on a Render free-tier URL before any feature code is written.
+### Step 1 — Walking skeleton in production
+**Goal:** the app is publicly reachable at its production URL before any feature code is written.
 
 - Add gems: `solid_cable`, `solid_queue`, `solid_cache`, `rqrcode`, `standard`. Run `bundle install`.
 - Configure Action Cable to use the `solid_cable` adapter (`config/cable.yml`).
 - Configure SQLite paths for primary, cable, queue, cache per §3 and §13.
 - Set `SOLID_QUEUE_IN_PUMA=true` so we don't run a second worker service.
-- Add `render.yaml` and `bin/render-build.sh` per §13.
+- Add `config/deploy.yml` and `.kamal/secrets` per §13.
 - Replace the default root with a placeholder `LobbiesController#new` that renders a single page reading "Set" and the Rails version.
-- **Acceptance:** `https://<name>.onrender.com` loads in production.
+- **Acceptance:** `https://onset.joaotorr.es` loads in production.
 
 ### Step 2 — Card primitives (pure Ruby + tests)
 **Goal:** the only algorithmically interesting part of the app is correct and exhaustively tested.
@@ -631,7 +610,7 @@ explicit `sleep`/poll; or restructuring the spec to not depend on the board sess
 
 - Commit message starts with `Step N:` and references the step's goal.
 - Tests added or updated as part of the step (not deferred to a "tests later" pass).
-- After every step, `bin/rails test` passes locally and the deploy succeeds on Render.
+- After every step, `bin/rails test` passes locally and `bin/kamal deploy` succeeds.
 
 ---
 
