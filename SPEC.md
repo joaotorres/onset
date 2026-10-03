@@ -38,16 +38,16 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 1. The board shows 12 face-up cards drawn from the deck.
 2. Players race to spot a Set.
 3. A player taps **"SET!"** on their phone. Server timestamps the request and atomically locks the claim to the first arrival.
-4. The claiming player has **5 seconds** to tap 3 cards on their phone.
+4. The claiming player has **15 seconds** (`Game::CLAIM_TIMEOUT`) to tap 3 cards on their phone.
    - **Correct Set**: +1 point, those 3 cards are removed, 3 new cards are dealt from the deck. Board unfreezes.
    - **Wrong Set**: −1 point, claiming player is locked out for 5 seconds (cannot claim again). Board unfreezes immediately for everyone else.
-   - **Timeout (no submission within 5s)**: claim is released. No score change. Board unfreezes.
+   - **Timeout (no submission within 15s)**: same penalty as a wrong Set: −1 point and a 5-second lockout. Board unfreezes.
 5. **No Set on the board**: any player can tap **"No Set"**. A 15-second countdown begins, visible on the board and all phones. Resolution:
    - If **all currently active players** join the call before the countdown ends, it resolves immediately.
    - Otherwise, the countdown expires.
    - On resolution: deal 3 additional cards from the deck (board grows to 15, then 18 if called again). Hard cap at **18 cards**.
    - If anyone calls **"SET!"** during the countdown, the No-Set call is **cancelled** and the claim flow begins.
-6. **Game end**: when the deck is empty and **no valid Set exists** on the remaining board cards. Show final scoreboard and a "Play again" button (rotates host).
+6. **Game end**: when the deck is empty and **no valid Set exists** on the remaining board cards. Once the deck is empty, players can also end early: every active player taps **"End game"**. In quick mode the game ends when a player reaches 5 points (`Game::QUICK_WIN_SCORE`). The board shows the podium and a "Play again" button.
 
 ### Edge cases
 
@@ -95,10 +95,15 @@ The room.
 | `discard` | json | Array of card ids already collected |
 | `host_player_id` | bigint | nullable; the player who created the room |
 | `claim_player_id` | bigint | nullable; the player currently holding the claim lock |
-| `claim_started_at` | datetime | nullable; for 5s claim window |
+| `claim_started_at` | datetime | nullable; for the 15s claim window |
 | `no_set_started_at` | datetime | nullable; for 15s No-Set countdown |
 | `no_set_caller_id` | bigint | nullable; the player who called No Set |
 | `no_set_voters` | json | Array of player ids who joined the call (default `[]`) |
+| `mode` | enum | `standard`, `quick` (first to `QUICK_WIN_SCORE` points) |
+| `start_voters` | json | Player ids who tapped "I'm ready" (default `[]`) |
+| `end_game_voters` | json | Player ids who voted to end once the deck is empty (default `[]`) |
+| `flash_claim_id` | bigint | nullable; the just-resolved claim the screens announce for 3s |
+| `last_dealt` | json | Card ids dealt by the last replace, outlined on the board for 3s (default `[]`) |
 | `last_activity_at` | datetime | for 24h idle cleanup |
 | `ended_at` | datetime | nullable |
 
@@ -119,7 +124,7 @@ A participant in a Game.
 | `color` | string | Hex code, chosen at join. UI offers 8 distinct presets. |
 | `score` | integer | default 0 |
 | `locked_until` | datetime | nullable; the timestamp until which the player cannot call SET (5s lockout) |
-| `last_seen_at` | datetime | updated on every WebSocket ping |
+| `last_seen_at` | datetime | updated on every phone request via `Player#seen!`, which skips callbacks so it never broadcasts |
 | `left_at` | datetime | nullable; for graceful disconnect |
 
 **Validations**: `name` present, length 1..20. `color` matches a hex pattern. `(game_id, name)` unique-case-insensitive (no two players in the same game can share a name).
@@ -180,42 +185,47 @@ The board and deck columns store integer ids; instantiate `Card` objects in the 
 ```ruby
 Rails.application.routes.draw do
   root "lobbies#new"
+  get "join" => "lobbies#join", :as => :join_by_code
 
   resources :games, only: [:create, :show], param: :code do
     member do
       post :start
       post :restart
+      post :ready
     end
     resources :players, only: [:new, :create] do
-      collection { get :join } # QR landing page
+      collection { get :join }
     end
-    resource :controller, only: [:show], controller: "controllers" # phone view
+    resource :controller, only: [:show], controller: "controllers"
     resources :claims, only: [:create, :update]
     resource :no_set, only: [:create, :update, :destroy]
+    resource :end_game, only: [:create]
   end
 
-  # Action Cable + health
   mount ActionCable.server => "/cable"
-  get "up" => "rails/health#show"
+  get "up" => "rails/health#show", :as => :rails_health_check
 end
 ```
 
-URL surface:
+URL surface. Every action a phone or the board POSTs answers `204 No Content`; the broadcast updates the screens (§7).
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| GET | `/` | Landing: "Start a game" / "Join with code" |
-| POST | `/games` | Create room, redirect to `/games/:code` |
+| GET | `/` | Landing: start a game, start a quick game, or join by code |
+| GET | `/join?code=` | Find the room by code, redirect to its join page or back with "Room not found" |
+| POST | `/games` | Create room (`mode=quick` for first to 5), redirect to `/games/:code` |
 | GET | `/games/:code` | Board view (TV) |
 | GET | `/games/:code/players/join` | Phone landing after QR scan: name + color form |
 | POST | `/games/:code/players` | Create player, set cookie, redirect to controller |
 | GET | `/games/:code/controller` | Phone controller view |
-| POST | `/games/:code/start` | Host transitions `waiting` → `playing` |
-| POST | `/games/:code/restart` | Reset deck, clear scores, status `playing` |
-| POST | `/games/:code/claims` | Atomic claim lock (returns 201 or 409) |
+| POST | `/games/:code/ready` | Phone votes to start; the game starts when every player (2+) has voted |
+| POST | `/games/:code/start` | Host starts the game from the board |
+| POST | `/games/:code/restart` | Play again: reset deck, clear scores, status `playing` |
+| POST | `/games/:code/claims` | Try to take the claim lock; a lost race changes nothing |
 | PATCH | `/games/:code/claims/:id` | Submit `card_ids` for a held claim |
 | POST | `/games/:code/no_set` | Initiate No-Set countdown OR join existing call |
 | DELETE | `/games/:code/no_set` | Withdraw your vote (rare; no UI button v1) |
+| POST | `/games/:code/end_game` | Vote to end once the deck is empty; ends when every active player has voted |
 
 ---
 
@@ -229,12 +239,12 @@ A round is the period between deals. Transitions are owned by the `Game` model a
    ┌─── (idle) ──────┼─── claim_lock_acquired ──→ claim_locked
    │                 │                              │
    │                 │  ↑                           │ submit_set
-   │                 │  └─── 5s timeout ────────────┤
+   │                 │  └─── 15s timeout ───────────┤
    │                 │                              ↓
    │                 │                          ┌────┐
    │                 │                          │ ✓  │ correct → score+1, deal
    │                 │                          │ ✗  │ wrong → score-1, lockout
-   │                 │                          │ ⏰ │ expired → no change
+   │                 │                          │ ⏰ │ expired → score-1, lockout
    │                 │                          └────┘
    │                 │                              │
    │                 │                              ↓ (back to idle)
@@ -259,7 +269,7 @@ A round is the period between deals. Transitions are owned by the `Game` model a
 
 ### Server-side timers
 
-Use Solid Queue jobs scheduled with `set(wait: 5.seconds)` to enforce timeouts. The job re-checks state inside a transaction (claim could have been resolved already) and only acts if still applicable. Do not rely on client-side timers for correctness — they are display-only.
+Use Solid Queue jobs scheduled with `set(wait: ...)` to enforce timeouts: `ExpireClaimJob` after `Game::CLAIM_TIMEOUT`, `ExpireNoSetJob` after 15s, `UnlockBroadcastJob` after the 5s lockout, `ClearClaimFlashJob` and `ClearLastDealtJob` after 3s. The job re-checks state inside a transaction (claim could have been resolved already) and only acts if still applicable. Do not rely on client-side timers for correctness: they are display-only.
 
 ---
 
@@ -294,6 +304,24 @@ after_update_commit -> {
 
 The board view subscribes to `game:CODE` only. The phone view subscribes to **both** `game:CODE` (so it sees the board state) **and** `player:ID`.
 
+### Actions answer 204, broadcasts update the screen
+
+Every POST from a phone or the board (SET!, card submit, No Set, agree, End game, ready, Start game, Play again) answers `204 No Content`. Turbo leaves the page alone, and the broadcast the action triggers updates every screen, including the one that acted.
+
+Do not redirect back to the same page. A redirect reloads it, which drops its stream subscriptions for about 500 ms, and any broadcast in that window is lost. Do not send per-player broadcasts for bookkeeping either (see `last_seen_at`): the `async` adapter can deliver two messages to the same stream out of order, and a stale one can win.
+
+### Hooks that must survive any markup change
+
+Turbo Streams replace these by id, so each stays the outermost element of its region:
+
+- Board: `#board` (holds the waiting state and `#start_button`), `#scoreboard`, `#announcement`, `#start_button`
+- Phone: `#controller_status` (wraps the header, the state body and the found-set banner)
+
+Stimulus attributes stay on whatever element plays the role:
+
+- `card-selection`: `card` targets with `data-card-id` and `click->card-selection#toggle`, plus `form`, `input`, `slot` and `count` targets
+- `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
+
 ### Why this works
 
 The server is the single source of truth. Every state change flows through model callbacks and emits HTML diffs to all subscribers. Clients have minimal logic — they apply patches and run small Stimulus controllers for input.
@@ -302,46 +330,51 @@ The server is the single source of truth. Every state change flows through model
 
 ## 8. Views & UX
 
-### Pages
+Colors, type and animations are in §10. Hook ids and Stimulus attributes that must survive markup changes are in §7.
 
-#### Landing (`/`)
+### Landing (`/`)
 
-Two big buttons: **Start a game** (POST `/games`) and **Join with code** (form posting to `/games/:code/players/join`).
+One page for phones and desktops, split at `md:`. Brand on the left: the **Onset** wordmark, a one-line tagline and three fanned cards that form a Set, with a caption saying why. Actions on the right:
 
-#### Board view (`/games/:code`)
+- **Start a game** and **Start quick game** buttons, each with a sub-line ("This screen becomes the board", "First to 5 points wins").
+- **Have a room code?** field plus **Join**. `GET /join?code=` upcases the code and redirects to the room's join page, or back with "Room not found".
 
-Full-screen, dark background, optimized for a TV at 6+ feet viewing distance.
+On phones the join form comes first, since joining is what phones come here for.
 
-Layout:
-- **Top left**: Room code in huge type, plus QR code image (uses `rqrcode` gem to render SVG at request time).
-- **Top right**: Scoreboard. Players listed with name, color dot, score. Active claim highlighted.
-- **Center**: 4×3 grid of cards (or 5×3 / 6×3 when board grows to 15/18). Cards are SVG, equal sizing, generous padding.
-- **Bottom**: Announcement strip. "Waiting for players…" / "Alex is calling SET! 4… 3…" / "No Set called by Alex — 12… 11…" / "Alex found a Set!" (animated)
+### Board (`/games/:code`)
 
-#### Phone landing (`/games/:code/players/join`)
+Full screen, built for a TV at 2m. Two columns: the play area (`#board` over `#announcement`) and a 26rem right rail with the room tile (small QR, room code, host) and the **Players** scoreboard.
 
-Mobile-first, portrait. Form with:
-- Name input (max 20 chars)
-- Color picker — 8 large swatch buttons, distinct enough from the card palette to avoid confusion.
-- "Join" button.
+- **Scoreboard**: rows sorted by score, dot, name, big score. The claiming player's row turns solid yellow. A locked-out player is greyed with a red **Locked** tag.
+- **Waiting**: a join hero with a 288px QR (the rail's small one doesn't scan from the couch), "Scan to join, or open HOST and enter" and the room code at 10rem. Player pills with a ✓ once ready. `#start_button`: **Start game** with "n of m ready" beside it, or disabled with "Need at least 2 players".
+- **Playing**: "N cards left in the deck" top right, or an orange "Deck is empty" pill. The card grid (§10). Cards dealt by the last replace get a green outline that fades over 3s.
+- **Announcement band**: always 9rem tall so the grid never jumps. Empty while playing: "Spot a Set? Hit SET! on your phone." Otherwise one tinted panel:
+  - Claiming (yellow): countdown ring, "Alex is calling SET!".
+  - No Set (purple): ring, "Alex called No Set", "Agree on your phone, or find one first", and "n/m agreed".
+  - Correct (green): the three cards, "Alex found a Set", "+1". Fades after 3s.
+  - Wrong / Time's up (red): the cards for a wrong claim, the reason with the 5-second lockout, "−1".
+- **Ended**: "Game over", then "Alex wins" or "It's a tie". Podium in 2-1-3 order; bars carry the real rank, so a tie reads #1 #1, and only a sole winner gets the ★. **Play again**.
 
-After submit: POST creates player, sets cookie, redirects to `/games/:code/controller`.
+### Phone join (`/games/:code/players/join`)
 
-#### Phone controller (`/games/:code/controller`)
+Portrait. "Joining room" with the code in large type, since the code is what people check. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. **Join** sits at the bottom, under the thumb. Field errors show under their field; base errors (game already started) in a red box.
 
-Three states the same view handles:
+### Phone controller (`/games/:code/controller`)
 
-1. **Idle** (no claim, no No-Set countdown): one giant **"SET!"** button filling most of the screen. Below it, a smaller **"No Set"** button. Player's score and color shown at top.
-2. **Claim active (mine)**: SET button replaced with the 12+ card grid (mirroring the board). Tap a card to highlight; tap again to deselect. Top of screen shows a 5-second countdown ring. After 3 cards selected, an auto-submit fires (or "Submit" button appears, depending on §11 decision — default: auto-submit on third tap with 250ms delay so the player can correct a misclick).
-3. **Claim active (someone else's)**: Big banner "Alex is calling SET!" with a countdown. Buttons disabled.
-4. **No-Set countdown**: Banner "No Set called by Alex — 12s". Big "I agree" button (joins the vote). SET button still available — tapping it cancels the No-Set call.
-5. **Locked out**: After a wrong claim, SET button greyed out for 5s with a countdown ring.
+Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. Portrait: header with dot, name and score. Landscape: three columns, read-only board on the left, a 9rem action column, a 5rem info column (dot, name, score).
 
-Use Stimulus for: card selection state, countdown ring rendering, button enable/disable.
+SET! sits in the same fixed slot across idle, locked out and someone else claiming, so the thumb never has to move.
 
-#### End screen
+1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more".
+2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted".
+3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait adds a tray of three slots that fill as cards are tapped. Tap a card to select, tap again to deselect, auto-submit per §11.
+4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
+5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed), then **I agree, no Set**, then "Spotted one after all?" and **SET!**, which cancels the call. After agreeing, or for the caller: "You agreed · waiting for n more".
+6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked".
+7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
+8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9" or "Tied for first"), "Play again from the big screen".
 
-When `status: :ended`: board view replaces the grid with a final scoreboard, top-3 podium, and a "Play again" button (host-only). Phones show "Game over — final score: X" and a "Ready for next game" toggle.
+Stimulus: `card-selection` (selection, tray, count, auto-submit) and `countdown` (every ring and seconds display).
 
 ---
 
@@ -351,7 +384,7 @@ For v1, **avoid a custom channel**. Turbo Streams over `broadcasts_to` covers al
 
 ---
 
-## 10. Card Rendering (SVG)
+## 10. Cards and visual system
 
 ### Palette
 
@@ -361,7 +394,7 @@ Colorblind-safe (IBM 3-color palette):
 - **Orange**: `#FE6100`
 - **Magenta**: `#DC267F`
 
-Background: near-white (`#FAFAFA`). Card border: subtle, `#E5E5E5`. Selected card on phone: blue glow ring (`box-shadow: 0 0 0 4px #648FFF`).
+Background: near-white (`#FAFAFA`). Card border: subtle, `#E5E5E5`. Selected card on phone: `ring-4 ring-blue-400 scale-95`.
 
 ### Component
 
@@ -375,16 +408,49 @@ Single ERB partial: `app/views/cards/_card.html.erb` taking a `card:` local. Ren
   - **Diamond**: rotated square (rhombus path).
 - Shading:
   - **Solid**: `fill=color`.
-  - **Outline**: `fill=none stroke=color stroke-width=4`.
-  - **Striped**: `fill="url(#stripes-#{color})"` where `<pattern>` is defined once per page using the card's color, drawing 3-4px diagonal lines.
+  - **Outline**: `fill=none stroke=color stroke-width=5`.
+  - **Striped**: `fill="url(#stripes-#{color})"`, a 40° hatch of 3.5px lines on a 7px pitch. Each SVG defines its own `<pattern>`.
 
-Cards on the **board** scale to fit the grid (CSS `width: 100%`, aspect ratio fixed). Cards on the **phone selection grid** are smaller but use the same SVG.
+The SVG fills its wrapper; wrappers set the size with a 5:7 aspect ratio. The partial is never restyled, only sized.
+
+- **Board grid**: 3 rows flowing into columns, centered, no horizontal scroll at 18 cards. Cards are `15rem` tall at 1080px and shrink with the viewport (`min(15rem, (100dvh - 22rem) / 3)`) so the third row never runs under the announcement band.
+- **Phone, portrait claim**: the grid fits the width (`auto-cols-fr`), about 84px wide with 12 cards.
+- **Phone, landscape**: the grid fills the height and scrolls sideways.
+
+### Visual system
+
+Dark UI where the cards are the only bright surfaces. Tailwind default palette plus these tokens in `app/assets/tailwind/application.css`:
+
+- `font-display`: Bricolage Grotesque (Google Fonts link in the layout). Only for display text: wordmark, room code, scores, SET!, headlines, countdown digits. Body copy stays on the default sans.
+- `animate-shake`: once, 0.4s. Locked-out phone panel.
+- `animate-arrive`: green outline that holds 1.5s and fades by 3s. Cards dealt by the last replace (`Game#last_dealt`).
+- `.found-set-flash`: holds 1.5s, fades by 3s. Correct-claim panels on the board and the phone.
+
+Surfaces: page `gray-950`, panels `gray-900`, borders `gray-700`/`gray-800`. Secondary text `gray-400`, muted `gray-500` (not `gray-600`, which fails contrast on `gray-950`).
+
+Each color means one thing everywhere:
+
+| Color | Meaning |
+|---|---|
+| blue-600 | SET! and primary actions |
+| violet-600 | quick game |
+| yellow-400 | a claim in progress (board panel, scoreboard row, phone claim bar) |
+| purple | No Set. It used to be red; red now only means wrong or locked |
+| red | wrong claim, timeout, lockout |
+| green | ready, correct, start, play again |
+| orange | deck empty and the End game vote (`orange-700` for white text; `orange-600` is only about 3.3:1) |
+
+Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberately apart from the card palette. They show as dots, the phone's top border strip and podium bars.
+
+Countdown rings: `r=45` in a 100 viewBox, gray track, colored progress with round caps, rotated -90° so they drain clockwise from the top. Seconds sit inside the ring, or inside the button the ring surrounds.
+
+QR codes: dark modules on a white tile. Inverted codes fail on some phone cameras.
 
 ---
 
 ## 11. Selection submission UX (decision)
 
-After the third tap on the phone, **auto-submit with a 250ms delay** so a player can deselect a misclick before commit. Show a subtle "Submitting…" pulse during the delay.
+After the third tap on the phone, **auto-submit with a 250ms delay** so a player can deselect a misclick before commit. The card grid dims to 50% during the delay. Each tap also copies the card into the portrait tray's next free slot and updates the n/3 count.
 
 ---
 
