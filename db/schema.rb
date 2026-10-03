@@ -10,55 +10,56 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_11_162135) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_03_195225) do
   create_table "claims", force: :cascade do |t|
-    t.json "card_ids"
-    t.datetime "created_at", null: false
     t.integer "game_id", null: false
     t.integer "player_id", null: false
-    t.datetime "resolved_at"
+    t.json "card_ids"
     t.integer "result", default: 0, null: false
     t.datetime "started_at", null: false
+    t.datetime "resolved_at"
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["game_id"], name: "index_claims_on_game_id"
     t.index ["player_id"], name: "index_claims_on_player_id"
   end
 
   create_table "games", force: :cascade do |t|
-    t.json "board", default: []
-    t.bigint "claim_player_id"
-    t.datetime "claim_started_at"
     t.string "code", limit: 6, null: false
-    t.datetime "created_at", null: false
-    t.json "deck", default: []
-    t.json "discard", default: []
-    t.json "end_game_voters", default: []
-    t.datetime "ended_at"
-    t.bigint "flash_claim_id"
     t.bigint "host_player_id"
     t.datetime "last_activity_at"
-    t.integer "mode", default: 0, null: false
+    t.datetime "ended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
+    t.json "deck", default: []
+    t.json "board", default: []
+    t.json "discard", default: []
+    t.bigint "claim_player_id"
+    t.datetime "claim_started_at"
     t.integer "no_set_caller_id"
     t.datetime "no_set_started_at"
     t.json "no_set_voters", default: []
+    t.bigint "flash_claim_id"
+    t.json "end_game_voters", default: []
     t.json "start_voters", default: []
-    t.integer "status", default: 0, null: false
-    t.datetime "updated_at", null: false
+    t.integer "mode", default: 0, null: false
+    t.json "last_dealt", default: []
     t.index ["code"], name: "index_games_on_code", unique: true
   end
 
   create_table "players", force: :cascade do |t|
-    t.string "color", null: false
-    t.datetime "created_at", null: false
     t.integer "game_id", null: false
+    t.bigint "user_id"
+    t.string "session_token", null: false
+    t.string "name", null: false
+    t.string "color", null: false
     t.datetime "last_seen_at"
     t.datetime "left_at"
-    t.datetime "locked_until"
-    t.string "name", null: false
-    t.integer "score", default: 0, null: false
-    t.string "session_token", null: false
+    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id"
+    t.integer "score", default: 0, null: false
+    t.datetime "locked_until"
     t.index ["game_id"], name: "index_players_on_game_id"
     t.index ["session_token"], name: "index_players_on_session_token", unique: true
   end

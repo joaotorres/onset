@@ -38,6 +38,17 @@ RSpec.describe Claim do
       expect(game.reload.board.size).to eq(12)
     end
 
+    it "records the replacement cards as just dealt" do
+      claim.submit!(find_set_on_board)
+      expect(game.reload.last_dealt).to eq([12, 13, 14])
+    end
+
+    it "deals nothing new when the board had more than 12 cards" do
+      game.update!(board: (0..14).to_a, deck: (15..80).to_a)
+      claim.submit!(find_set_on_board)
+      expect(game.reload.last_dealt).to eq([])
+    end
+
     it "moves submitted cards to discard" do
       ids = find_set_on_board
       claim.submit!(ids)

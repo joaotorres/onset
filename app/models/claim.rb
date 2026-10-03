@@ -58,9 +58,11 @@ class Claim < ApplicationRecord
       claim_player_id: nil,
       claim_started_at: nil,
       flash_claim_id: id,
+      last_dealt: drawn,
       status: (game_ended || quick_ended) ? :ended : :playing
     )
     ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
+    ClearLastDealtJob.set(wait: 3.seconds).perform_later(game, drawn) if drawn.any?
   end
 
   def resolve_wrong!(submitted_ids)

@@ -64,7 +64,7 @@
     <% end %>
     <div class="my-auto grid grid-rows-3 grid-flow-col auto-cols-max justify-center gap-6">
       <% game.board_cards.each do |card| %>
-        <div class="h-60 aspect-[5/7]"><%= render "cards/card", card: card %></div>
+        <div class="h-60 aspect-[5/7] <%= "rounded-xl outline-4 outline-offset-4 outline-green-400 animate-arrive" if game.just_dealt?(card.id) %>"><%= render "cards/card", card: card %></div>
       <% end %>
     </div>
   </div>

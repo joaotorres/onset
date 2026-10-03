@@ -22,7 +22,7 @@ class Game < ApplicationRecord
 
   def start!
     shuffled = (0..80).to_a.shuffle
-    update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [], start_voters: [])
+    update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [], start_voters: [], last_dealt: [])
   end
 
   def restart!
@@ -40,7 +40,8 @@ class Game < ApplicationRecord
         no_set_started_at: nil,
         no_set_voters: [],
         end_game_voters: [],
-        start_voters: []
+        start_voters: [],
+        last_dealt: []
       )
     end
   end
@@ -176,8 +177,14 @@ class Game < ApplicationRecord
       no_set_caller_id: nil,
       no_set_started_at: nil,
       no_set_voters: [],
+      last_dealt: drawn,
       status: game_ended ? :ended : :playing
     )
+    ClearLastDealtJob.set(wait: 3.seconds).perform_later(self, drawn) if drawn.any?
+  end
+
+  def just_dealt?(card_id)
+    last_dealt.include?(card_id)
   end
 
   private

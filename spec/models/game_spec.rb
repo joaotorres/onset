@@ -246,6 +246,12 @@ RSpec.describe Game do
       expect(game.no_set_active?).to be false
     end
 
+    it "records the added cards as just dealt" do
+      dealt = game.deck.first(3)
+      game.resolve_no_set!
+      expect(game.reload.last_dealt).to eq(dealt)
+    end
+
     it "caps board at 18 cards" do
       game.update!(board: (0..17).to_a, deck: (18..80).to_a)
       game.resolve_no_set!
