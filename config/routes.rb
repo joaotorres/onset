@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root "lobbies#new"
+  get "join" => "lobbies#join", :as => :join_by_code
 
   resources :games, only: [:create, :show], param: :code do
     member do
