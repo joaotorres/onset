@@ -1,36 +1,24 @@
-<% join_url = join_game_players_url(@game.code) %>
-<% qr_svg = RQRCode::QRCode.new(join_url).as_svg(
-     offset: 0, color: "030712", shape_rendering: "crispEdges",
-     module_size: 4, standalone: true, use_path: true,
-     viewbox: true, svg_attributes: {class: "w-full h-full"}
-   ) %>
+<%= turbo_stream_from "game:#{@game.code}" %>
 
-<div class="min-h-screen bg-gray-950 text-white p-6">
-  <div class="max-w-5xl mx-auto">
-    <%= turbo_stream_from "game:#{@game.code}" %>
+<main class="h-dvh overflow-hidden bg-gray-950 text-white p-10 grid grid-cols-[minmax(0,1fr)_26rem] gap-10">
+  <div class="min-h-0 flex flex-col gap-6">
+    <%= render "board", game: @game %>
+    <%= render "start_button", game: @game %>
+    <%= render "announcement", game: @game, flash_claim: @game.flash_claim %>
+  </div>
 
-    <div class="flex justify-between items-start mb-8">
-      <div class="flex items-start gap-6">
-        <div>
-          <p class="text-gray-400 text-sm uppercase tracking-widest mb-1">Room</p>
-          <p class="text-5xl font-bold tracking-widest"><%= @game.code %></p>
-          <p class="text-gray-500 text-xs mt-2 max-w-32 break-all"><%= join_url %></p>
-        </div>
-        <div class="w-28 h-28 bg-white rounded-xl p-2 flex-shrink-0">
-          <%= qr_svg.html_safe %>
-        </div>
+  <aside class="min-h-0 flex flex-col gap-8">
+    <div class="flex items-center gap-5 rounded-3xl bg-gray-900 p-5">
+      <div class="shrink-0 rounded-xl bg-white p-2"><%= join_qr_svg(@game, "size-28") %></div>
+      <div class="min-w-0">
+        <p class="text-lg uppercase tracking-widest text-gray-400">Room</p>
+        <p class="font-display text-5xl font-bold leading-none tracking-wider"><%= @game.code %></p>
+        <p class="mt-2 truncate text-lg text-gray-400"><%= join_host %></p>
       </div>
-
+    </div>
+    <div class="min-h-0">
+      <p class="mb-3 px-5 text-lg uppercase tracking-widest text-gray-400">Players</p>
       <%= render "scoreboard", game: @game %>
     </div>
-
-    <%= render "board", game: @game %>
-
-    <div class="mt-6">
-      <%= render "start_button", game: @game %>
-
-      <%= render "announcement", game: @game, flash_claim: @game.flash_claim %>
-    </div>
-
-  </div>
-</div>
+  </aside>
+</main>
