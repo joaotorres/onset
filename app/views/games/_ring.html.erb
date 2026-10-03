@@ -1,0 +1,11 @@
+<%# Board countdown ring, size-24 with the seconds inside. Same geometry as the phone rings. %>
+<div class="relative size-24 shrink-0"
+     data-controller="countdown"
+     data-countdown-started-at-value="<%= started_at.iso8601 %>"
+     data-countdown-duration-value="<%= duration %>">
+  <svg viewBox="0 0 100 100" class="size-full -rotate-90" aria-hidden="true">
+    <circle cx="50" cy="50" r="45" fill="none" stroke-width="8" class="stroke-gray-700"></circle>
+    <circle data-countdown-target="ring" cx="50" cy="50" r="45" fill="none" stroke-width="8" stroke-linecap="round" stroke-dasharray="282.74" class="<%= stroke %>"></circle>
+  </svg>
+  <span data-countdown-target="display" class="absolute inset-0 grid place-items-center font-display text-4xl font-bold tabular-nums <%= digits %>"><%= duration %></span>
+</div>
