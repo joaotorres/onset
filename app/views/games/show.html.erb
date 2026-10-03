@@ -3,7 +3,6 @@
 <main class="h-dvh overflow-hidden bg-gray-950 text-white p-10 grid grid-cols-[minmax(0,1fr)_26rem] gap-10">
   <div class="min-h-0 flex flex-col gap-6">
     <%= render "board", game: @game %>
-    <%= render "start_button", game: @game %>
     <%= render "announcement", game: @game, flash_claim: @game.flash_claim %>
   </div>
 

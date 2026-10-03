@@ -42,6 +42,10 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = {host: "localhost", port: 3000}
 
+  # Host for URLs rendered outside a request (Turbo broadcasts, e.g. the board QR).
+  # Set APP_HOST to your LAN address (192.168.1.20:3000) to join from a phone.
+  routes.default_url_options = {host: ENV.fetch("APP_HOST", "localhost:3000")}
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 

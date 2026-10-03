@@ -1,28 +1,27 @@
 <% if game.waiting? %>
-  <div id="board" class="py-8 max-w-sm mx-auto">
-    <h2 class="text-center text-2xl font-bold text-white mb-6">Waiting for players…</h2>
+  <div id="board" class="flex-1 min-h-0 flex flex-col justify-center gap-12">
+    <div class="flex items-center gap-14">
+      <div class="shrink-0 rounded-3xl bg-white p-6"><%= join_qr_svg(game, "size-72") %></div>
+      <div class="min-w-0">
+        <p class="text-3xl text-gray-300">Scan to join, or open <span class="font-semibold text-white"><%= join_host %></span> and enter</p>
+        <p class="mt-3 font-display text-[10rem] font-bold leading-none tracking-[0.12em]"><%= game.code %></p>
+      </div>
+    </div>
 
     <% if game.players.any? %>
-      <ul class="space-y-3 mb-8">
+      <ul class="flex flex-wrap gap-4">
         <% game.players.each do |p| %>
-          <li class="flex items-center gap-3 px-4 py-3 bg-gray-800 rounded-xl">
-            <span class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: <%= p.color %>;"></span>
-            <span class="text-white font-medium"><%= p.name %></span>
-            <% if game.start_voters.include?(p.id) %>
-              <span class="ml-auto text-green-400 text-sm font-semibold">Ready ✓</span>
-            <% end %>
+          <% ready = game.start_voters.include?(p.id) %>
+          <li class="flex items-center gap-3 rounded-2xl bg-gray-900 px-6 py-4 text-3xl font-semibold <%= "text-gray-400" unless ready %>">
+            <span class="size-5 rounded-full" style="background-color: <%= p.color %>;"></span>
+            <%= p.name %>
+            <% if ready %><span class="text-2xl text-green-400">✓</span><% end %>
           </li>
         <% end %>
       </ul>
-    <% else %>
-      <p class="text-gray-500 italic text-center mb-8">No players yet — scan the QR to join</p>
     <% end %>
 
-    <% if game.players.any? %>
-      <p class="text-center text-gray-400 text-sm">
-        <%= game.start_voters.size %>/<%= game.players.count %> players ready
-      </p>
-    <% end %>
+    <%= render "games/start_button", game: game %>
   </div>
 
 <% elsif game.ended? %>
@@ -71,33 +70,15 @@
           class: "block mx-auto px-10 py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
   </div>
 <% else %>
-  <div id="board">
+  <div id="board" class="flex-1 min-h-0 flex flex-col gap-4">
     <% if game.deck.empty? %>
-      <p class="text-center text-orange-400 font-semibold mb-4">Deck is empty — play out the remaining cards</p>
+      <p class="text-right"><span class="inline-block rounded-full bg-orange-500/15 px-5 py-1.5 text-xl font-semibold text-orange-400 ring-1 ring-inset ring-orange-500/40">Deck is empty · play out the remaining cards</span></p>
+    <% else %>
+      <p class="text-right text-xl text-gray-400"><span class="font-display text-3xl font-bold text-white tabular-nums"><%= game.deck.size %></span> cards left in the deck</p>
     <% end %>
-    <div class="flex items-start gap-3">
-      <div class="overflow-x-auto">
-        <div class="grid grid-flow-col gap-3"
-             style="grid-template-rows: repeat(3, 11rem); grid-auto-columns: calc(11rem * 5 / 7)">
-          <% cards = game.board.present? ? game.board_cards : Card.deck.first(12) %>
-          <% cards.each do |card| %>
-            <div>
-              <%= render "cards/card", card: card %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-
-      <% fc = game.flash_claim %>
-      <% if fc&.correct? && fc.card_ids.present? %>
-        <div class="found-set-flash flex-shrink-0 flex flex-col gap-2 items-center pl-2 border-l border-green-600/40">
-          <p class="text-green-400 text-xs font-bold text-center truncate max-w-[10rem]"><%= fc.player.name %></p>
-          <% fc.card_ids.map { |cid| Card.new(cid) }.each do |card| %>
-            <div style="width: calc(13rem * 5 / 7); height: 13rem;">
-              <%= render "cards/card", card: card %>
-            </div>
-          <% end %>
-        </div>
+    <div class="my-auto grid grid-rows-3 grid-flow-col auto-cols-max justify-center gap-6">
+      <% game.board_cards.each do |card| %>
+        <div class="h-60 aspect-[5/7]"><%= render "cards/card", card: card %></div>
       <% end %>
     </div>
   </div>

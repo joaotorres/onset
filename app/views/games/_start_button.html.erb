@@ -1,12 +1,14 @@
-<div id="start_button">
+<div id="start_button" class="flex items-center gap-8">
   <% if game.waiting? %>
-    <% if game.players.count >= 2 %>
+    <% total = game.players.count %>
+    <% if total >= 2 %>
       <%= button_to "Start game", start_game_path(game.code), method: :post,
-            class: "w-full py-3 bg-green-600 hover:bg-green-500 text-white text-lg font-semibold rounded-xl transition-colors" %>
+            form_class: "contents",
+            class: "h-24 rounded-3xl bg-green-600 hover:bg-green-500 active:scale-95 transition px-16 font-display text-4xl font-bold" %>
+      <p class="text-3xl text-gray-400"><span class="font-display font-bold text-white"><%= game.start_voters.size %></span> of <%= total %> ready</p>
     <% else %>
-      <button disabled class="w-full py-3 bg-gray-700 text-gray-500 text-lg font-semibold rounded-xl cursor-not-allowed">
-        Need at least 2 players
-      </button>
+      <button type="button" disabled class="h-24 cursor-not-allowed rounded-3xl bg-gray-800 px-16 font-display text-4xl font-bold text-gray-500">Start game</button>
+      <p class="text-3xl text-gray-400">Need at least 2 players</p>
     <% end %>
   <% end %>
 </div>
