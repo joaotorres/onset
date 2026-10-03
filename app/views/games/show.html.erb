@@ -1,6 +1,6 @@
 <% join_url = join_game_players_url(@game.code) %>
 <% qr_svg = RQRCode::QRCode.new(join_url).as_svg(
-     offset: 0, color: "fff", shape_rendering: "crispEdges",
+     offset: 0, color: "030712", shape_rendering: "crispEdges",
      module_size: 4, standalone: true, use_path: true,
      viewbox: true, svg_attributes: {class: "w-full h-full"}
    ) %>
@@ -16,7 +16,7 @@
           <p class="text-5xl font-bold tracking-widest"><%= @game.code %></p>
           <p class="text-gray-500 text-xs mt-2 max-w-32 break-all"><%= join_url %></p>
         </div>
-        <div class="w-28 h-28 bg-gray-800 rounded-xl p-1 flex-shrink-0">
+        <div class="w-28 h-28 bg-white rounded-xl p-2 flex-shrink-0">
           <%= qr_svg.html_safe %>
         </div>
       </div>

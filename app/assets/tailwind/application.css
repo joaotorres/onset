@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-shake: shake 0.4s ease-in-out 1;
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  --animate-arrive: arrive 3s ease-out forwards;
+  @keyframes arrive {
+    0%, 50% { outline-color: var(--color-green-400); }
+    100% { outline-color: transparent; }
+  }
+}
+
 @keyframes found-set-fade-out {
   0%, 50% { opacity: 1; }
   100% { opacity: 0; }

@@ -348,7 +348,7 @@
         <% else %>
           <%= button_to "End Game", game_end_game_path(game.code), method: :post,
                 data: {"turbo-submits-with": "…"},
-                class: "player-idle-noset-btn w-40 py-3 rounded-2xl bg-orange-600 hover:bg-orange-500 active:scale-95 text-white font-semibold transition-all shadow" %>
+                class: "player-idle-noset-btn w-40 py-3 rounded-2xl bg-orange-700 hover:bg-orange-600 active:scale-95 text-white font-semibold transition-all shadow" %>
           <% if game.end_game_voters.any? %>
             <p class="text-gray-500 text-xs"><%= game.end_game_voters.size %>/<%= active_count %> voted</p>
           <% end %>
