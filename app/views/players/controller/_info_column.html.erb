@@ -1,0 +1,7 @@
+<%# Landscape-only right column. %>
+<div class="portrait:hidden w-20 shrink-0 flex flex-col items-center justify-center gap-1 text-center">
+  <span class="size-4 rounded-full" style="background-color: <%= player.color %>;"></span>
+  <span class="max-w-full truncate text-sm font-semibold"><%= player.name %></span>
+  <p class="mt-2 text-xs uppercase tracking-widest text-gray-400">Score</p>
+  <p class="font-display text-4xl font-bold leading-none tabular-nums <%= local_assigns[:score_class] %>"><%= player.score %></p>
+</div>

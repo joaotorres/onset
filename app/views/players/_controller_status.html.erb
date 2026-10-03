@@ -1,380 +1,237 @@
 <%
   game = local_assigns[:game] || player.game
   flash_claim = local_assigns[:flash_claim]
-  my_claim = game.claim_player_id == player.id ? game.claims.find_by(player: player, result: :pending) : nil
-  state_class = if my_claim
-    "player-claiming"
-  elsif game.no_set_active?
-    "player-no-set"
-  elsif game.claim_active?
-    "player-claim-active"
-  elsif game.playing?
-    "player-idle"
-  end
+  my_claim = (game.claim_player_id == player.id) ? game.claims.find_by(player: player, result: :pending) : nil
+  locked = player.locked?
+  set_round = "portrait:size-64 portrait:rounded-full landscape:size-full landscape:rounded-3xl"
 %>
-<div id="controller_status" class="flex-1 flex flex-col<%= " #{state_class}" if state_class %>">
+<div id="controller_status" class="flex-1 min-h-0 flex flex-col">
   <% if flash_claim&.correct? && flash_claim.card_ids.present? %>
-    <div class="found-set-flash fixed top-0 left-0 right-0 z-50 bg-gray-900/95 border-b border-green-600/40 py-2 px-4 flex items-center justify-center gap-3">
-      <% flash_claim.card_ids.map { |cid| Card.new(cid) }.each do |card| %>
-        <div style="width: calc(4.5rem * 5 / 7); height: 4.5rem;">
-          <%= render "cards/card", card: card %>
-        </div>
-      <% end %>
-      <p class="text-green-400 text-sm font-bold ml-2"><%= flash_claim.player.name %> +1</p>
+    <div class="found-set-flash fixed inset-x-0 top-0 z-10 flex items-center gap-4 border-b-2 border-green-500 bg-gray-900/95 px-4 py-3">
+      <div class="flex shrink-0 gap-2">
+        <% flash_claim.card_ids.map { |cid| Card.new(cid) }.each do |card| %>
+          <div class="h-20 aspect-[5/7]"><%= render "cards/card", card: card %></div>
+        <% end %>
+      </div>
+      <div class="min-w-0">
+        <p class="flex items-center gap-2 truncate text-xl font-bold"><span class="size-3 shrink-0 rounded-full" style="background-color: <%= flash_claim.player.color %>;"></span><%= flash_claim.player.name %></p>
+        <p class="text-sm text-gray-400">found a Set</p>
+      </div>
+      <p class="ml-auto font-display text-4xl font-extrabold text-green-400">+1</p>
     </div>
   <% end %>
 
-  <div class="player-status-header flex items-center justify-between mb-6">
-    <div class="flex items-center gap-3">
-      <span class="w-4 h-4 rounded-full inline-block" style="background-color: <%= player.color %>;"></span>
-      <span class="font-semibold text-lg"><%= player.name %></span>
-    </div>
-    <div class="text-right">
-      <p class="text-gray-400 text-xs uppercase tracking-widest">Score</p>
-      <p class="text-2xl font-bold"><%= player.score %></p>
-    </div>
-  </div>
+  <%= render "players/controller/header", player: player, score_class: (game.playing? && locked && !my_claim && !game.claim_active? && !game.no_set_active?) ? "text-red-400" : nil %>
 
   <% if game.waiting? %>
-    <%# Waiting lobby: player list + vote-to-start %>
-    <div class="flex-1 flex flex-col px-2">
-      <h2 class="text-center text-xl font-bold text-white mb-4">Waiting for players…</h2>
-
-      <ul class="space-y-2 mb-6">
-        <% game.players.each do |p| %>
-          <li class="flex items-center gap-3 px-3 py-2 bg-gray-800 rounded-xl">
-            <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: <%= p.color %>;"></span>
-            <span class="text-white font-medium text-sm"><%= p.name %></span>
-            <% if game.start_voters.include?(p.id) %>
-              <span class="ml-auto text-green-400 text-xs font-semibold">Ready ✓</span>
-            <% end %>
-          </li>
+    <% total = game.players.count %>
+    <% voted = game.start_voters.size %>
+    <% status_box = "grid h-16 w-full place-items-center rounded-2xl border-2 px-3 text-center font-semibold landscape:h-full" %>
+    <div class="flex-1 min-h-0 flex portrait:flex-col landscape:gap-4">
+      <div class="flex-1 min-h-0 flex flex-col justify-center landscape:min-w-0">
+        <h2 class="font-display text-4xl font-bold landscape:text-2xl">You're in</h2>
+        <p class="mt-1 text-gray-400">Waiting for players…</p>
+        <ul class="mt-6 grid grid-cols-2 gap-2 landscape:mt-4">
+          <% game.players.each do |p| %>
+            <% ready = game.start_voters.include?(p.id) %>
+            <li class="flex items-center gap-2 rounded-xl bg-gray-900 px-3 py-3">
+              <span class="size-3 shrink-0 rounded-full" style="background-color: <%= p.color %>;"></span>
+              <span class="truncate font-medium"><%= p.name %></span>
+              <% if p.id == player.id %><span class="ml-auto text-sm text-gray-500">you</span><% end %>
+              <% if ready %><span class="<%= "ml-auto" unless p.id == player.id %> text-green-400">✓</span><% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <div class="flex portrait:mt-6 landscape:w-36 landscape:shrink-0">
+        <% if total < 2 %>
+          <p class="<%= status_box %> border-gray-700 text-gray-400">Waiting for more players to join…</p>
+        <% elsif game.start_voters.include?(player.id) %>
+          <p class="<%= status_box %> border-green-600 text-green-400">Ready ✓ · waiting for <%= total - voted %> more</p>
+        <% else %>
+          <%= button_to "I'm ready", ready_game_path(game.code), method: :post,
+                form_class: "contents", data: {turbo_submits_with: "…"},
+                class: "h-16 w-full rounded-2xl bg-green-600 hover:bg-green-500 active:scale-95 transition font-display text-2xl font-bold shadow-xl landscape:h-full" %>
         <% end %>
-      </ul>
-
-      <% already_voted = game.start_voters.include?(player.id) %>
-      <% total = game.players.count %>
-      <% voted = game.start_voters.size %>
-      <% if total < 2 %>
-        <p class="text-center text-gray-500 text-sm">Waiting for more players to join…</p>
-      <% elsif already_voted %>
-        <p class="text-center text-green-400 font-semibold mb-3">You're ready!</p>
-        <p class="text-center text-gray-400 text-sm">Waiting for others… (<%= voted %>/<%= total %>)</p>
-      <% else %>
-        <%= button_to "Start Game", ready_game_path(game.code), method: :post,
-              data: {"turbo-submits-with": "…"},
-              class: "w-full py-4 rounded-2xl bg-green-600 hover:bg-green-500 active:scale-95 text-white font-bold text-xl transition-all shadow-xl mb-2" %>
-        <% if voted > 0 %>
-          <p class="text-center text-gray-400 text-sm"><%= voted %>/<%= total %> ready</p>
-        <% end %>
-      <% end %>
+      </div>
+      <%= render "players/controller/info_column", player: player %>
     </div>
 
   <% elsif game.ended? %>
-    <%# Game over state %>
-    <div class="flex-1 flex items-center justify-center">
-      <div class="text-center">
-        <p class="text-3xl font-bold text-white mb-2">Game Over</p>
-        <p class="text-gray-400 text-lg">Final score:</p>
-        <p class="text-5xl font-bold text-white mt-1"><%= player.score %></p>
-      </div>
+    <% rank = game.rank_of(player) %>
+    <% winner = game.winner %>
+    <div class="flex-1 flex flex-col items-center justify-center text-center">
+      <p class="text-sm uppercase tracking-[0.3em] text-gray-400">Game over</p>
+      <p class="mt-6 font-display text-8xl font-extrabold leading-none landscape:mt-3 landscape:text-6xl"><%= rank.ordinalize %></p>
+      <p class="mt-2 text-xl text-gray-300">of <%= game.players.size %> players · <%= pluralize(player.score, "point") %></p>
+      <% if winner %>
+        <p class="mt-10 flex items-center gap-2 text-lg landscape:mt-5"><span class="text-yellow-400">★</span><span class="size-3 rounded-full" style="background-color: <%= winner.color %>;"></span><%= winner == player ? "You win" : "#{winner.name} wins" %> with <%= winner.score %></p>
+      <% else %>
+        <p class="mt-10 text-lg landscape:mt-5"><span class="text-yellow-400">★</span> Tied for first at <%= game.standings.first&.score %></p>
+      <% end %>
+      <p class="mt-8 text-sm text-gray-500 landscape:mt-4">Play again from the big screen</p>
     </div>
 
   <% elsif my_claim %>
-    <%# State 2: claim active — mine. Show card grid with countdown ring. %>
+    <%# Claiming (mine): pick 3 cards. %>
+    <div data-controller="card-selection" class="flex-1 min-h-0 flex portrait:flex-col portrait:gap-4 landscape:gap-3">
+      <div class="landscape:hidden flex items-center gap-4 rounded-2xl bg-yellow-400 px-4 py-3 text-gray-950"
+           data-controller="countdown"
+           data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
+           data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
+        <%= render "players/controller/small_ring", size: "size-14", track: "stroke-yellow-600", stroke: "stroke-gray-950", digits: "text-2xl", duration: Game::CLAIM_TIMEOUT %>
+        <div class="min-w-0 flex-1">
+          <p class="font-display text-2xl font-bold leading-tight">Your SET!</p>
+          <p class="text-sm font-medium">Tap 3 cards</p>
+        </div>
+        <p class="font-display text-3xl font-bold tabular-nums"><span data-card-selection-target="count">0</span><span class="opacity-50">/3</span></p>
+      </div>
 
-    <%# Portrait-only countdown bar (hidden in landscape via CSS) %>
-    <div class="player-claim-portrait-bar flex items-center gap-3 mb-3"
-         data-controller="countdown"
-         data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
-         data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
-      <svg class="w-8 h-8 flex-shrink-0 -rotate-90" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
-        <circle cx="50" cy="50" r="45" fill="none" stroke="#FBBF24" stroke-width="8"
-                stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
-                stroke-linecap="round"
-                data-countdown-target="ring"/>
-      </svg>
-      <span class="text-xl font-bold text-yellow-400" data-countdown-target="display"><%= Game::CLAIM_TIMEOUT %></span>
-      <span class="text-gray-400 text-sm">s</span>
-      <p class="text-yellow-400 font-semibold text-sm ml-1">Pick 3 cards — tap to select</p>
-    </div>
+      <div class="landscape:hidden grid grid-cols-3 gap-3 px-4">
+        <% 3.times do |i| %>
+          <div data-card-selection-target="slot" class="aspect-[5/7] grid place-items-center rounded-xl border-2 border-dashed border-gray-700 font-display text-3xl font-bold text-gray-600"><%= i + 1 %></div>
+        <% end %>
+      </div>
 
-    <%# In landscape: flex-row with card grid on left and info panel on right %>
-    <div class="player-claim-content">
       <%= form_with url: game_claim_path(game.code, my_claim.id), method: :patch,
-            data: {controller: "card-selection", "card-selection-target": "form"} do |f| %>
-        <%= f.hidden_field :card_ids, value: "[]",
-              data: {"card-selection-target": "input"} %>
-
-        <div class="player-card-overflow overflow-x-auto -mx-4 px-4">
-          <div class="player-card-grid grid grid-flow-col gap-2">
-            <% game.board_cards.each do |card| %>
-              <div class="cursor-pointer rounded-xl transition-all"
-                   data-card-selection-target="card"
-                   data-card-id="<%= card.id %>"
-                   data-action="click->card-selection#toggle">
-                <%= render "cards/card", card: card %>
-              </div>
-            <% end %>
-          </div>
+            class: "min-w-0 portrait:mt-auto landscape:flex-1 landscape:min-h-0 landscape:overflow-x-auto transition-opacity",
+            data: {"card-selection-target": "form"} do |f| %>
+        <%= f.hidden_field :card_ids, value: "[]", data: {"card-selection-target": "input"} %>
+        <div class="grid grid-rows-3 grid-flow-col gap-2 portrait:auto-cols-fr landscape:h-full landscape:auto-cols-max">
+          <% game.board_cards.each do |card| %>
+            <button type="button"
+                    class="aspect-[5/7] rounded-xl transition portrait:w-full landscape:h-full"
+                    aria-pressed="false"
+                    data-card-selection-target="card"
+                    data-card-id="<%= card.id %>"
+                    data-action="click->card-selection#toggle">
+              <%= render "cards/card", card: card %>
+            </button>
+          <% end %>
         </div>
       <% end %>
 
-      <%# Landscape-only middle panel: action buttons %>
-      <div class="player-claim-button-panel">
-        <%= button_to "SET!", game_claims_path(game.code), method: :post,
-              disabled: true,
-              class: "player-claim-set-btn w-full py-3 rounded-2xl bg-gray-700 cursor-not-allowed opacity-50 text-white font-bold tracking-widest transition-all duration-300 shadow" %>
-        <%= button_to "No Set", game_no_set_path(game.code), method: :post,
-              disabled: true,
-              class: "player-claim-noset-btn w-full py-2 rounded-2xl bg-gray-700 cursor-not-allowed opacity-50 text-gray-300 font-semibold transition-all shadow" %>
+      <div class="portrait:hidden w-36 shrink-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-yellow-400 p-3 text-center text-gray-950"
+           data-controller="countdown"
+           data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
+           data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
+        <%= render "players/controller/small_ring", size: "size-16", track: "stroke-yellow-600", stroke: "stroke-gray-950", digits: "text-2xl", duration: Game::CLAIM_TIMEOUT %>
+        <p class="font-display text-xl font-bold leading-tight">Your SET!</p>
+        <p class="text-sm font-medium">Tap 3 cards</p>
+        <p class="font-display text-2xl font-bold tabular-nums"><span data-card-selection-target="count">0</span><span class="opacity-50">/3</span></p>
       </div>
 
-      <%# Landscape-only right panel: player info + countdown %>
-      <div class="player-claim-side-panel">
-        <div class="flex items-center gap-1.5 max-w-full">
-          <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: <%= player.color %>;"></span>
-          <span class="font-semibold text-sm truncate"><%= player.name %></span>
-        </div>
-        <div class="text-center">
-          <p class="text-gray-400 text-xs uppercase tracking-wide">Score</p>
-          <p class="text-2xl font-bold"><%= player.score %></p>
-        </div>
-        <div class="flex flex-col items-center gap-1"
-             data-controller="countdown"
-             data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
-             data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
-          <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
-            <circle cx="50" cy="50" r="45" fill="none" stroke="#FBBF24" stroke-width="8"
-                    stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
-                    stroke-linecap="round"
-                    data-countdown-target="ring"/>
-          </svg>
-          <span class="text-xl font-bold text-yellow-400" data-countdown-target="display"><%= Game::CLAIM_TIMEOUT %></span>
-        </div>
-        <p class="text-yellow-400 text-xs text-center font-semibold">Pick 3<br>cards</p>
-      </div>
+      <%= render "players/controller/info_column", player: player %>
     </div>
 
   <% elsif game.claim_active? %>
-    <%# State 3: claim active — someone else's %>
-
-    <%# Landscape-only: read-only board cards (left column) %>
-    <div class="player-idle-board">
-      <div class="player-card-grid grid grid-flow-col gap-2">
-        <% game.board_cards.each do |card| %>
-          <div><%= render "cards/card", card: card %></div>
-        <% end %>
+    <%# Someone else is claiming. %>
+    <div class="flex-1 min-h-0 flex portrait:flex-col portrait:items-center portrait:justify-center landscape:gap-3">
+      <%= render "players/controller/board_strip", game: game %>
+      <div class="flex flex-col items-center justify-center gap-5 text-center landscape:w-36 landscape:shrink-0 landscape:gap-2 landscape:py-2">
+        <div>
+          <p class="flex items-center justify-center gap-2 font-display text-4xl font-bold landscape:text-xl"><span class="size-4 shrink-0 rounded-full" style="background-color: <%= game.claiming_player.color %>;"></span><%= game.claiming_player.name %></p>
+          <p class="mt-1 text-lg text-yellow-400 landscape:text-xs">is calling SET!</p>
+        </div>
+        <div class="relative grid place-items-center portrait:size-76 landscape:w-full landscape:flex-1"
+             data-controller="countdown"
+             data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
+             data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
+          <%= render "players/controller/button_ring", stroke: "stroke-yellow-400" %>
+          <button type="button" disabled class="flex flex-col items-center justify-center cursor-not-allowed bg-gray-900 text-gray-500 <%= set_round %>">
+            <span class="font-display text-5xl font-extrabold tracking-widest landscape:text-2xl">SET!</span>
+            <span class="mt-2 text-sm text-yellow-400"><span data-countdown-target="display" class="tabular-nums"><%= Game::CLAIM_TIMEOUT %></span> s</span>
+          </button>
+        </div>
+        <%= render "players/controller/secondary_action", game: game, player: player, disabled: true %>
       </div>
-    </div>
-
-    <%# Middle: portrait=centered message, landscape=disabled SET! column %>
-    <div class="player-claim-active-actions flex-1 flex flex-col items-center justify-center gap-6">
-      <%# Portrait-only: who's claiming + countdown %>
-      <div class="player-claim-active-portrait-info text-center"
-           data-controller="countdown"
-           data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
-           data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
-        <p class="text-2xl font-bold text-yellow-400 mb-2"><%= game.claiming_player.name %> is calling SET!</p>
-        <p class="text-gray-400 text-xl"><span data-countdown-target="display"><%= Game::CLAIM_TIMEOUT %></span>…</p>
-      </div>
-
-      <%# Landscape-only: both buttons disabled while someone is picking %>
-      <div class="player-claim-active-set-wrap">
-        <%= button_to "SET!", game_claims_path(game.code), method: :post,
-              disabled: true,
-              class: "player-claim-active-set-btn w-full py-3 rounded-2xl bg-gray-700 cursor-not-allowed opacity-50 text-white font-bold tracking-widest transition-all duration-300 shadow" %>
-        <%= button_to "No Set", game_no_set_path(game.code), method: :post,
-              disabled: true,
-              class: "w-full py-2 rounded-2xl bg-gray-700 cursor-not-allowed opacity-50 text-gray-300 font-semibold transition-all shadow" %>
-      </div>
-    </div>
-
-    <%# Landscape-only: info panel (right column) %>
-    <div class="player-claim-active-info">
-      <div class="flex items-center gap-1.5">
-        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: <%= player.color %>;"></span>
-        <span class="font-semibold text-sm truncate"><%= player.name %></span>
-      </div>
-      <div class="text-center">
-        <p class="text-gray-400 text-xs uppercase tracking-wide">Score</p>
-        <p class="text-2xl font-bold"><%= player.score %></p>
-      </div>
-      <div class="text-center">
-        <p class="text-yellow-400 text-xs font-semibold truncate"><%= game.claiming_player.name %></p>
-        <p class="text-gray-400 text-xs">is calling SET!</p>
-      </div>
-      <div class="flex flex-col items-center gap-1"
-           data-controller="countdown"
-           data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
-           data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
-        <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
-          <circle cx="50" cy="50" r="45" fill="none" stroke="#FBBF24" stroke-width="8"
-                  stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
-                  stroke-linecap="round"
-                  data-countdown-target="ring"/>
-        </svg>
-        <span class="text-xl font-bold text-yellow-400" data-countdown-target="display"><%= Game::CLAIM_TIMEOUT %></span>
-      </div>
+      <%= render "players/controller/info_column", player: player %>
     </div>
 
   <% elsif game.no_set_active? %>
-    <%# State 4: No-Set countdown %>
-
-    <%# Landscape-only: read-only board cards (left column) %>
-    <div class="player-idle-board">
-      <div class="player-card-grid grid grid-flow-col gap-2">
-        <% game.board_cards.each do |card| %>
-          <div><%= render "cards/card", card: card %></div>
-        <% end %>
-      </div>
-    </div>
-
-    <%# Action buttons: portrait=centered column, landscape=fixed middle column %>
-    <div class="player-no-set-actions flex-1 flex flex-col items-center justify-center gap-6">
-      <%= button_to "SET!", game_claims_path(game.code), method: :post,
-            disabled: player.locked?,
-            data: {"turbo-submits-with": "Claiming…"},
-            class: "player-no-set-set-btn w-40 h-16 rounded-full text-white font-bold tracking-widest transition-all duration-300 shadow #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
-
-      <%# Portrait-only: caller info + countdown (moved to right panel in landscape) %>
-      <div class="player-no-set-portrait-info text-center"
-           data-controller="countdown"
-           data-countdown-started-at-value="<%= game.no_set_started_at.iso8601 %>"
-           data-countdown-duration-value="15">
-        <p class="text-purple-400 font-semibold text-lg mb-1">No Set called by</p>
-        <p class="text-white font-bold text-2xl mb-4"><%= game.no_set_caller.name %></p>
-        <div class="flex items-center justify-center gap-2">
-          <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
-            <circle cx="50" cy="50" r="45" fill="none" stroke="#A855F7" stroke-width="8"
-                    stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
-                    stroke-linecap="round"
-                    data-countdown-target="ring"/>
-          </svg>
-          <span class="text-2xl font-bold text-purple-400" data-countdown-target="display">15</span>
-          <span class="text-gray-400">s</span>
+    <% active_count = game.players.select(&:active?).size %>
+    <% voted = game.no_set_voters.size %>
+    <% waiting_for = [active_count - voted, 0].max %>
+    <% status_box = "grid h-20 w-full place-items-center rounded-2xl border-2 border-purple-700 px-3 text-center font-semibold text-purple-200 landscape:h-auto landscape:flex-1 landscape:text-sm" %>
+    <div class="flex-1 min-h-0 flex portrait:flex-col landscape:gap-3">
+      <%= render "players/controller/board_strip", game: game %>
+      <div class="flex flex-col portrait:flex-1 portrait:gap-4 landscape:w-36 landscape:shrink-0 landscape:gap-2">
+        <div class="flex items-center gap-4 rounded-2xl bg-purple-950/60 p-4 ring-1 ring-inset ring-purple-800 landscape:flex-col landscape:gap-1 landscape:p-2 landscape:text-center"
+             data-controller="countdown"
+             data-countdown-started-at-value="<%= game.no_set_started_at.iso8601 %>"
+             data-countdown-duration-value="15">
+          <%= render "players/controller/small_ring", size: "size-16 landscape:size-12", track: "stroke-gray-700", stroke: "stroke-purple-400", digits: "text-2xl text-purple-300 landscape:text-lg", duration: 15 %>
+          <div class="min-w-0">
+            <p class="text-sm text-purple-300 landscape:text-xs">No Set called by</p>
+            <p class="flex items-center gap-2 truncate font-display text-2xl font-bold landscape:justify-center landscape:text-base"><span class="size-3 shrink-0 rounded-full" style="background-color: <%= game.no_set_caller.color %>;"></span><%= game.no_set_caller.name %></p>
+          </div>
+          <p class="ml-auto text-right landscape:hidden"><span class="font-display text-3xl font-bold tabular-nums"><%= voted %></span><span class="text-gray-400">/<%= active_count %></span><span class="block text-xs uppercase tracking-widest text-gray-400">agreed</span></p>
+        </div>
+        <div class="mt-auto flex flex-col gap-3 landscape:mt-0 landscape:flex-1 landscape:gap-2">
+          <% if game.no_set_caller == player %>
+            <p class="<%= status_box %>">You called No Set · waiting for <%= waiting_for %> more</p>
+          <% elsif game.no_set_voters.include?(player.id) %>
+            <p class="<%= status_box %>">You agreed · waiting for <%= waiting_for %> more</p>
+          <% else %>
+            <%= button_to "I agree, no Set", game_no_set_path(game.code), method: :post,
+                  form_class: "contents", data: {turbo_submits_with: "…"},
+                  class: "h-20 w-full rounded-2xl bg-purple-600 hover:bg-purple-500 active:scale-95 transition font-display text-2xl font-bold landscape:h-auto landscape:flex-1 landscape:text-base" %>
+          <% end %>
+          <p class="text-center text-sm text-gray-500 landscape:hidden">Spotted one after all?</p>
+          <% if locked %>
+            <button type="button" disabled class="h-16 w-full cursor-not-allowed rounded-2xl bg-gray-900 font-display text-2xl font-extrabold tracking-widest text-gray-500 landscape:h-12 landscape:text-lg">SET!</button>
+          <% else %>
+            <%= button_to "SET!", game_claims_path(game.code), method: :post,
+                  form_class: "contents", data: {turbo_submits_with: "…"},
+                  class: "h-16 w-full rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display text-2xl font-extrabold tracking-widest landscape:h-12 landscape:text-lg" %>
+          <% end %>
         </div>
       </div>
-
-      <% already_voted = game.no_set_voters.include?(player.id) %>
-      <% if game.no_set_caller == player %>
-        <p class="text-purple-400 font-semibold">You called 'No Set'</p>
-      <% elsif already_voted %>
-        <p class="text-green-400 font-semibold">You agreed — waiting for others…</p>
-      <% else %>
-        <%= button_to "I agree — No Set", game_no_set_path(game.code), method: :post,
-              data: {"turbo-submits-with": "Joined…"},
-              class: "player-no-set-agree-btn w-56 py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-bold text-lg transition-all shadow-xl" %>
-      <% end %>
+      <%= render "players/controller/info_column", player: player %>
     </div>
 
-    <%# Landscape-only: info panel (right column) %>
-    <div class="player-no-set-info">
-      <div class="flex items-center gap-1.5">
-        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: <%= player.color %>;"></span>
-        <span class="font-semibold text-sm truncate"><%= player.name %></span>
-      </div>
-      <div class="text-center">
-        <p class="text-gray-400 text-xs uppercase tracking-wide">Score</p>
-        <p class="text-2xl font-bold"><%= player.score %></p>
-      </div>
-      <div class="text-center">
-        <p class="text-purple-400 text-xs font-semibold">No Set by</p>
-        <p class="text-white text-sm font-bold truncate"><%= game.no_set_caller.name %></p>
-      </div>
-      <div class="flex flex-col items-center gap-1"
-           data-controller="countdown"
-           data-countdown-started-at-value="<%= game.no_set_started_at.iso8601 %>"
-           data-countdown-duration-value="15">
-        <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
-          <circle cx="50" cy="50" r="45" fill="none" stroke="#A855F7" stroke-width="8"
-                  stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
-                  stroke-linecap="round"
-                  data-countdown-target="ring"/>
-        </svg>
-        <span class="text-xl font-bold text-purple-400" data-countdown-target="display">15</span>
-      </div>
-    </div>
-
-  <% elsif game.playing? %>
-    <%# State 1: idle — landscape: board + buttons + info; portrait: buttons only %>
-
-    <%# Landscape-only: read-only board cards (left column) %>
-    <div class="player-idle-board">
-      <div class="player-card-grid grid grid-flow-col gap-2">
-        <% game.board_cards.each do |card| %>
-          <div><%= render "cards/card", card: card %></div>
-        <% end %>
-      </div>
-    </div>
-
-    <%# Action buttons: portrait=centered column, landscape=fixed middle column %>
-    <div class="player-idle-actions flex-1 flex flex-col items-center justify-center gap-6">
-      <% if player.locked? %>
-        <div class="text-center"
+  <% elsif game.playing? && locked %>
+    <%# Locked out after a wrong or expired claim: SET! becomes the countdown. %>
+    <div class="flex-1 min-h-0 flex rounded-3xl bg-red-950/40 animate-shake portrait:flex-col portrait:items-center portrait:justify-center landscape:gap-3">
+      <%= render "players/controller/board_strip", game: game %>
+      <div class="flex flex-col items-center justify-center gap-5 landscape:w-36 landscape:shrink-0 landscape:gap-2 landscape:py-2">
+        <div class="text-center">
+          <% if player.lockout_reason == "expired" %>
+            <p class="font-display text-4xl font-bold text-red-400 landscape:text-xl">Time's up! −1</p>
+            <p class="mt-1 text-red-200 landscape:text-xs">Out of time · locked for 5 s</p>
+          <% else %>
+            <p class="font-display text-4xl font-bold text-red-400 landscape:text-xl">Wrong! −1</p>
+            <p class="mt-1 text-red-200 landscape:text-xs">Not a Set · locked for 5 s</p>
+          <% end %>
+        </div>
+        <div class="relative grid place-items-center portrait:size-76 landscape:w-full landscape:flex-1"
              data-controller="countdown"
              data-countdown-started-at-value="<%= (player.locked_until - 5.seconds).iso8601 %>"
              data-countdown-duration-value="5">
-          <p class="text-red-400 font-semibold mb-3">Locked out</p>
-          <div class="flex items-center justify-center gap-2">
-            <svg class="w-10 h-10 -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="45" fill="none" stroke="#374151" stroke-width="8"/>
-              <circle cx="50" cy="50" r="45" fill="none" stroke="#EF4444" stroke-width="8"
-                      stroke-dasharray="<%= (2 * Math::PI * 45).round(1) %>"
-                      stroke-linecap="round"
-                      data-countdown-target="ring"/>
-            </svg>
-            <span class="text-2xl font-bold text-red-400" data-countdown-target="display">5</span>
-            <span class="text-gray-400">s</span>
-          </div>
+          <%= render "players/controller/button_ring", stroke: "stroke-red-500" %>
+          <button type="button" disabled class="flex flex-col items-center justify-center cursor-not-allowed bg-gray-900 text-red-400 ring-1 ring-inset ring-red-900 <%= set_round %>">
+            <span data-countdown-target="display" class="font-display text-8xl font-extrabold leading-none tabular-nums landscape:text-5xl">5</span>
+            <span class="mt-2 text-sm font-semibold uppercase tracking-[0.3em] text-red-300 landscape:text-xs">Locked</span>
+          </button>
         </div>
-      <% end %>
-
-      <%= button_to "SET!", game_claims_path(game.code), method: :post,
-            disabled: player.locked?,
-            data: {"turbo-submits-with": "Claiming…"},
-            class: "player-idle-set-btn w-64 h-64 rounded-full text-white text-4xl font-bold tracking-widest transition-all duration-300 shadow-2xl #{player.locked? ? "bg-gray-700 cursor-not-allowed opacity-50" : "bg-blue-600 hover:bg-blue-500 active:scale-95"}" %>
-
-      <% if game.deck.empty? %>
-        <% already_voted = game.end_game_voters.include?(player.id) %>
-        <% active_count = game.players.select(&:active?).count %>
-        <% if already_voted %>
-          <p class="text-orange-400 font-semibold text-sm">Voted to end (<%= game.end_game_voters.size %>/<%= active_count %>)</p>
-        <% else %>
-          <%= button_to "End Game", game_end_game_path(game.code), method: :post,
-                data: {"turbo-submits-with": "…"},
-                class: "player-idle-noset-btn w-40 py-3 rounded-2xl bg-orange-700 hover:bg-orange-600 active:scale-95 text-white font-semibold transition-all shadow" %>
-          <% if game.end_game_voters.any? %>
-            <p class="text-gray-500 text-xs"><%= game.end_game_voters.size %>/<%= active_count %> voted</p>
-          <% end %>
-        <% end %>
-      <% else %>
-        <%= button_to "No Set", game_no_set_path(game.code), method: :post,
-              data: {"turbo-submits-with": "…"},
-              class: "player-idle-noset-btn w-40 py-3 rounded-2xl bg-red-900 hover:bg-red-800 active:scale-95 text-red-200 font-semibold transition-all shadow" %>
-      <% end %>
+        <%= render "players/controller/secondary_action", game: game, player: player %>
+      </div>
+      <%= render "players/controller/info_column", player: player, score_class: "text-red-400" %>
     </div>
 
-    <%# Landscape-only: player info (right column) %>
-    <div class="player-idle-info">
-      <div class="flex items-center gap-1.5">
-        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: <%= player.color %>;"></span>
-        <span class="font-semibold text-sm truncate"><%= player.name %></span>
+  <% elsif game.playing? %>
+    <%# Idle. %>
+    <div class="flex-1 min-h-0 flex portrait:flex-col portrait:items-center portrait:justify-center landscape:gap-3">
+      <%= render "players/controller/board_strip", game: game %>
+      <div class="flex flex-col items-center justify-center gap-6 landscape:w-36 landscape:shrink-0 landscape:gap-3">
+        <div class="grid place-items-center portrait:size-76 landscape:w-full landscape:flex-1">
+          <%= button_to "SET!", game_claims_path(game.code), method: :post,
+                form_class: "contents", data: {turbo_submits_with: "…"},
+                class: "bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display font-extrabold tracking-widest shadow-2xl ring-8 ring-blue-500/20 portrait:text-5xl landscape:text-3xl #{set_round}" %>
+        </div>
+        <%= render "players/controller/secondary_action", game: game, player: player %>
       </div>
-      <div class="text-center">
-        <p class="text-gray-400 text-xs uppercase tracking-wide">Score</p>
-        <p class="text-2xl font-bold"><%= player.score %></p>
-      </div>
-    </div>
-
-  <% else %>
-    <div class="flex-1 flex items-center justify-center">
-      <p class="text-gray-500 italic">Waiting for the game to start…</p>
+      <%= render "players/controller/info_column", player: player %>
     </div>
   <% end %>
 </div>

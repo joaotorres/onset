@@ -22,6 +22,11 @@ class Player < ApplicationRecord
 
   def locked? = locked_until.present? && locked_until > Time.current
 
+  # "wrong" or "expired": why the current lockout happened.
+  def lockout_reason
+    game.claims.where(player: self, result: [:wrong, :expired]).order(:resolved_at).last&.result
+  end
+
   def broadcast_controller_status
     broadcast_replace_to "player:#{id}",
       target: "controller_status",

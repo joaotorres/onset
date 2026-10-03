@@ -1,0 +1,8 @@
+<%# Landscape-only read-only board on the left. %>
+<div class="portrait:hidden flex-1 min-w-0 overflow-x-auto">
+  <div class="h-full grid grid-rows-3 grid-flow-col auto-cols-max gap-2">
+    <% game.board_cards.each do |card| %>
+      <div class="h-full aspect-[5/7]"><%= render "cards/card", card: card %></div>
+    <% end %>
+  </div>
+</div>

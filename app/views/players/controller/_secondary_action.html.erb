@@ -1,0 +1,22 @@
+<%# The pill under SET!: No Set, or the End game vote once the deck is empty. %>
+<% pill = "min-h-12 rounded-full px-8 font-semibold landscape:w-full landscape:px-2" %>
+<% if local_assigns[:disabled] %>
+  <button type="button" disabled class="<%= pill %> cursor-not-allowed bg-gray-900 text-gray-600">No Set</button>
+<% elsif game.deck.empty? %>
+  <% active_count = game.players.select(&:active?).size %>
+  <% voters = game.end_game_voters.size %>
+  <div class="flex flex-col items-center gap-1.5 landscape:w-full">
+    <% if game.end_game_voters.include?(player.id) %>
+      <p class="grid min-h-12 place-items-center rounded-full border-2 border-orange-700 px-6 text-sm font-semibold text-orange-300 landscape:w-full landscape:px-2">Voted to end</p>
+    <% else %>
+      <%= button_to "End game", game_end_game_path(game.code), method: :post,
+            form_class: "contents", data: {turbo_submits_with: "…"},
+            class: "#{pill} bg-orange-700 hover:bg-orange-600 active:scale-95 transition text-white" %>
+    <% end %>
+    <p class="text-sm text-gray-400 landscape:text-xs">Deck empty · <%= voters %>/<%= active_count %> voted</p>
+  </div>
+<% else %>
+  <%= button_to "No Set", game_no_set_path(game.code), method: :post,
+        form_class: "contents", data: {turbo_submits_with: "…"},
+        class: "#{pill} bg-purple-950 hover:bg-purple-900 active:scale-95 transition text-purple-200 ring-1 ring-inset ring-purple-800" %>
+<% end %>

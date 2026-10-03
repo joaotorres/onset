@@ -28,8 +28,8 @@ RSpec.describe "Realtime sync", type: :system do
     join("phone2", "Bob", 1)
 
     # Both phones vote to start; the board follows via broadcast.
-    on("phone1") { click_button "Start Game" }
-    on("phone2") { click_button "Start Game" }
+    on("phone1") { click_button "I'm ready" }
+    on("phone2") { click_button "I'm ready" }
     on("phone1") { expect(page).to have_button("SET!") }
     on("phone2") { expect(page).to have_button("SET!") }
   end
@@ -37,13 +37,16 @@ RSpec.describe "Realtime sync", type: :system do
   it "claim on one phone appears on other phones and board instantly" do
     on("phone1") do
       click_button "SET!"
-      expect(page).to have_content("Pick 3 cards")
+      expect(page).to have_content("Tap 3 cards")
     end
 
-    on("phone2") { expect(page).to have_content("Alice is calling SET!") }
+    on("phone2") do
+      expect(page).to have_content("is calling SET!")
+      expect(page).to have_content("Alice")
+    end
 
     expect(page).to have_content("Alice is calling SET!")
-    expect(page).to have_css("#scoreboard .text-yellow-400", text: "Alice")
+    expect(page).to have_css("#scoreboard li.bg-yellow-400", text: "Alice")
   end
 
   # Regression: phone actions used to redirect, and the page reload dropped the
@@ -51,17 +54,17 @@ RSpec.describe "Realtime sync", type: :system do
   # left the first voter stuck on "Voted to end".
   it "both phones see game over when the end game votes land back to back" do
     Game.find_by!(code: @code).update!(deck: [])
-    on("phone1") { expect(page).to have_button("End Game") }
-    on("phone2") { expect(page).to have_button("End Game") }
+    on("phone1") { expect(page).to have_button("End game") }
+    on("phone2") { expect(page).to have_button("End game") }
 
     on("phone1") do
-      click_button "End Game"
+      click_button "End game"
       expect(page).to have_content("Voted to end")
     end
-    on("phone2") { click_button "End Game" }
+    on("phone2") { click_button "End game" }
 
-    on("phone1") { expect(page).to have_content("Game Over") }
-    on("phone2") { expect(page).to have_content("Game Over") }
-    expect(page).to have_button("Play Again")
+    on("phone1") { expect(page).to have_content(/game over/i) }
+    on("phone2") { expect(page).to have_content(/game over/i) }
+    expect(page).to have_button("Play again")
   end
 end

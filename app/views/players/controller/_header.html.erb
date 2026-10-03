@@ -1,0 +1,10 @@
+<header class="landscape:hidden mb-3 flex items-center justify-between">
+  <div class="min-w-0 flex items-center gap-2.5">
+    <span class="size-4 shrink-0 rounded-full" style="background-color: <%= player.color %>;"></span>
+    <span class="truncate text-lg font-semibold"><%= player.name %></span>
+  </div>
+  <div class="flex items-baseline gap-2">
+    <span class="text-xs uppercase tracking-widest text-gray-400">Score</span>
+    <span class="font-display text-4xl font-bold leading-none tabular-nums <%= local_assigns[:score_class] %>"><%= player.score %></span>
+  </div>
+</header>

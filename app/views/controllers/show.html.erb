@@ -1,10 +1,7 @@
 <%= turbo_stream_from "game:#{@game.code}" %>
 <%= turbo_stream_from "player:#{@player.id}" %>
 
-<div class="h-dvh bg-gray-950 text-white flex flex-col p-4 overflow-hidden">
+<main class="h-dvh overflow-hidden bg-gray-950 text-white border-t-4 p-4 flex flex-col" style="border-color: <%= @player.color %>;">
   <%= render "players/controller_status", player: @player, flash_claim: @game.flash_claim %>
-
-  <div class="text-center text-gray-500 text-sm pb-4 mt-4">
-    Room <span class="tracking-widest"><%= @game.code %></span>
-  </div>
-</div>
+  <p class="mt-2 text-center text-xs text-gray-500">Room <span class="tracking-widest"><%= @game.code %></span></p>
+</main>

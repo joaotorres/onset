@@ -112,4 +112,19 @@ RSpec.describe Player do
       expect(player.reload.last_seen_at).to be_within(2.seconds).of(Time.current)
     end
   end
+
+  describe "#lockout_reason" do
+    let(:game) { Game.create!.tap(&:start!) }
+    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C") }
+
+    it "is nil without a failed claim" do
+      expect(player.lockout_reason).to be_nil
+    end
+
+    it "reports the most recent failed claim" do
+      game.claims.create!(player: player, started_at: 2.minutes.ago, resolved_at: 2.minutes.ago, result: :wrong)
+      game.claims.create!(player: player, started_at: 1.minute.ago, resolved_at: 1.minute.ago, result: :expired)
+      expect(player.lockout_reason).to eq("expired")
+    end
+  end
 end

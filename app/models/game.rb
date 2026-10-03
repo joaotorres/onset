@@ -84,6 +84,11 @@ class Game < ApplicationRecord
     first if first && (second.nil? || first.score > second.score)
   end
 
+  # Competition ranking: tied players share a rank.
+  def rank_of(player)
+    players.where("score > ?", player.score).count + 1
+  end
+
   def board_cards
     board.map { |id| Card.new(id) }
   end

@@ -356,4 +356,15 @@ RSpec.describe Game do
       expect(game.winner).to be_nil
     end
   end
+
+  describe "#rank_of" do
+    let(:game) { Game.create! }
+    let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", score: 7) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", score: 7) }
+    let!(:caio) { game.players.create!(name: "Caio", color: "#F1C40F", score: 2) }
+
+    it "gives tied players the same rank and skips the next" do
+      expect([alice, bob, caio].map { game.rank_of(it) }).to eq([1, 1, 3])
+    end
+  end
 end
