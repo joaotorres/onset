@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     member do
       post :start
       post :restart
+      post :ready
     end
     resources :players, only: [:new, :create] do
       collection { get :join }
@@ -12,6 +13,7 @@ Rails.application.routes.draw do
     resource :controller, only: [:show], controller: "controllers"
     resources :claims, only: [:create, :update]
     resource :no_set, only: [:create, :update, :destroy]
+    resource :end_game, only: [:create]
   end
 
   mount ActionCable.server => "/cable"

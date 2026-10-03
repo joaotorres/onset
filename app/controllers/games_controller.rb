@@ -1,8 +1,8 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [:show, :start, :restart]
+  before_action :set_game, only: [:show, :start, :restart, :ready]
 
   def create
-    game = Game.create!
+    game = Game.create!(mode: (params[:mode] == "quick") ? :quick : :standard)
     cookies.encrypted[:host_game] = {value: game.code, httponly: true, same_site: :lax}
     redirect_to game_path(game.code)
   end
@@ -15,6 +15,7 @@ class GamesController < ApplicationController
     unless cookies.encrypted[:host_game] == @game.code
       head :forbidden and return
     end
+    redirect_to(game_path(@game.code)) and return if @game.players.count < 2
     @game.start!
     redirect_to game_path(@game.code)
   end
@@ -25,6 +26,14 @@ class GamesController < ApplicationController
     end
     @game.restart!
     redirect_to game_path(@game.code)
+  end
+
+  def ready
+    player = @game.players.find_by(session_token: cookies.encrypted[:player_token])
+    head :forbidden and return unless player
+
+    @game.vote_start!(player)
+    head :ok
   end
 
   private

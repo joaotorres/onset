@@ -85,6 +85,59 @@ RSpec.describe Claim do
     end
   end
 
+  describe "#expire!" do
+    it "marks the claim as expired" do
+      claim.expire!
+      expect(claim.reload).to be_expired
+    end
+
+    it "decrements the player score by 1" do
+      player.update!(score: 3)
+      expect { claim.expire! }.to change { player.reload.score }.by(-1)
+    end
+
+    it "does not reduce score below zero" do
+      player.update!(score: 0)
+      claim.expire!
+      expect(player.reload.score).to eq(0)
+    end
+
+    it "locks the player out for 5 seconds" do
+      claim.expire!
+      expect(player.reload).to be_locked
+    end
+
+    it "releases the claim lock on the game" do
+      claim.expire!
+      expect(game.reload.claim_player_id).to be_nil
+      expect(game.reload.claim_started_at).to be_nil
+    end
+
+    it "does not change the board" do
+      board_before = game.board.dup
+      claim.expire!
+      expect(game.reload.board).to eq(board_before)
+    end
+  end
+
+  describe "#submit! in quick mode" do
+    let(:game) {
+      Game.create!(mode: :quick).tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
+    }
+
+    it "ends the game when a player reaches 5 points" do
+      player.update!(score: 4)
+      claim.submit!(find_set_on_board)
+      expect(game.reload).to be_ended
+    end
+
+    it "does not end the game if the player has fewer than 5 points" do
+      player.update!(score: 2)
+      claim.submit!(find_set_on_board)
+      expect(game.reload).to be_playing
+    end
+  end
+
   describe "#submit! with invalid input" do
     it "ignores a submission with the wrong number of cards" do
       expect { claim.submit!([0, 1]) }.not_to change { claim.reload.result }

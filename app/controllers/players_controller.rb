@@ -14,6 +14,10 @@ class PlayersController < ApplicationController
   end
 
   def create
+    unless @game.waiting?
+      redirect_to join_game_players_path(@game.code), alert: "This game has already started." and return
+    end
+
     @player = @game.players.build(player_params)
     if @player.save
       cookies.encrypted[:player_token] = {value: @player.session_token, httponly: true, same_site: :lax}

@@ -11,6 +11,16 @@ RSpec.describe "Games" do
       post games_path
       expect(cookies[:host_game]).to be_present
     end
+
+    it "creates a standard game by default" do
+      post games_path
+      expect(Game.last).to be_standard
+    end
+
+    it "creates a quick game when mode=quick" do
+      post games_path, params: {mode: "quick"}
+      expect(Game.last).to be_quick
+    end
   end
 
   describe "GET /games/:code" do
@@ -35,6 +45,8 @@ RSpec.describe "Games" do
       before do
         post games_path  # sets host cookie
         @game = Game.last
+        @game.players.create!(name: "Alice", color: "#648FFF", session_token: SecureRandom.hex)
+        @game.players.create!(name: "Bob", color: "#FE6100", session_token: SecureRandom.hex)
       end
 
       it "transitions the game to playing" do
@@ -98,6 +110,43 @@ RSpec.describe "Games" do
         post restart_game_path(game.code)
         expect(response).to have_http_status(:forbidden)
       end
+    end
+  end
+
+  describe "POST /games/:code/ready" do
+    let(:game) { Game.create! }
+
+    def sign_in_player(name: "Alice", color: "#E74C3C")
+      post game_players_path(game.code), params: {player: {name: name, color: color}}
+      game.players.find_by!(name: name)
+    end
+
+    it "records the player's vote without starting the game when others haven't voted" do
+      player = sign_in_player
+      game.players.create!(name: "Bob", color: "#2ECC71")
+      post ready_game_path(game.code)
+      expect(game.reload.start_voters).to include(player.id)
+      expect(game.reload).to be_waiting
+    end
+
+    it "starts the game when all players have voted" do
+      sign_in_player
+      bob = game.players.create!(name: "Bob", color: "#2ECC71", session_token: SecureRandom.hex)
+      post ready_game_path(game.code)  # Alice votes via cookie
+      game.vote_start!(bob)            # Bob votes directly
+      expect(game.reload).to be_playing
+    end
+
+    it "does not start the game when only some players have voted" do
+      sign_in_player
+      game.players.create!(name: "Bob", color: "#2ECC71")
+      post ready_game_path(game.code)
+      expect(game.reload).to be_waiting
+    end
+
+    it "returns 403 without a valid player cookie" do
+      post ready_game_path(game.code)
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

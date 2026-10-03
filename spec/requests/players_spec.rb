@@ -30,6 +30,12 @@ RSpec.describe "Players" do
       expect(response).to have_http_status(:unprocessable_content)
     end
 
+    it "redirects with an alert when the game has already started" do
+      game.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: [])
+      post game_players_path(game.code), params: valid_params
+      expect(response).to redirect_to(join_game_players_path(game.code))
+    end
+
     it "rejects a duplicate color in the same game" do
       Player.create!(name: "Alice", color: "#E74C3C", game: game)
       post game_players_path(game.code), params: {player: {name: "Bob", color: "#E74C3C"}}

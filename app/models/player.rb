@@ -9,6 +9,7 @@ class Player < ApplicationRecord
   validate :name_unique_within_game
 
   before_validation :generate_session_token, on: :create
+  after_create_commit :broadcast_player_joined
   after_update_commit :broadcast_controller_status
 
   def active? = last_seen_at.present? && last_seen_at > 30.seconds.ago
@@ -25,6 +26,10 @@ class Player < ApplicationRecord
   end
 
   private
+
+  def broadcast_player_joined
+    game.broadcast_lobby_state
+  end
 
   def generate_session_token
     self.session_token ||= SecureRandom.hex(16)

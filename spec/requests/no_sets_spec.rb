@@ -6,8 +6,11 @@ RSpec.describe "NoSets" do
   }
 
   def sign_in(name: "Alice", color: "#E74C3C")
+    was_playing = game.playing?
+    game.update_columns(status: 0) if was_playing
     post game_players_path(game.code), params: {player: {name: name, color: color}}
-    game.players.find_by!(name: name)
+    game.update_columns(status: 1) if was_playing
+    game.reload.players.find_by!(name: name)
   end
 
   describe "POST /games/:code/no_set" do
