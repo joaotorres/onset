@@ -533,13 +533,12 @@ Each step delivers a **small but end-to-end-working** increment. The app should 
 - `bin/rails test:system` covering: claim on one phone updates the board on another within 1 second.
 - **Acceptance:** with two phones and a board open, action on any device propagates live everywhere.
 
-**Known issue (implementation complete, spec skipped):** `spec/system/realtime_sync_spec.rb` is marked
-`xit` because it is flaky when run in isolation — the board's `game:#{code}` WebSocket subscription
-does not reliably receive the claim broadcast via the `async` Action Cable adapter. The feature works
-correctly in manual testing and in the full suite. Suspected cause: cold-start latency in the async
-executor's single-thread pool before the NIO event loop has flushed the WebSocket write buffer.
-Investigation avenues: pre-warming the executor before the spec; switching to `inline` adapter + an
-explicit `sleep`/poll; or restructuring the spec to not depend on the board session's WS latency.
+**Resolved issue:** `spec/system/realtime_sync_spec.rb` was skipped as flaky. Two causes, both fixed:
+phone and board actions redirected, and the page reload dropped the stream subscription for about
+500 ms, losing any broadcast in that window. Every request also touched `last_seen_at`, which
+broadcast a stale controller state that the `async` adapter could deliver after the real one. Actions
+now answer `204 No Content` and rely on the broadcast, and `Player#seen!` records `last_seen_at`
+without callbacks.
 
 ### Step 10 — Claim timeout (5s)
 **Goal:** a held claim that doesn't submit auto-expires server-side.

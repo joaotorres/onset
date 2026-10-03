@@ -3,12 +3,9 @@ class ClaimsController < ApplicationController
   before_action :set_player
 
   def create
-    claim = @game.try_claim!(@player)
-    if claim
-      redirect_to game_controller_path(@game.code)
-    else
-      redirect_to game_controller_path(@game.code), status: :conflict
-    end
+    # A lost race is not an error: the broadcast shows who is claiming.
+    @game.try_claim!(@player)
+    head :no_content
   end
 
   def update
@@ -29,7 +26,7 @@ class ClaimsController < ApplicationController
       Array(raw).map(&:to_i)
     end
     claim.submit!(submitted_ids)
-    redirect_to game_controller_path(@game.code)
+    head :no_content
   end
 
   private
@@ -41,6 +38,6 @@ class ClaimsController < ApplicationController
   def set_player
     token = cookies.encrypted[:player_token]
     @player = @game.players.find_by!(session_token: token)
-    @player.touch(:last_seen_at)
+    @player.seen!
   end
 end

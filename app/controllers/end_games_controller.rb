@@ -4,7 +4,7 @@ class EndGamesController < ApplicationController
 
   def create
     @game.vote_end_game!(@player)
-    redirect_to game_controller_path(@game.code)
+    head :no_content
   end
 
   private
@@ -16,6 +16,6 @@ class EndGamesController < ApplicationController
   def set_player
     token = cookies.encrypted[:player_token]
     @player = @game.players.find_by!(session_token: token)
-    @player.touch(:last_seen_at)
+    @player.seen!
   end
 end

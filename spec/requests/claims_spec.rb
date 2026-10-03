@@ -19,40 +19,40 @@ RSpec.describe "Claims" do
   end
 
   describe "POST /games/:code/claims" do
-    it "acquires a claim and redirects to the controller view" do
+    it "acquires a claim and answers 204 so the page is not reloaded" do
       sign_in
       expect { post game_claims_path(game.code) }
         .to change(Claim, :count).by(1)
-      expect(response).to redirect_to(game_controller_path(game.code))
+      expect(response).to have_http_status(:no_content)
     end
 
-    it "returns 409 when a claim is already active" do
+    it "ignores a claim while another is active, still answering 204" do
       other = game.players.create!(name: "Bob", color: "#2ECC71")
       game.try_claim!(other)
       sign_in
-      post game_claims_path(game.code)
-      expect(response).to have_http_status(:conflict)
+      expect { post game_claims_path(game.code) }.not_to change(Claim, :count)
+      expect(response).to have_http_status(:no_content)
     end
 
-    it "returns 409 when the player is locked out after a wrong claim" do
+    it "ignores a claim from a locked-out player, still answering 204" do
       player = sign_in
       claim = game.try_claim!(player)
       non_set_ids = game.board_cards.combination(3).find { |trio| !Card.valid_set?(*trio) }.map(&:id)
       claim.submit!(non_set_ids)
       expect(player.reload).to be_locked
 
-      post game_claims_path(game.code)
-      expect(response).to have_http_status(:conflict)
+      expect { post game_claims_path(game.code) }.not_to change(Claim, :count)
+      expect(response).to have_http_status(:no_content)
     end
   end
 
   describe "PATCH /games/:code/claims/:id" do
-    it "resolves a correct claim and redirects" do
+    it "resolves a correct claim and answers 204" do
       player = sign_in
       claim = game.try_claim!(player)
       patch game_claim_path(game.code, claim.id), params: {card_ids: valid_set_ids.to_json}
       expect(claim.reload).to be_correct
-      expect(response).to redirect_to(game_controller_path(game.code))
+      expect(response).to have_http_status(:no_content)
     end
 
     it "rejects a submission from a different player" do

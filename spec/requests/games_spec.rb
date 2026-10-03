@@ -59,9 +59,9 @@ RSpec.describe "Games" do
         expect(@game.reload.board.size).to eq(12)
       end
 
-      it "redirects back to the board" do
+      it "answers 204 so the board is not reloaded" do
         post start_game_path(@game.code)
-        expect(response).to redirect_to(game_path(@game.code))
+        expect(response).to have_http_status(:no_content)
       end
     end
 
@@ -91,9 +91,9 @@ RSpec.describe "Games" do
         expect(@game.reload.board.size).to eq(12)
       end
 
-      it "redirects back to the board" do
+      it "answers 204 so the board is not reloaded" do
         post restart_game_path(@game.code)
-        expect(response).to redirect_to(game_path(@game.code))
+        expect(response).to have_http_status(:no_content)
       end
 
       it "resets player scores" do
@@ -127,6 +127,7 @@ RSpec.describe "Games" do
       post ready_game_path(game.code)
       expect(game.reload.start_voters).to include(player.id)
       expect(game.reload).to be_waiting
+      expect(response).to have_http_status(:no_content)
     end
 
     it "starts the game when all players have voted" do

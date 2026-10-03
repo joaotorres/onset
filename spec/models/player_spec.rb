@@ -100,4 +100,16 @@ RSpec.describe Player do
       expect(player.host?).to be false
     end
   end
+
+  describe "#seen!" do
+    let(:game) { Game.create! }
+    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C") }
+
+    it "records last_seen_at without broadcasting the controller" do
+      player
+      expect(player).not_to receive(:broadcast_controller_status)
+      player.seen!
+      expect(player.reload.last_seen_at).to be_within(2.seconds).of(Time.current)
+    end
+  end
 end

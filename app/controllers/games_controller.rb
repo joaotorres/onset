@@ -15,9 +15,8 @@ class GamesController < ApplicationController
     unless cookies.encrypted[:host_game] == @game.code
       head :forbidden and return
     end
-    redirect_to(game_path(@game.code)) and return if @game.players.count < 2
-    @game.start!
-    redirect_to game_path(@game.code)
+    @game.start! if @game.players.count >= 2
+    head :no_content
   end
 
   def restart
@@ -25,7 +24,7 @@ class GamesController < ApplicationController
       head :forbidden and return
     end
     @game.restart!
-    redirect_to game_path(@game.code)
+    head :no_content
   end
 
   def ready
@@ -33,7 +32,7 @@ class GamesController < ApplicationController
     head :forbidden and return unless player
 
     @game.vote_start!(player)
-    head :ok
+    head :no_content
   end
 
   private

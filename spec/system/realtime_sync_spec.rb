@@ -5,61 +5,63 @@ RSpec.describe "Realtime sync", type: :system do
     driven_by :selenium, using: :headless_chrome
   end
 
-  # TODO: flaky — passes when run as part of the full suite but fails when run in
-  # isolation. The board's game:#{code} WebSocket subscription does not receive
-  # the claim broadcast reliably with the async Action Cable adapter under Puma.
-  # Root cause is likely a cold-start latency in the async executor's thread pool.
-  # See SPEC.md §15 Step 9 note for investigation context.
-  xit "claim on one phone appears on other phones and board instantly" do
-    # Host creates a game and opens the board view
+  def join(session, name, swatch)
+    Capybara.using_session(session) do
+      visit join_game_players_path(@code)
+      fill_in "player[name]", with: name
+      all("label.cursor-pointer")[swatch].click
+      click_button "Join"
+      expect(page).to have_content("Waiting for players")
+      expect(page).to have_css("turbo-cable-stream-source[connected]", count: 2, visible: :all)
+    end
+  end
+
+  def on(session, &) = Capybara.using_session(session, &)
+
+  before do
     visit root_path
     click_button "Start a game"
-    game_code = find("p.text-5xl").text
+    @code = find("p.text-5xl").text
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
 
-    # Two players join — both establish WS before the game starts
-    Capybara.using_session("phone1") do
-      visit join_game_players_path(game_code)
-      fill_in "player[name]", with: "Alice"
-      all("label.cursor-pointer").first.click
-      click_button "Join"
-      expect(page).to have_content("Waiting for the game to start")
-    end
+    join("phone1", "Alice", 0)
+    join("phone2", "Bob", 1)
 
-    Capybara.using_session("phone2") do
-      visit join_game_players_path(game_code)
-      fill_in "player[name]", with: "Bob"
-      all("label.cursor-pointer").last.click
-      click_button "Join"
-      expect(page).to have_content("Waiting for the game to start")
-    end
+    # Both phones vote to start; the board follows via broadcast.
+    on("phone1") { click_button "Start Game" }
+    on("phone2") { click_button "Start Game" }
+    on("phone1") { expect(page).to have_button("SET!") }
+    on("phone2") { expect(page).to have_button("SET!") }
+  end
 
-    # Host starts the game; board's WS reconnects after Turbo Drive navigation
-    click_button "Start game"
-    expect(page).to have_css("#board")
-    # Wait until the board's Action Cable subscription is confirmed live
-    expect(page).to have_css("turbo-cable-stream-source[connected]", wait: 3, visible: :all)
-
-    # Both phones receive the game-started broadcast (confirms their WS connections work)
-    Capybara.using_session("phone1") { expect(page).to have_button("SET!", wait: 3) }
-    Capybara.using_session("phone2") { expect(page).to have_button("SET!", wait: 3) }
-
-    # Alice claims SET! — wait until Turbo follows the redirect and phone1
-    # shows the card grid, which confirms the server finished try_claim! and
-    # the broadcasts are in the async queue.
-    Capybara.using_session("phone1") do
+  it "claim on one phone appears on other phones and board instantly" do
+    on("phone1") do
       click_button "SET!"
-      expect(page).to have_content("Pick 3 cards", wait: 3)
+      expect(page).to have_content("Pick 3 cards")
     end
 
-    # Bob's phone updates via his player stream
-    Capybara.using_session("phone2") do
-      expect(page).to have_content("Alice is calling SET!", wait: 3)
-    end
+    on("phone2") { expect(page).to have_content("Alice is calling SET!") }
 
-    # Board view also updates via the game stream:
-    # announcement strip shows the claim
-    expect(page).to have_content("Alice is calling SET!", wait: 8)
-    # and scoreboard highlights the claiming player in yellow
-    expect(page).to have_css(".text-yellow-400", text: "Alice", wait: 3)
+    expect(page).to have_content("Alice is calling SET!")
+    expect(page).to have_css("#scoreboard .text-yellow-400", text: "Alice")
+  end
+
+  # Regression: phone actions used to redirect, and the page reload dropped the
+  # phone's stream subscription for ~500 ms. A second vote landing in that window
+  # left the first voter stuck on "Voted to end".
+  it "both phones see game over when the end game votes land back to back" do
+    Game.find_by!(code: @code).update!(deck: [])
+    on("phone1") { expect(page).to have_button("End Game") }
+    on("phone2") { expect(page).to have_button("End Game") }
+
+    on("phone1") do
+      click_button "End Game"
+      expect(page).to have_content("Voted to end")
+    end
+    on("phone2") { click_button "End Game" }
+
+    on("phone1") { expect(page).to have_content("Game Over") }
+    on("phone2") { expect(page).to have_content("Game Over") }
+    expect(page).to have_button("Play Again")
   end
 end

@@ -14,11 +14,11 @@ RSpec.describe "NoSets" do
   end
 
   describe "POST /games/:code/no_set" do
-    it "initiates a No-Set countdown and redirects" do
+    it "initiates a No-Set countdown and answers 204" do
       sign_in
       post game_no_set_path(game.code)
       expect(game.reload.no_set_active?).to be true
-      expect(response).to redirect_to(game_controller_path(game.code))
+      expect(response).to have_http_status(:no_content)
     end
 
     it "touches last_seen_at so the player counts as active" do
