@@ -74,6 +74,16 @@ class Game < ApplicationRecord
     end
   end
 
+  def standings
+    players.order(score: :desc, id: :asc).to_a
+  end
+
+  # Nil on a tie for first place.
+  def winner
+    first, second = standings
+    first if first && (second.nil? || first.score > second.score)
+  end
+
   def board_cards
     board.map { |id| Card.new(id) }
   end

@@ -337,4 +337,23 @@ RSpec.describe Game do
       expect(game.no_set_voters).to be_empty
     end
   end
+
+  describe "#standings and #winner" do
+    let(:game) { Game.create! }
+    let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", score: 3) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", score: 7) }
+
+    it "orders players by score, highest first" do
+      expect(game.standings).to eq([bob, alice])
+    end
+
+    it "names the single top scorer as winner" do
+      expect(game.winner).to eq(bob)
+    end
+
+    it "has no winner when first place is tied" do
+      alice.update!(score: 7)
+      expect(game.winner).to be_nil
+    end
+  end
 end
