@@ -7,7 +7,7 @@
 %>
 <div id="controller_status" class="flex-1 min-h-0 flex flex-col">
   <% if flash_claim&.correct? && flash_claim.card_ids.present? %>
-    <div class="found-set-flash fixed inset-x-0 top-0 z-10 flex items-center gap-4 border-b-2 border-green-500 bg-gray-900/95 px-4 py-3">
+    <div class="found-set-flash pointer-events-none fixed inset-x-0 top-0 z-10 flex items-center gap-4 border-b-2 border-green-500 bg-gray-900/95 px-4 py-3">
       <div class="flex shrink-0 gap-2">
         <% flash_claim.card_ids.map { |cid| Card.new(cid) }.each do |card| %>
           <div class="h-20 aspect-[5/7]"><%= render "cards/card", card: card %></div>

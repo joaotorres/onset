@@ -46,20 +46,20 @@ export default class extends Controller {
   }
 
   fillSlot(id, card) {
-    const slot = this.slotTargets.find(s => !s.dataset.cardId)
+    const slot = this.slotTargets.find(s => !s.dataset.slotCardId)
     const svg = card.querySelector("svg")
     if (!slot || !svg) return
 
-    slot.dataset.cardId = id
+    slot.dataset.slotCardId = id
     slot.classList.remove(...EMPTY_SLOT)
     slot.replaceChildren(svg.cloneNode(true))
   }
 
   emptySlot(id) {
-    const slot = this.slotTargets.find(s => s.dataset.cardId === String(id))
+    const slot = this.slotTargets.find(s => s.dataset.slotCardId === String(id))
     if (!slot) return
 
-    delete slot.dataset.cardId
+    delete slot.dataset.slotCardId
     slot.classList.add(...EMPTY_SLOT)
     slot.replaceChildren(String(this.slotTargets.indexOf(slot) + 1))
   }
