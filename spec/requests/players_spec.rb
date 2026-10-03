@@ -7,7 +7,14 @@ RSpec.describe "Players" do
     it "returns 200 and shows the join form" do
       get join_game_players_path(game.code)
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Join Game")
+      expect(response.body).to include("Joining room")
+    end
+
+    it "marks a taken color with the initial of the player who took it" do
+      game.players.create!(name: "marta", color: "#1ABC9C")
+      get join_game_players_path(game.code)
+      expect(response.body).to include('title="Taken by marta"')
+      expect(response.body).to match(%r{<span class="text-lg font-bold text-gray-950">M</span>})
     end
   end
 

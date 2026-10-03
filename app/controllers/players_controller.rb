@@ -2,7 +2,7 @@ class PlayersController < ApplicationController
   PRESET_COLORS = %w[#E74C3C #2ECC71 #F1C40F #9B59B6 #1ABC9C #E91E63 #00BCD4 #8BC34A].freeze
 
   before_action :set_game
-  before_action :set_taken_colors, only: [:new, :join, :create]
+  before_action :set_color_owners, only: [:new, :join, :create]
 
   def join
     @player = Player.new
@@ -33,8 +33,8 @@ class PlayersController < ApplicationController
     @game = Game.find_by!(code: params[:game_code])
   end
 
-  def set_taken_colors
-    @taken_colors = @game.players.pluck(:color)
+  def set_color_owners
+    @color_owners = @game.players.index_by(&:color)
   end
 
   def player_params
