@@ -104,7 +104,7 @@ The room.
 | `end_game_voters` | json | Player ids who voted to end once the deck is empty (default `[]`) |
 | `flash_claim_id` | bigint | nullable; the just-resolved claim the screens announce for 3s |
 | `last_dealt` | json | Card ids dealt by the last replace, outlined on the board for 3s (default `[]`) |
-| `last_activity_at` | datetime | for 24h idle cleanup |
+| `last_activity_at` | datetime | unused; idle cleanup uses `updated_at` |
 | `ended_at` | datetime | nullable |
 
 **Validations**: `code` present, unique, matches `/\A[A-Z2-9]{6}\z/` (no `0/O/1/I` to avoid confusion).
@@ -456,7 +456,7 @@ After the third tap on the phone, **auto-submit with a 250ms delay** so a player
 
 ## 12. Background Jobs
 
-- **`CleanupIdleGamesJob`** — runs hourly via `recurring.yml`. Deletes Games with `last_activity_at < 24.hours.ago`. Cascades to Players and Claims.
+- **`CleanupIdleGamesJob`** — runs hourly via `recurring.yml`. Deletes Games with `updated_at < 24.hours.ago` (every gameplay action goes through `Game#update!`). Cascades to Players and Claims.
 - **`ExpireClaimJob`** — enqueued with `wait: 5.seconds` when a claim is acquired. If the claim is still `pending`, mark it `expired`, clear the lock, broadcast.
 - **`ExpireNoSetJob`** — enqueued with `wait: 15.seconds` when a No-Set is called. If still active, draw 3 cards (or end game), clear the call, broadcast.
 - **`ExpirePlayerLockoutJob`** — optional; the lockout is enforced by checking `locked_until` at claim time, but a job that broadcasts UI updates when the lockout expires is nice-to-have.
@@ -653,7 +653,7 @@ without callbacks.
 
 - `CleanupIdleGamesJob` per §12, scheduled hourly via `config/recurring.yml`.
 - Cascading destroy on Game removes Players and Claims.
-- **Acceptance:** in console, `Game.first.update(last_activity_at: 25.hours.ago)`, run the job, the game is gone.
+- **Acceptance:** in console, `Game.first.update_column(:updated_at, 25.hours.ago)`, run the job, the game is gone.
 
 ### Step 16 — Visual + UX polish (real screens)
 **Goal:** the game looks and feels correct on a TV across the room and on a phone in hand.

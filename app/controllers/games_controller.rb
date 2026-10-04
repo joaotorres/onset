@@ -1,5 +1,9 @@
 class GamesController < ApplicationController
   before_action :set_game, only: [:show, :start, :restart, :ready]
+  rate_limit to: 10, within: 1.minute, only: :create, with: -> {
+    flash.now[:alert] = "Too many new games. Try again in a minute."
+    render "lobbies/new", status: :too_many_requests
+  }
 
   def create
     game = Game.create!(mode: (params[:mode] == "quick") ? :quick : :standard)

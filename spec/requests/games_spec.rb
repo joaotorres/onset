@@ -21,6 +21,24 @@ RSpec.describe "Games" do
       post games_path, params: {mode: "quick"}
       expect(Game.last).to be_quick
     end
+
+    context "when rate limited" do
+      # The test env uses a null cache store, so count in a real one.
+      let(:store) { ActiveSupport::Cache::MemoryStore.new }
+
+      before do
+        allow(GamesController.cache_store).to receive(:increment) { |*args, **opts| store.increment(*args, **opts) }
+      end
+
+      it "returns 429 after 10 requests a minute" do
+        10.times { post games_path }
+        expect(response).not_to have_http_status(:too_many_requests)
+
+        expect { post games_path }.not_to change(Game, :count)
+        expect(response).to have_http_status(:too_many_requests)
+        expect(response.body).to include("Try again in a minute.")
+      end
+    end
   end
 
   describe "GET /games/:code" do

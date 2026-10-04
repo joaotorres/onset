@@ -3,6 +3,11 @@ class PlayersController < ApplicationController
 
   before_action :set_game
   before_action :set_color_owners, only: [:new, :join, :create]
+  rate_limit to: 20, within: 1.minute, only: :create, with: -> {
+    @player = Player.new
+    flash.now[:alert] = "Too many join attempts. Try again in a minute."
+    render :new, status: :too_many_requests
+  }
 
   def join
     @player = Player.new

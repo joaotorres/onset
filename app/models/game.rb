@@ -8,8 +8,9 @@ class Game < ApplicationRecord
 
   QUICK_WIN_SCORE = 5
 
-  has_many :players, dependent: :destroy
+  # Claims first: they reference players, so destroying players first trips the foreign key.
   has_many :claims, dependent: :destroy
+  has_many :players, dependent: :destroy
   belongs_to :host_player, class_name: "Player", optional: true
   belongs_to :claiming_player, class_name: "Player", foreign_key: :claim_player_id, optional: true
   belongs_to :no_set_caller, class_name: "Player", foreign_key: :no_set_caller_id, optional: true

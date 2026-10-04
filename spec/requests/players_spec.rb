@@ -21,6 +21,24 @@ RSpec.describe "Players" do
   describe "POST /games/:code/players" do
     let(:valid_params) { {player: {name: "Alice", color: "#E74C3C"}} }
 
+    context "when rate limited" do
+      # The test env uses a null cache store, so count in a real one.
+      let(:store) { ActiveSupport::Cache::MemoryStore.new }
+
+      before do
+        allow(PlayersController.cache_store).to receive(:increment) { |*args, **opts| store.increment(*args, **opts) }
+      end
+
+      it "returns 429 after 20 requests a minute" do
+        20.times { post game_players_path(game.code), params: {player: {name: "x", color: "#zzz"}} }
+        expect(response).not_to have_http_status(:too_many_requests)
+
+        expect { post game_players_path(game.code), params: valid_params }.not_to change(Player, :count)
+        expect(response).to have_http_status(:too_many_requests)
+        expect(response.body).to include("Try again in a minute.")
+      end
+    end
+
     it "creates a player and redirects to the controller view" do
       expect { post game_players_path(game.code), params: valid_params }
         .to change(Player, :count).by(1)
