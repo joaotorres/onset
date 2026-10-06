@@ -42,6 +42,7 @@
             </li>
           <% end %>
         </ul>
+        <%= link_to "New to Set? How to play →", how_to_play_path(return_to: game_controller_path(game.code)), class: "mt-4 inline-flex min-h-11 items-center self-start text-sm font-semibold text-blue-400 hover:text-blue-300 landscape:mt-2" %>
       </div>
       <div class="flex portrait:mt-6 landscape:w-36 landscape:shrink-0">
         <% if total < 2 %>

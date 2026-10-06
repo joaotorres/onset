@@ -22,4 +22,28 @@ RSpec.describe "Lobbies", type: :request do
       expect(flash[:alert]).to match(/Room not found/)
     end
   end
+
+  describe "GET /how-to-play" do
+    it "returns 200 and renders the four sections" do
+      get how_to_play_path
+      expect(response).to have_http_status(:ok)
+      ["Every card has four features", "What makes a Set", "Almost, but not a Set", "Playing Onset"].each do |heading|
+        expect(response.body).to include(heading)
+      end
+    end
+
+    it "links back to the game when return_to is a same-site path" do
+      get how_to_play_path, params: {return_to: "/games/ABC123/controller"}
+      expect(response.body).to include(%(href="/games/ABC123/controller">Back to the game</a>))
+    end
+
+    ["https://example.com", "//example.com"].each do |url|
+      it "ignores return_to=#{url} and goes back to the root" do
+        get how_to_play_path, params: {return_to: url}
+        expect(response.body).to include(%(href="#{root_path}">← Back</a>))
+        expect(response.body).not_to include("Back to the game")
+        expect(response.body).not_to include("example.com")
+      end
+    end
+  end
 end

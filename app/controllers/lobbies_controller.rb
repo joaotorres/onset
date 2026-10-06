@@ -8,4 +8,11 @@ class LobbiesController < ApplicationController
 
     redirect_to join_game_players_path(game.code)
   end
+
+  def how_to_play
+    return_to = params[:return_to].to_s
+    # only same-site paths, never a full URL or protocol-relative //host
+    @return_to = return_to if return_to.start_with?("/") && !return_to.start_with?("//")
+    @back_path = @return_to || root_path
+  end
 end

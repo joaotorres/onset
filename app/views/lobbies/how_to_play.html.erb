@@ -1,0 +1,169 @@
+<% content_for :title, "How to play · Onset" %>
+
+<main class="min-h-dvh bg-gray-950 text-white">
+  <div class="mx-auto max-w-5xl px-5 pt-6 pb-16 md:px-10 md:pt-10 md:pb-24">
+    <nav class="flex items-center justify-between">
+      <%= link_to "← Back", @back_path, class: "inline-flex min-h-11 items-center text-sm font-semibold text-gray-300 hover:text-white" %>
+      <%= link_to "Onset", root_path, class: "font-display text-xl font-extrabold tracking-tight" %>
+    </nav>
+
+    <header class="mt-10 md:mt-16">
+      <p class="text-sm uppercase tracking-widest text-gray-400">How to play</p>
+      <h1 class="mt-3 max-w-3xl font-display text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl">Find three cards that make a Set.</h1>
+      <p class="mt-5 max-w-2xl text-lg text-gray-300 md:text-xl">Onset is the card game Set, played live. Everyone looks at the same cards on the big screen and races to spot a Set from their phone.</p>
+    </header>
+
+    <section class="mt-16 md:mt-24">
+      <h2 class="font-display text-3xl font-bold md:text-4xl">Every card has four features</h2>
+      <p class="mt-3 max-w-2xl text-gray-400 md:text-lg">Each feature comes in three versions, which makes 81 different cards.</p>
+      <div class="mt-8 grid gap-4 md:grid-cols-2 md:gap-6">
+        <div class="rounded-3xl bg-gray-900 p-5 md:p-6">
+          <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400">Number</h3>
+          <div class="mt-4 grid grid-cols-3 gap-3 md:gap-4">
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(0, 0, 0, 0) %></div><figcaption class="text-sm text-gray-300">1</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 0, 0, 0) %></div><figcaption class="text-sm text-gray-300">2</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(2, 0, 0, 0) %></div><figcaption class="text-sm text-gray-300">3</figcaption></figure>
+          </div>
+        </div>
+        <div class="rounded-3xl bg-gray-900 p-5 md:p-6">
+          <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400">Shape</h3>
+          <div class="mt-4 grid grid-cols-3 gap-3 md:gap-4">
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 0, 0, 1) %></div><figcaption class="text-sm text-gray-300">oval</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 0, 1) %></div><figcaption class="text-sm text-gray-300">squiggle</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 2, 0, 1) %></div><figcaption class="text-sm text-gray-300">diamond</figcaption></figure>
+          </div>
+        </div>
+        <div class="rounded-3xl bg-gray-900 p-5 md:p-6">
+          <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400">Shading</h3>
+          <div class="mt-4 grid grid-cols-3 gap-3 md:gap-4">
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 2, 0, 2) %></div><figcaption class="text-sm text-gray-300">solid</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 2, 1, 2) %></div><figcaption class="text-sm text-gray-300">striped</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 2, 2, 2) %></div><figcaption class="text-sm text-gray-300">outline</figcaption></figure>
+          </div>
+        </div>
+        <div class="rounded-3xl bg-gray-900 p-5 md:p-6">
+          <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400">Color</h3>
+          <div class="mt-4 grid grid-cols-3 gap-3 md:gap-4">
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 0) %></div><figcaption class="text-sm text-gray-300">blue</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 1) %></div><figcaption class="text-sm text-gray-300">orange</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 2) %></div><figcaption class="text-sm text-gray-300">magenta</figcaption></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-16 md:mt-24">
+      <h2 class="font-display text-3xl font-bold md:text-4xl">What makes a Set</h2>
+      <p class="mt-4 max-w-3xl font-display text-2xl font-bold leading-snug md:text-3xl">Three cards where each feature is either <span class="text-green-400">all the same</span> or <span class="text-green-400">all different</span>.</p>
+      <div class="mt-8 grid gap-4 md:grid-cols-2 md:gap-6">
+        <article class="rounded-3xl bg-gray-900 p-5 ring-1 ring-inset ring-green-500/40 md:p-6">
+          <p class="font-semibold text-green-400">✓ A Set: some features the same</p>
+          <div class="mt-5 flex justify-center gap-3 md:gap-4">
+            <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(0, 1, 1, 2) %></div>
+            <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(1, 1, 1, 0) %></div>
+            <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(2, 1, 1, 1) %></div>
+          </div>
+          <ul class="mt-5 space-y-2 text-sm md:text-base">
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Number</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Shape</span><span class="text-gray-200">all the same <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Shading</span><span class="text-gray-200">all the same <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Color</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+          </ul>
+        </article>
+        <article class="rounded-3xl bg-gray-900 p-5 ring-1 ring-inset ring-green-500/40 md:p-6">
+          <p class="font-semibold text-green-400">✓ A Set: everything different</p>
+          <div class="mt-5 flex justify-center gap-3 md:gap-4">
+            <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(0, 0, 0, 0) %></div>
+            <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(1, 1, 1, 1) %></div>
+            <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(2, 2, 2, 2) %></div>
+          </div>
+          <ul class="mt-5 space-y-2 text-sm md:text-base">
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Number</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Shape</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Shading</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Color</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="mt-16 md:mt-24">
+      <h2 class="font-display text-3xl font-bold md:text-4xl">Almost, but not a Set</h2>
+      <div class="mt-8 grid gap-6 rounded-3xl bg-gray-900 p-5 ring-1 ring-inset ring-red-500/40 md:grid-cols-[auto_minmax(0,1fr)] md:items-center md:gap-10 md:p-8">
+        <div class="flex justify-center gap-3 md:gap-4">
+          <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(0, 0, 0, 0) %></div>
+          <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(1, 2, 1, 0) %></div>
+          <div class="h-32 aspect-[5/7] md:h-40"><%= example_card(2, 1, 2, 1) %></div>
+        </div>
+        <div>
+          <p class="font-semibold text-red-400">✗ Not a Set</p>
+          <ul class="mt-4 space-y-2 text-sm md:text-base">
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Number</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Shape</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4"><span class="text-gray-400">Shading</span><span class="text-gray-200">all different <span class="text-green-400">✓</span></span></li>
+            <li class="flex justify-between gap-4 rounded-lg bg-red-500/10 px-2 py-1 -mx-2"><span class="text-red-300">Color</span><span class="text-red-200">two blue, one orange <span class="text-red-400">✗</span></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-4 grid gap-4 md:grid-cols-2 md:gap-6">
+        <div class="rounded-2xl bg-blue-500/10 px-5 py-4 ring-1 ring-inset ring-blue-500/40">
+          <p class="font-semibold text-blue-300">Quick check</p>
+          <p class="mt-1 text-gray-200">If two cards share something and the third doesn't, it's not a Set.</p>
+        </div>
+        <div class="rounded-2xl bg-blue-500/10 px-5 py-4 ring-1 ring-inset ring-blue-500/40">
+          <p class="font-semibold text-blue-300">Tip</p>
+          <p class="mt-1 text-gray-200">Pick any two cards. Only one card in the whole deck completes them, so look for that one.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-16 md:mt-24">
+      <h2 class="font-display text-3xl font-bold md:text-4xl">Playing Onset</h2>
+      <ol class="mt-8 grid gap-4 md:grid-cols-2 md:gap-6">
+        <li class="rounded-3xl bg-gray-900 p-5 md:p-6">
+          <span class="font-display text-4xl font-extrabold text-blue-400">1</span>
+          <h3 class="mt-2 text-xl font-bold">Join from your phone</h3>
+          <p class="mt-2 text-gray-400">Scan the code on the big screen, then pick a name and a color.</p>
+        </li>
+        <li class="rounded-3xl bg-gray-900 p-5 md:p-6">
+          <span class="font-display text-4xl font-extrabold text-blue-400">2</span>
+          <h3 class="mt-2 text-xl font-bold">Look for a Set</h3>
+          <p class="mt-2 text-gray-400">Twelve cards go up on the big screen. Everyone looks at the same cards at the same time.</p>
+        </li>
+        <li class="rounded-3xl bg-gray-900 p-5 md:p-6">
+          <span class="font-display text-4xl font-extrabold text-blue-400">3</span>
+          <h3 class="mt-2 flex items-center gap-2 text-xl font-bold">Tap <span class="rounded-full bg-blue-600 px-3 py-0.5 font-display text-base font-extrabold tracking-widest">SET!</span></h3>
+          <p class="mt-2 text-gray-400">Tap SET! on your phone, then pick the three cards within 15 seconds. Nobody else can call while you pick.</p>
+        </li>
+        <li class="rounded-3xl bg-gray-900 p-5 md:p-6">
+          <span class="font-display text-4xl font-extrabold text-blue-400">4</span>
+          <h3 class="mt-2 text-xl font-bold">Score</h3>
+          <p class="mt-2 text-gray-400"><span class="font-semibold text-green-400">Right: +1</span> and the three cards are replaced. <span class="font-semibold text-red-400">Wrong or out of time: −1</span> and you're locked out for 5 seconds.</p>
+        </li>
+      </ol>
+      <div class="mt-4 grid gap-4 md:grid-cols-2 md:gap-6">
+        <div class="rounded-3xl p-5 ring-1 ring-inset ring-purple-800 md:p-6">
+          <h3 class="text-lg font-bold text-purple-300">No Set on the table?</h3>
+          <p class="mt-2 text-gray-400">Anyone can call No Set. If the others agree within 15 seconds, three more cards go down.</p>
+        </div>
+        <div class="rounded-3xl p-5 ring-1 ring-inset ring-gray-800 md:p-6">
+          <h3 class="text-lg font-bold">End of the game</h3>
+          <p class="mt-2 text-gray-400">The game ends when the deck runs out, or when someone reaches 5 points in a quick game. Most points wins.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-16 rounded-3xl bg-gray-900 p-6 text-center md:mt-24 md:p-10">
+      <h2 class="font-display text-3xl font-bold md:text-4xl">Ready to play?</h2>
+      <div class="mt-6 flex flex-col items-center justify-center gap-3 md:flex-row">
+        <% if @return_to %>
+          <%= link_to "Back to the game", @return_to, class: "inline-flex h-14 w-full items-center justify-center rounded-2xl bg-blue-600 px-8 text-lg font-bold hover:bg-blue-500 active:scale-95 transition md:w-auto" %>
+        <% else %>
+          <%# Same form as the landing page's "Start a game" button, with these classes %>
+          <%= button_to "Start a game", games_path, form: { class: "w-full md:w-auto" }, class: "inline-flex h-14 w-full items-center justify-center rounded-2xl bg-blue-600 px-8 text-lg font-bold hover:bg-blue-500 active:scale-95 transition md:w-auto" %>
+          <%= link_to "Join with a room code", root_path, class: "inline-flex h-14 w-full items-center justify-center rounded-2xl bg-gray-800 px-8 text-lg font-semibold hover:bg-gray-700 active:scale-95 transition md:w-auto" %>
+        <% end %>
+      </div>
+    </section>
+  </div>
+</main>
