@@ -24,7 +24,9 @@
             <p class="mt-1 text-2xl text-gray-300">Not a Set · locked out for 5 seconds</p>
           <% end %>
         </div>
-        <p class="ml-auto font-display text-7xl font-extrabold text-red-400">−1</p>
+        <% if flash_claim.penalized? %>
+          <p class="ml-auto font-display text-7xl font-extrabold text-red-400">−1</p>
+        <% end %>
       <% end %>
     </div>
 

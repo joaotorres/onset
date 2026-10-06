@@ -131,6 +131,33 @@ RSpec.describe Claim do
     end
   end
 
+  describe "penalty in the announcement" do
+    def announcement_for(claim)
+      ApplicationController.render(partial: "games/announcement", locals: {game: game.reload, flash_claim: claim.reload})
+    end
+
+    it "is not shown for a wrong claim at score 0" do
+      player.update!(score: 0)
+      claim.submit!(find_non_set_on_board)
+      expect(claim.reload).not_to be_penalized
+      expect(announcement_for(claim)).not_to include("−1")
+    end
+
+    it "is shown for a wrong claim at score 2" do
+      player.update!(score: 2)
+      claim.submit!(find_non_set_on_board)
+      expect(claim.reload).to be_penalized
+      expect(announcement_for(claim)).to include("−1")
+    end
+
+    it "is not shown for a timeout at score 0" do
+      player.update!(score: 0)
+      claim.expire!
+      expect(claim.reload).not_to be_penalized
+      expect(announcement_for(claim)).not_to include("−1")
+    end
+  end
+
   describe "#submit! in quick mode" do
     let(:game) {
       Game.create!(mode: :quick).tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }

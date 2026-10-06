@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_03_195225) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_06_205840) do
   create_table "claims", force: :cascade do |t|
     t.integer "game_id", null: false
     t.integer "player_id", null: false
@@ -20,6 +20,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_03_195225) do
     t.datetime "resolved_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "penalized", default: false, null: false
     t.index ["game_id"], name: "index_claims_on_game_id"
     t.index ["player_id"], name: "index_claims_on_player_id"
   end
