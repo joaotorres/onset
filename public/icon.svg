@@ -1,3 +1,1 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><rect width="16" height="16" rx="3.5" fill="#030712"/><rect x="3" y="1" width="10" height="14" rx="1.5" fill="#FAFAFA"/><g transform="translate(8 4.5) scale(0.06364 0.04464) translate(-100 -68)"><ellipse cx="100" cy="68" rx="55" ry="28" fill="#648FFF"/></g><g transform="translate(8 8) scale(0.05455 0.05357) translate(-100 -140)"><polygon fill="#FE6100" points="100,112 155,140 100,168 45,140"/></g><g transform="translate(8 11.5) scale(0.06818 0.04464) translate(-100 -212)"><path fill="#DC267F" d="M 45 212 C 35 187 55 184 80 184 C 105 184 120 200 135 200 C 150 200 165 187 155 212 C 165 237 150 240 135 240 C 120 240 105 224 80 224 C 55 224 35 237 45 212 Z"/></g></svg>
