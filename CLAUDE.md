@@ -4,12 +4,29 @@ The full design lives in `SPEC.md`. Read it before starting any non-trivial task
 
 ## Workflow
 
-- **One step at a time.** Implement only the step the user names from SPEC.md §15. Do not proceed to the next step unless explicitly asked.
-- **Acceptance is the commit gate.** Each step in §15 ends with an **Acceptance:** criterion. A step is not done until that criterion is met. If a criterion can't be verified locally (e.g., production deploy), say so and tell the user what to verify.
-- **Plan before coding for any step that touches more than two files.** Post the plan in chat, wait for an OK, then implement.
-- **Tests live in the same commit as the behavior.** Don't defer them.
-- **Commit message format:** `Step N: <short description>` matching the step's goal in §15.
-- **Stop on ambiguity.** If the spec doesn't decide something the step requires, ask in chat. Do not guess.
+Work moves from request to deploy through the skills-loop plugin. Config in
+`docs/agents/skills-loop.conf`, documentation in the plugin's
+`docs/workflow.md`.
+
+```
+bin/mode                    the model mode: chosen from Fable usage, or set (global)
+/request "one-liner"        a needs-triage ticket per line, then the chain carries on
+/design-brief NN            visual tickets: a brief for the design tool
+(paste the design reply)    the design entry, then the chain carries on
+/skills-loop:auto           carry the chain on, after a /clear at the context cap
+                            (each ticket's triage and build runs in a fresh subagent)
+bin/auto                    triage, build and review in one session with you
+                            (--headless, --unattended, --max N, --skip-gaps)
+bin/next-ticket             the next ticket and its launch command; --all is the board
+bin/deploy                  deploy, mark tickets deployed, tag, push
+```
+
+`docs/loop-log.md` records each step, newest first.
+
+When triaging, splitting, implementing, reviewing or designing a ticket,
+call the Skill tool with `loop-rules`: the gates, the implement loop, the
+headless exit, the design pass, the chain and the log live there. If it is not available in
+this session, stop and say so.
 
 ## Stack guardrails
 
@@ -41,11 +58,11 @@ The spec is intentionally minimal. Do not add the following without flagging in 
 
 - Format with `bundle exec standardrb --fix` before commit.
 - Ruby idioms: prefer guard clauses over nested conditionals; small methods on rich models; service objects only when a model gets unwieldy.
-- Database changes are migrations, never schema edits. One migration per step that needs schema changes.
+- Database changes are migrations, never schema edits. One migration per ticket that needs schema changes.
 
 ## When in doubt
 
-Re-read the relevant spec section. If still unclear, ask in chat with a specific question and a proposed answer. Do not invent details that drift from the spec.
+Re-read the relevant spec section. Do not invent details that drift from the spec.
 
 ## Agent skills
 

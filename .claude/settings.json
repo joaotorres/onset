@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git rev-list:*)",
+      "Bash(git describe:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(bundle exec standardrb:*)",
+      "Bash(bin/rails tailwindcss:build)",
+      "Bash(bin/rails db:test:prepare:*)"
+    ],
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(rm -rf:*)",
+      "Bash(sudo:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Bash(cat .env:*)"
+    ]
+  }
+}

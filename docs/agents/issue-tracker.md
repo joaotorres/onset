@@ -28,3 +28,16 @@ Used by `/wayfinder`. The **map** is a file with one **child** file per ticket.
 - **Frontier**: scan `.scratch/<effort>/issues/` for files that are open, unblocked, and unclaimed; first by number wins.
 - **Claim**: set `Status: claimed` and save before any work.
 - **Resolve**: append the answer under an `## Answer` heading, set `Status: resolved`, then append a context pointer (gist + link) to the map's Decisions-so-far in `map.md`.
+
+## skills-loop
+
+Tickets live in `.scratch/onset-v1/issues/` and use the ticket format in the
+`loop-rules` skill (call the Skill tool with `loop-rules`), which overrides
+any template a skill carries. The spec
+is `SPEC.md`, not `.scratch/<feature-slug>/spec.md`. The triage labels are
+the status vocabulary for these tickets, not the wayfinder's
+`claimed`/`resolved`. Commits for a ticket carry `Ticket: onset-v1/NN`.
+
+`/code-review` takes its spec and standards sources from the `loop-rules`
+skill, section Review sources: call the Skill tool with `loop-rules` first. If that skill is not available, stop and say
+the skills-loop plugin is not loaded.

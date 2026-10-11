@@ -517,6 +517,8 @@ Brute-force solver runs in `Card.any_set_on?` already. A "bot player" is a `Play
 
 ## 15. Implementation plan (vertical slices)
 
+Complete. Kept as history: new work runs as skills-loop tickets.
+
 Each step delivers a **small but end-to-end-working** increment. The app should be deployable and demoable after every step. One commit per step, pushed to `main`, deployed with `bin/kamal deploy`. Sections referenced by number are normative; do not re-derive their content here.
 
 > Step 0 has already been done manually outside Claude Code: `rails new . --database=sqlite3 --css=tailwind --javascript=importmap` produced the vanilla skeleton committed as the first commit on `main`. Steps below build on that.
