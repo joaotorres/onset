@@ -26,5 +26,8 @@
       "Read(./.env.*)",
       "Bash(cat .env:*)"
     ]
+  },
+  "enabledPlugins": {
+    "skills-loop@skills-loop": true
   }
 }
