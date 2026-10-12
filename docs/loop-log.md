@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  request 04: filed, behavioural. Next: triage.
 - 2026-10-12  request 03: filed, behavioural. Next: triage.
 - 2026-10-12  request 02: filed, behavioural. Next: triage.
 - 2026-10-12  request 01: filed, behavioural. Next: triage.
