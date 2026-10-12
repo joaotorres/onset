@@ -66,6 +66,21 @@ RSpec.describe "Lobbies", type: :request do
       end
     end
 
+    it "describes devices-first play with the big screen optional" do
+      get how_to_play_path
+      text = response.parsed_body.text.squish
+      [
+        "Onset is the card game Set, played live. Everyone plays on their own phone or computer, sees the same cards and races to spot a Set. A big screen the whole table can see is optional.",
+        "Join on your screen",
+        "Start a game, or join one with its room code, link or QR, then pick a name and a color.",
+        "Twelve cards go up on every player screen, and on the big screen if you use one. Everyone sees the same cards at the same time.",
+        "Tap SET! on your screen, then pick the three cards within 15 seconds. Nobody else can call while you pick."
+      ].each { |copy| expect(text).to include(copy) }
+      ["Join from your phone", "Scan the code on the big screen", "on your phone", "from their phone"].each do |old|
+        expect(text).not_to include(old)
+      end
+    end
+
     it "links back to the game when return_to is a same-site path" do
       get how_to_play_path, params: {return_to: "/games/ABC123/controller"}
       expect(response.body).to include(%(href="/games/ABC123/controller">Back to the game</a>))

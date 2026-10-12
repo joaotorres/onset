@@ -1,6 +1,6 @@
 # 13: How to play describes devices-first play
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by: 16
 Model:
