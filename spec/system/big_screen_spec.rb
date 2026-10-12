@@ -39,6 +39,28 @@ RSpec.describe "Big screen", type: :system do
     code = rect("[data-room-code]")
     line_height = page.evaluate_script("parseFloat(getComputedStyle(document.querySelector('[data-room-code]')).fontSize)")
     expect(code["height"]).to be < line_height * 1.5
+
+    qr = rect("[data-qr-tile]")
+    link = rect("[data-join-here]")
+    expect(link["top"]).to be >= qr["bottom"]
+    expect(link["right"] - link["left"]).to be <= qr["right"] - qr["left"]
+    link_line = page.evaluate_script("parseFloat(getComputedStyle(document.querySelector('[data-join-here]')).lineHeight)")
+    expect(link["height"]).to be < link_line * 1.5
+  end
+
+  it "joins from this computer in a new tab and shows the pill without a reload" do
+    visit game_path(game.code)
+    expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
+
+    join_tab = window_opened_by { click_link "Join from this computer" }
+    within_window(join_tab) do
+      fill_in "player[name]", with: "Alice"
+      all("label.cursor-pointer").first.click
+      click_button "Join"
+      expect(page).to have_current_path(game_controller_path(game.code))
+    end
+
+    expect(page).to have_css("#board li", text: "Alice")
   end
 
   it "renders the room code at 10rem at 1920x1080" do

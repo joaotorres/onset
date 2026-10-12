@@ -1,6 +1,6 @@
 # 03: Join from this computer link on the big screen
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by: 02
 Model:

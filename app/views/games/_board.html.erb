@@ -1,7 +1,12 @@
 <% if game.waiting? %>
   <div id="board" class="flex-1 min-h-0 flex flex-col justify-center gap-12">
     <div class="flex items-center gap-14">
-      <div class="shrink-0 rounded-3xl bg-white p-6"><%= join_qr_svg(game, "size-72") %></div>
+      <div class="shrink-0 flex flex-col items-center gap-4">
+        <div class="rounded-3xl bg-white p-6" data-qr-tile><%= join_qr_svg(game, "size-72") %></div>
+        <%= link_to "Join from this computer →", join_game_players_path(game.code),
+              target: "_blank", rel: "noopener",
+              class: "whitespace-nowrap text-2xl leading-8 font-semibold text-blue-400 hover:text-blue-300", data: {join_here: true} %>
+      </div>
       <%# The code shrinks with this column so it never runs into the rail at laptop widths. %>
       <div class="@container min-w-0 flex-1" data-hero-text>
         <p class="text-3xl text-gray-300">Scan to join, or open <span class="font-semibold text-white"><%= join_host %></span> and enter</p>

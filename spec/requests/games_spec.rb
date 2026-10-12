@@ -71,7 +71,36 @@ RSpec.describe "Games" do
       expect(qr_svgs.first.parent["class"]).to include("bg-white")
     end
 
+    def join_link(html = response.body) = Nokogiri::HTML(html).css("a").find { |a| a.text.include?("Join from this computer") }
+
+    it "links to the join page in a new tab while waiting" do
+      get game_path(game.code)
+      link = join_link
+      expect(link).to be_present
+      expect(link["href"]).to eq(join_game_players_path(game.code))
+      expect(link["target"]).to eq("_blank")
+      expect(link["rel"].split).to include("noopener")
+    end
+
+    describe "waiting board broadcast" do
+      include Turbo::Broadcastable::TestHelper
+
+      it "keeps the join link when a player joins" do
+        streams = capture_turbo_stream_broadcasts("game:#{game.code}") do
+          game.players.create!(name: "Alice", color: "#648FFF")
+        end
+        board = streams.find { |s| s["target"] == "board" }
+        expect(join_link(board.to_html)["href"]).to eq(join_game_players_path(game.code))
+      end
+    end
+
     %i[playing ended].each do |state|
+      it "shows no join link while #{state}" do
+        game.update!(status: state, board: (0..11).to_a, deck: (12..80).to_a)
+        get game_path(game.code)
+        expect(join_link).to be_nil
+      end
+
       it "shows the room tile with no QR while #{state}" do
         game.update!(status: state, board: (0..11).to_a, deck: (12..80).to_a)
         get game_path(game.code)
