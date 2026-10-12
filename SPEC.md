@@ -37,7 +37,7 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 
 1. The board shows 12 face-up cards drawn from the deck.
 2. Players race to spot a Set.
-3. A player taps **"SET!"** on their phone. Server timestamps the request and atomically locks the claim to the first arrival.
+3. A player taps **"SET!"** on their phone, or, in landscape, a card on the board their phone shows (§8, Phone controller), which also selects that card. Server timestamps the request and atomically locks the claim to the first arrival.
 4. The claiming player has **15 seconds** (`Game::CLAIM_TIMEOUT`) to tap 3 cards on their phone.
    - **Correct Set**: +1 point, those 3 cards are removed, 3 new cards are dealt from the deck. Board unfreezes.
    - **Wrong Set**: −1 point, claiming player is locked out for 5 seconds (cannot claim again). Board unfreezes immediately for everyone else.
@@ -320,6 +320,7 @@ Turbo Streams replace these by id, so each stays the outermost element of its re
 Stimulus attributes stay on whatever element plays the role:
 
 - `card-selection`: `card` targets with `data-card-id` and `click->card-selection#toggle`, plus `form`, `input`, `slot` and `count` targets
+- Idle landscape board: each card carries `data-card-id` and its tap posts the SET! claim (§8, Phone controller, Idle); whatever Stimulus controller does it lists its attributes here
 - `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
 
 ### Why this works
@@ -361,13 +362,13 @@ Portrait. "Joining room" with the code in large type, since the code is what peo
 
 ### Phone controller (`/games/:code/controller`)
 
-Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. Portrait: header with dot, name and score. Landscape: three columns, read-only board on the left, a 9rem action column, a 5rem info column (dot, name, score).
+Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. Portrait: header with dot, name and score. Landscape: three columns, the board on the left, a 9rem action column, a 5rem info column (dot, name, score). The board is read-only in every state but idle and claiming (mine).
 
 SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**.
 
 1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more".
-2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted".
-3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait adds a tray of three slots that fill as cards are tapped. Tap a card to select, tap again to deselect, auto-submit per §11.
+2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Landscape: tapping a card on the board calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
+3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait adds a tray of three slots that fill as cards are tapped. A claim started by tapping a card opens with that card selected (1/3) if it is still on the board. Tap a card to select, tap again to deselect, auto-submit per §11.
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
 5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
 6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked".
