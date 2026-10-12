@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  triage 02: ready, SPEC §8 Board one QR (hero only), room tile from start of play, room code fits at 1280px, four Decided lines. Next: build.
 - 2026-10-12  triage 01: ready, SPEC §10 striped pattern ids unique per rendered SVG, three Decided lines. Next: build.
 - 2026-10-12  design-brief 07, 08, 09, 10: spec gap, SPEC is still board-first. Next: triage with gap.
 - 2026-10-12  request 12: filed, behavioural. Next: triage.
