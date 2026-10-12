@@ -180,8 +180,7 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 
 ## Open questions
 
-- Game over rank when tied for first: drawn as "1st" with "Tied for first" under it. Should it read "=1st" or similar? (ticket 07)
-- Winner line when the viewer wins: drawn with the name ("★ Ada wins with 7"). Should it say "You"? (ticket 07)
+- Answered by triage 07 in SPEC §8 Player screen > 8. Game over: a tied rank stays a plain "1st", and the winner line reads "★ You win with 7" when the viewer wins, as the code already does. Redraw the -win boards to match in the next brief that touches game over
 
 ---
 

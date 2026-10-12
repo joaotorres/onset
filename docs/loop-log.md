@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  triage 07: ready, both design questions settled in SPEC §8 game over (plain "1st" on a tie, "You win"), computer layout and 1024×640 no-scroll added, five Decided lines. Next: triage 08.
 - 2026-10-12  design-entry 07, 08, 09, 10: v2, 8 components and the v2 rules into docs/design-system.md, 81 boards in the handoff, two SPEC conflicts decided by the user for the canvas, 4 design questions and 3 proposals for triage. Next: triage 07 to 10.
 - 2026-10-12  context cap: 118k, over 100k with the review next, nothing else ready. Next: /clear, then /skills-loop:auto.
 - 2026-10-12  triage 13: ready, blocked by 09, no spec change (§1 covers it), how-to-play header and steps 1 to 3 get exact devices-first copy, five Decided lines. Next: build once 09 is done.
