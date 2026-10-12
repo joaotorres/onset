@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  triage 18: ready, SPEC §8 Landing splits at lg: with the brand column contents shrinking to fit, overlap reproduced at 768 to 1100px, two Decided lines. Next: build.
 - 2026-10-12  request 18: filed, behavioural, landing fanned cards overlap the Start a game card at narrow desktop widths. Next: triage.
 - 2026-10-12  deploy deploy-20261012-2151: 01, 02, 03, 04, 05, 06, 07, 08, 10, 11, 12, 13, 14, 15, 16, 17 deployed. Next: new requests.
 - 2026-10-12  context cap: 174k, over 100k with the review next, nothing else ready. Next: /clear, then /skills-loop:auto.
