@@ -5,6 +5,7 @@ Kind: visual
 Blocked by:
 Model:
 Effort:
+Split: yes
 
 ## Request
 
@@ -45,3 +46,9 @@ Design proposes: while locked out the No Set pill stays enabled, since lockout o
 Design proposes: during a claim of my own, landscape and computer show one yellow block in place of the panel and SET!, with the pill slot empty; portrait puts the claim bar in the status slot and the 3-slot tray in place of SET! and its pill. No Set is not offered during my claim (Game#call_no_set! refuses it anyway).
 
 Decided: docs/design-system.md v2 changes the idle No Set pill from outlined `purple-950` to filled `purple-700` with white text, and the agreed waiting text from `purple-700`/`purple-300` to `purple-500`/`purple-200`, because the brief asked for every play state and the design tool drew them so. Rules changed: the `_secondary_action` look. Instead of: keeping v1's pills.
+
+Decided: SPEC §10 Component's landscape line now shrinks the cards to fit with no sideways scroll, the computer line sizes to the board's width and height, and §8 Computer stacks the scoreboard above the state's panel in a side column, as the user decided for both design conflicts on 2026-10-12; the card size rule goes into §10 in words, the formula staying in docs/design-system.md, because no sideways scroll is something a player notices. Instead of: the rule in docs/design-system.md alone.
+
+Decided: the design proposal is accepted: locked out, the pill slot keeps No Set or the End game vote enabled, written into SPEC §2 Edge cases and §8 Player screen > 6. Locked out, because §2 says lockout only blocks SET!, the code already renders No Set enabled there and Game#call_no_set! allows it. Instead of: disabling the pill while locked out.
+
+Decided: the design proposal is accepted: during my claim portrait puts the claim bar in the status slot and the tray in place of SET! and its pill, landscape and computer show one yellow block in place of the panel and SET! with the pill slot empty, and No Set is not offered, written into SPEC §8 Player screen > 3. Claiming (mine), because Game#call_no_set! refuses a call during a claim and it keeps the slots fixed. Instead of: a disabled No Set pill during my claim.

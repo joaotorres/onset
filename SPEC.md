@@ -54,7 +54,7 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 ### Edge cases
 
 - A player can call No Set even if they were never going to find one — that's the point.
-- Wrong-claim lockout (5s) only prevents that player from calling SET; they can still observe and join No-Set votes.
+- Wrong-claim lockout (5s) only prevents that player from calling SET; they can still observe, call No Set and join No-Set votes.
 - If the board grows beyond 12 (after No-Set draws), it stays oversized until a Set is found and removed; replacement cards only re-fill up to 12. Concretely: if board has 15 and a Set is found, board shrinks to 12 (no replacements).
 - If the deck runs out mid-game, the board is not refilled. Game continues until no Sets remain on the board.
 
@@ -369,7 +369,7 @@ Full height, no page scroll. A strip of the player's color across the top, "Room
 
 - **Portrait** (narrower than tall, under 1024px wide): the scoreboard across the top, the board under it at the full width, then the state's panel, SET! and its pill at the bottom, under the thumb.
 - **Landscape** (wider than tall, under 1024px wide): three columns, the board on the left, a 9rem action column, a scores column.
-- **Computer** (1024px wide and up, Tailwind `lg:`): a board-sized card grid on the left and a side panel with the scoreboard and, beside it, the state's panel, SET! and its pill. The exact layout comes from the design pass.
+- **Computer** (1024px wide and up, Tailwind `lg:`): a board-sized card grid on the left and a side column with the scoreboard stacked above the state's panel, SET! and its pill, so the board keeps the width.
 
 Shared by all three during play:
 
@@ -391,10 +391,10 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
 
    With 8 players and the invite there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640. The exact layout comes from the design pass.
 2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
-3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait adds a tray of three slots that fill as cards are tapped. A claim started by tapping a card opens with that card selected (1/3) if it is still on the board. Tap a card to select, tap again to deselect, auto-submit per §11.
+3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait puts the bar in the status slot above SET! and a tray of three slots, which fill as cards are tapped, in place of SET! and its pill. Landscape and computer show the bar as one block in place of the panel and SET!, the pill slot left empty. No Set is not offered during the player's own claim. A claim started by tapping a card opens with that card selected (1/3) if it is still on the board. Tap a card to select, tap again to deselect, auto-submit per §11.
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
 5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed in every layout) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
-6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked".
+6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked". The pill slot keeps the idle secondary action, **No Set** or the **End game** vote, enabled: lockout only blocks SET! (§2 Edge cases).
 7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
 8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9", "★ You win with 9" when the player is the sole winner, or "★ Tied for first at 9"), the standings, then a green **Play again** button, the ready vote (§5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more", n being the active players who have not voted. The room restarts with the same mode, fresh deck and zero scores once every active player has voted, straight into play. Accepted risk: active means seen in the last 30s and only a player's own requests refresh it, so after 30s on this screen the first tap may restart the room alone.
 
@@ -441,8 +441,10 @@ The SVG fills its wrapper; wrappers set the size with a 5:7 aspect ratio. The pa
 
 - **Big screen grid**: 3 rows flowing into columns, centered, no horizontal scroll at 18 cards. Cards are `15rem` tall at 1080px and shrink with the viewport (`min(15rem, (100dvh - 22rem) / 3)`) so the third row never runs under the announcement band.
 - **Player screen, portrait**: in every playing state the grid fits the width (`auto-cols-fr`) and shrinks to the height left, so SET! and its pill never leave the screen.
-- **Player screen, landscape**: the grid fills the height and scrolls sideways.
-- **Player screen, computer**: 3 rows flowing into columns, sized to the height as on the big screen, no horizontal scroll at 18 cards.
+- **Player screen, landscape**: 3 rows flowing into columns, the cards shrinking to fit the board's width and height, with no sideways scroll; at 12 cards they fill the height.
+- **Player screen, computer**: 3 rows flowing into columns, sized to the board's width and height, no horizontal scroll at 18 cards.
+
+On the player screen, in every layout, a card takes the largest size at which `cards / 3` columns fit the board's width and 3 rows its height, with a 5px gap on phones and 12px on computer.
 
 ### Visual system
 

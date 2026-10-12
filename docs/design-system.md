@@ -141,10 +141,12 @@ The SVG fills its wrapper; wrappers set the size with a 5:7 aspect ratio. The pa
 
 - **Big screen grid**: 3 rows flowing into columns, centered, no horizontal scroll at 18 cards. Cards are `15rem` tall at 1080px and shrink with the viewport (`min(15rem, (100dvh - 22rem) / 3)`) so the third row never runs under the announcement band.
 - **Player screen, portrait**: in every playing state the grid fits the width (`auto-cols-fr`) and shrinks to the height left, so SET! and its pill never leave the screen.
-- **Player screen, landscape**: the grid fills the height and scrolls sideways.
-- **Player screen, computer**: 3 rows flowing into columns, sized to the height as on the big screen, no horizontal scroll at 18 cards.
+- **Player screen, landscape**: 3 rows flowing into columns, the cards shrinking to fit the board's width and height, with no sideways scroll; at 12 cards they fill the height.
+- **Player screen, computer**: 3 rows flowing into columns, sized to the board's width and height, no horizontal scroll at 18 cards.
 
-The landscape line is superseded by the v2 card size rule above (no sideways scroll). Ticket 09's triage rewrites it in `SPEC.md`.
+On the player screen, in every layout, a card takes the largest size at which `cards / 3` columns fit the board's width and 3 rows its height, with a 5px gap on phones and 12px on computer.
+
+Triage 09 rewrote the landscape line in `SPEC.md` to match the v2 card size rule.
 
 #### Visual system
 
