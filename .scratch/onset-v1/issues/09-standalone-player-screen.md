@@ -35,3 +35,13 @@ Decided: tapping a card while idle calls SET! in every layout, SPEC §2 and §7 
 Decided: no page scroll with 8 players and 18 cards at 375×667 portrait, 667×375 landscape and 1024×640 computer in every state, cards shrinking to fit and portrait fitting the scoreboard in at most two rows, because §8 bars page scroll and 8 preset colors cap a room at 8 players, as ticket 07 set its sizes. Instead of: page scroll or a capped scoreboard.
 
 Decided: the 07, 08, 09, 10 brief draws every screen fresh on a new empty canvas and says the code is the truth for what it does not change, because the canvas has no boards to redraw. Instead of: first drawing the built landing, join page and player screen on the canvas from the code.
+
+Design conflicts with SPEC §10 Component ("Player screen, landscape: the grid fills the height and scrolls sideways"): the design shrinks the cards to fit the width at 18 cards (55×77), with no sideways scroll; at 12 cards they fill the height. The user decided the design wins on 2026-10-12: triage rewrites the §10 line.
+
+Design conflicts with SPEC §8 Player screen ("a side panel with the scoreboard and, beside it, the state's panel, SET! and its pill"): the computer layout stacks the scoreboard above the state panel in a 248px side column, so cards grow to 106×148 at 18 cards. The user decided the design wins on 2026-10-12: triage rewrites "beside it".
+
+Design proposes: while locked out the No Set pill stays enabled, since lockout only blocks SET!. Game#call_no_set! already allows it; §2 Edge cases names only joining No Set votes.
+
+Design proposes: during a claim of my own, landscape and computer show one yellow block in place of the panel and SET!, with the pill slot empty; portrait puts the claim bar in the status slot and the 3-slot tray in place of SET! and its pill. No Set is not offered during my claim (Game#call_no_set! refuses it anyway).
+
+Decided: docs/design-system.md v2 changes the idle No Set pill from outlined `purple-950` to filled `purple-700` with white text, and the agreed waiting text from `purple-700`/`purple-300` to `purple-500`/`purple-200`, because the brief asked for every play state and the design tool drew them so. Rules changed: the `_secondary_action` look. Instead of: keeping v1's pills.

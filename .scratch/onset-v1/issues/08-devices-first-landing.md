@@ -31,3 +31,9 @@ Decided: the creator does not become `host_player_id`; hosting stays with the cr
 Decided: the big screen room tile is unchanged and §8 now says its "host" line is the site address (`join_host`), because the code shows the hostname there, never a host player. Instead of: adding or removing a host player line.
 
 Decided: the 07, 08, 09, 10 brief draws every screen fresh on a new empty canvas and says the code is the truth for what it does not change, because the canvas has no boards to redraw. Instead of: first drawing the built landing, join page and player screen on the canvas from the code.
+
+Design proposes: after a bad room code, the landing's code field comes back empty, red-bordered, with "Room not found" under it. Today's alert reads "Room not found. Check the code on the big screen.", and "on the big screen" no longer holds devices-first; §8 Landing says only "Room not found".
+
+Design question: with every color taken the room is full and Join can only fail. Proposal: a base error "This room is full" and Join disabled. Drawn as §8 says for now (none selected).
+
+Decided: on phones the landing runs wordmark and tagline, the join form, then the mode toggle and Start a game, the fanned cards and caption last, because §8's "join form comes first" ranks it ahead of Start a game and the wordmark still names the page. Instead of: the join form above the wordmark.

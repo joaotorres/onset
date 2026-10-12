@@ -31,3 +31,7 @@ Decided: Show on a big screen opens `/games/:code` in a new tab, because leaving
 Decided: the invite shows the room code with "or open HOST and enter the code", the "Room CODE" footer staying, because that is the big screen's wording and the footer is shared by every state. Instead of: dropping the footer while waiting.
 
 Decided: the 07, 08, 09, 10 brief draws every screen fresh on a new empty canvas and says the code is the truth for what it does not change, because the canvas has no boards to redraw. Instead of: first drawing the built landing, join page and player screen on the canvas from the code.
+
+Design question: with 1 player in the room, can the creator cast the ready vote alone? If so "Ready ✓ · waiting for 0 more" reads wrong. Proposal: "Ready ✓ · waiting for others to join".
+
+Decided: docs/design-system.md v2 adds the rule that white text on green uses `green-700`, the big screen's Start game and Play again staying on `green-600` as a known gap for a later request, decided by the user, because the big screen is outside tickets 07 to 10. Instead of: a player-screen-only rule, or folding the big screen buttons into this ticket.
