@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  triage 17: ready, SPEC §10 green row notes green-700 for white text, three Decided lines. Next: build.
 - 2026-10-12  request 17: filed, behavioural, big screen Start game and Play again to green-700. Next: triage.
 - 2026-10-12  context cap: 164k, over 100k with the review next, nothing else ready. Next: /clear, then /skills-loop:auto.
 - 2026-10-12  build 13: done, how to play copy describes devices-first play with the big screen optional, bundle exec rspec green, no Decided lines. Next: the auto run picks the next step.

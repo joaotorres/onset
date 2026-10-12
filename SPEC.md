@@ -466,7 +466,7 @@ Each color means one thing everywhere:
 | yellow-400 | a claim in progress (big screen panel, scoreboard entries, player screen claim bar) |
 | purple | No Set. It used to be red; red now only means wrong or locked |
 | red | wrong claim, timeout, lockout |
-| green | ready, correct, start, play again |
+| green | ready, correct, start, play again (`green-700` for white text; `green-600` is only about 3.3:1) |
 | orange | deck empty and the End game vote (`orange-700` for white text; `orange-600` is only about 3.3:1) |
 
 Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberately apart from the card palette. They show as dots, the player screen's top border strip and podium bars.
