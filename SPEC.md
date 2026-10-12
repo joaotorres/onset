@@ -409,7 +409,7 @@ Single ERB partial: `app/views/cards/_card.html.erb` taking a `card:` local. Ren
 - Shading:
   - **Solid**: `fill=color`.
   - **Outline**: `fill=none stroke=color stroke-width=5`.
-  - **Striped**: `fill="url(#stripes-#{color})"`, a 40° hatch of 3.5px lines on a 7px pitch. Each SVG defines its own `<pattern>`.
+  - **Striped**: `fill="url(#stripes-#{color}-#{suffix})"`, a 40° hatch of 3.5px lines on a 7px pitch. Each SVG defines its own `<pattern>`, with an id unique to that rendered SVG, never to the card alone: the same card can appear twice on one page, and a browser resolves `url(#id)` to the first element with that id, so a duplicate inside a hidden element paints the shape empty. A copy made in the browser (the phone tray, §11) gets fresh ids too.
 
 The SVG fills its wrapper; wrappers set the size with a 5:7 aspect ratio. The partial is never restyled, only sized.
 
