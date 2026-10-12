@@ -363,13 +363,13 @@ Portrait. "Joining room" with the code in large type, since the code is what peo
 
 Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. Portrait: header with dot, name and score. Landscape: three columns, read-only board on the left, a 9rem action column, a 5rem info column (dot, name, score).
 
-SET! sits in the same fixed slot across idle, locked out and someone else claiming, so the thumb never has to move.
+SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**.
 
 1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more".
 2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted".
 3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait adds a tray of three slots that fill as cards are tapped. Tap a card to select, tap again to deselect, auto-submit per §11.
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
-5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed), then **I agree, no Set**, then "Spotted one after all?" and **SET!**, which cancels the call. After agreeing, or for the caller: "You agreed · waiting for n more".
+5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
 6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked".
 7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
 8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9" or "Tied for first"), "Play again from the big screen".
