@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  triage 13: ready, blocked by 09, no spec change (§1 covers it), how-to-play header and steps 1 to 3 get exact devices-first copy, five Decided lines. Next: build once 09 is done.
 - 2026-10-12  design-brief 07, 08, 09, 10: v1, brief written for a new empty Onset canvas, design-handoff.md created. Next: the user's design pass, then /design-entry.
 - 2026-10-12  request 13: filed, behavioural. Next: triage.
 - 2026-10-12  context cap: 162k, over 100k with the review and the 07 to 10 brief next. Next: /clear, then /skills-loop:auto.
