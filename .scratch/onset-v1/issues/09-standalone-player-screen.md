@@ -2,6 +2,7 @@
 
 Status: needs-triage
 Kind: visual
+Design gap: yes
 Blocked by:
 Model:
 Effort:
@@ -15,3 +16,5 @@ Without a big screen the player screen carries what only the big screen shows to
 ## Comments
 
 Decided: overlaps 06 (tapping a card calls SET!) for the clickable grid; filed as its own ticket, 06 owns the tap behaviour and this one the layout. Instead of: merging into 06.
+
+Design gap: SPEC §8 "Phone controller" assumes a big screen shows the cards. In portrait while idle the player screen shows no cards (only SET! and No Set), so with no big screen a portrait phone player cannot see the board: must portrait show the board while idle, and where do SET! and No Set go then? Which scoreboard fields the player screen shows (§8 "Board": sorted by score, claiming row yellow, Locked tag) and where in portrait and landscape. Which big screen announcements move over (§8 "Announcement band": claiming, No Set, correct with cards, wrong or time's up of other players) and the deck count or "Deck is empty" pill. Whether `last_dealt`'s green outline (§10 `animate-arrive`) shows on the player screen. What width or input counts as "computer" for the board-sized layout, versus phone landscape.
