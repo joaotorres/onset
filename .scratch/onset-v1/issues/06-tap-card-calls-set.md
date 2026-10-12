@@ -15,7 +15,7 @@ Applies where the player screen shows cards while idle (landscape, a computer). 
 ## Spec references
 
 - SPEC §2 "Round flow" item 3: a card tap in landscape is a way to call SET!
-- SPEC §8 "Phone controller": the landscape sentence (board read-only except idle and claiming (mine)), item 2 Idle (tap calls SET! with that card selected, first tap only, lost race does nothing, never carries into a later claim), item 3 Claiming (mine) (opens with the tapped card selected, 1/3)
+- SPEC §8 "Player screen": the landscape sentence (board read-only except idle and claiming (mine)), item 2 Idle (tap calls SET! with that card selected, first tap only, lost race does nothing, never carries into a later claim), item 3 Claiming (mine) (opens with the tapped card selected, 1/3)
 - SPEC §7 "Hooks that must survive any markup change": the idle landscape board line
 
 ## Scope

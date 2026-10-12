@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  triage 12: ready, SPEC intro and §1 devices-first with the terms, player screen and big screen across §2 to §11, §8 headings renamed and open tickets' references updated, big screen announcement lines say "on your screen", five Decided lines. Next: build.
 - 2026-10-12  triage 11: ready, SPEC §8 Phone controller game over Play again ready vote by every active player, §2, §4 and §5 updated, big screen unchanged, six Decided lines. Next: build.
 - 2026-10-12  triage 06: ready, SPEC §2 Round flow and §8 Phone controller idle landscape card tap calls SET! with that card selected, §7 hook line, six Decided lines. Next: build.
 - 2026-10-12  triage 05: ready, SPEC §8 Phone controller SET! keeps its round slot in the No Set countdown with I agree, no Set as the pill under it, six Decided lines. Next: build.

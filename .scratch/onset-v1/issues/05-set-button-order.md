@@ -14,7 +14,7 @@ During the No Set countdown the phone puts "I agree, no Set" above SET!, swappin
 
 ## Spec references
 
-- SPEC §8 "Phone controller": the fixed-slot paragraph (SET! keeps its slot in the No Set countdown, the pill slot under it) and item 5 (No Set countdown)
+- SPEC §8 "Player screen": the fixed-slot paragraph (SET! keeps its slot in the No Set countdown, the pill slot under it) and item 5 (No Set countdown)
 
 ## Scope
 

@@ -14,7 +14,7 @@ For someone playing from the same computer as the big screen, and for testing. A
 
 ## Spec references
 
-- §8 Views & UX > Board (`/games/:code`) > Waiting (a **Join from this computer →** link under the hero QR opens the join page in a new tab; one player per browser)
+- §8 Views & UX > Big screen (`/games/:code`) > Waiting (a **Join from this computer →** link under the hero QR opens the join page in a new tab; one player per browser)
 - §5 Routes (`GET /games/:code/players/join`, the link's target, unchanged)
 
 ## Scope

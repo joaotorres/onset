@@ -1,6 +1,6 @@
 # Set — Online Multiplayer Spec
 
-A web implementation of the card game **Set**, designed for the "shared screen + phones as controllers" pattern (Jackbox-style). The board displays on a TV or laptop; players connect their phones via QR code and use them to call and submit Sets.
+A web implementation of the card game **Set**, played devices-first: each player plays on their own device, a phone or a computer, and a shared big screen (a TV or laptop the whole table can see) is optional. `docs/adr/0001-devices-first-play.md` records why this replaced the Jackbox-style design, where a shared screen showed the cards and phones were only controllers.
 
 This document is the source of truth for the v1 MVP. It is intentionally tight; favor it over guesses, but flag ambiguities back to the spec rather than inventing.
 
@@ -8,7 +8,9 @@ This document is the source of truth for the v1 MVP. It is intentionally tight; 
 
 ## 1. Overview
 
-**What it is.** Real-time multiplayer Set. One device acts as the **board** (rendering the 12+ cards, scores, and announcements). Each player connects a **phone** (the controller) to claim Sets and pick the three cards.
+**What it is.** Real-time multiplayer Set. Each player plays on their own **player screen** (`/games/:code/controller`), on a phone or a computer, from which they call SET!, pick the three cards and vote. A **big screen** (`/games/:code`) is an optional shared display of the same room: the board, the scores and the announcements, for everyone at the table. Any room can open it at any time, before or during play; it is a URL, not a mode stored on the game, so every game is the same. Since the big screen is optional, the player screen is meant to stand alone; §8 says what each screen shows.
+
+**Terms.** This spec and every user-facing text say **player screen** and **big screen** (`GLOSSARY.md`), never "phone", "controller" or "TV" for the screens. **Board** means the face-up cards. Code names predate these terms and stay: `ControllersController`, the `controller` route, `#controller_status`, the `board` column and `#board`.
 
 **Stack.** Ruby on Rails 8, SQLite, Hotwire (Turbo + Stimulus), Action Cable with Solid Cable adapter, Solid Queue, Tailwind CSS, deployed with Kamal to a VPS.
 
@@ -37,17 +39,17 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 
 1. The board shows 12 face-up cards drawn from the deck.
 2. Players race to spot a Set.
-3. A player taps **"SET!"** on their phone, or, in landscape, a card on the board their phone shows (§8, Phone controller), which also selects that card. Server timestamps the request and atomically locks the claim to the first arrival.
-4. The claiming player has **15 seconds** (`Game::CLAIM_TIMEOUT`) to tap 3 cards on their phone.
+3. A player taps **"SET!"** on their player screen, or, in landscape, a card on the board their player screen shows (§8, Player screen), which also selects that card. Server timestamps the request and atomically locks the claim to the first arrival.
+4. The claiming player has **15 seconds** (`Game::CLAIM_TIMEOUT`) to tap 3 cards on their player screen.
    - **Correct Set**: +1 point, those 3 cards are removed, 3 new cards are dealt from the deck. Board unfreezes.
    - **Wrong Set**: −1 point, claiming player is locked out for 5 seconds (cannot claim again). Board unfreezes immediately for everyone else.
    - **Timeout (no submission within 15s)**: same penalty as a wrong Set: −1 point and a 5-second lockout. Board unfreezes.
-5. **No Set on the board**: any player can tap **"No Set"**. A 15-second countdown begins, visible on the board and all phones. Resolution:
+5. **No Set on the board**: any player can tap **"No Set"**. A 15-second countdown begins, visible on the big screen and every player screen. Resolution:
    - If **all currently active players** join the call before the countdown ends, it resolves immediately.
    - Otherwise, the countdown expires.
    - On resolution: deal 3 additional cards from the deck (board grows to 15, then 18 if called again). Hard cap at **18 cards**.
    - If anyone calls **"SET!"** during the countdown, the No-Set call is **cancelled** and the claim flow begins.
-6. **Game end**: when the deck is empty and **no valid Set exists** on the remaining board cards. Once the deck is empty, players can also end early: every active player taps **"End game"**. In quick mode the game ends when a player reaches 5 points (`Game::QUICK_WIN_SCORE`). The board shows the podium and a "Play again" button that restarts the room at once. Each player screen shows **Play again** as a ready vote: the room restarts once every active player has voted (§8, Phone controller, Game over).
+6. **Game end**: when the deck is empty and **no valid Set exists** on the remaining board cards. Once the deck is empty, players can also end early: every active player taps **"End game"**. In quick mode the game ends when a player reaches 5 points (`Game::QUICK_WIN_SCORE`). The big screen shows the podium and a "Play again" button that restarts the room at once. Each player screen shows **Play again** as a ready vote: the room restarts once every active player has voted (§8, Player screen, Game over).
 
 ### Edge cases
 
@@ -65,7 +67,7 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 - **One Rails process.** Serves HTML, JSON, WebSockets, and background jobs from a single container.
 - **SQLite** for primary, cable (Solid Cable), queue (Solid Queue), and cache (Solid Cache) databases. All four files live on the mounted persistent disk.
 - **Turbo Streams** drive realtime UI. The server renders ERB partials and broadcasts diffs over Action Cable. Minimal custom JS.
-- **Stimulus** for client-only interactions: the 3-card selection on the phone, button countdown timers, the QR widget.
+- **Stimulus** for client-only interactions: the 3-card selection on the player screen, button countdown timers, the QR widget.
 
 ### Why this works in one container
 
@@ -103,7 +105,7 @@ The room.
 | `start_voters` | json | Player ids who tapped "I'm ready" while waiting, or "Play again" once ended (default `[]`) |
 | `end_game_voters` | json | Player ids who voted to end once the deck is empty (default `[]`) |
 | `flash_claim_id` | bigint | nullable; the just-resolved claim the screens announce for 3s |
-| `last_dealt` | json | Card ids dealt by the last replace, outlined on the board for 3s (default `[]`) |
+| `last_dealt` | json | Card ids dealt by the last replace, outlined on the big screen for 3s (default `[]`) |
 | `last_activity_at` | datetime | unused; idle cleanup uses `updated_at` |
 | `ended_at` | datetime | nullable |
 
@@ -124,7 +126,7 @@ A participant in a Game.
 | `color` | string | Hex code, chosen at join. UI offers 8 distinct presets. |
 | `score` | integer | default 0 |
 | `locked_until` | datetime | nullable; the timestamp until which the player cannot call SET (5s lockout) |
-| `last_seen_at` | datetime | updated on every phone request via `Player#seen!`, which skips callbacks so it never broadcasts |
+| `last_seen_at` | datetime | updated on every player screen request via `Player#seen!`, which skips callbacks so it never broadcasts |
 | `left_at` | datetime | nullable; for graceful disconnect |
 
 **Validations**: `name` present, length 1..20. `color` matches a hex pattern. `(game_id, name)` unique-case-insensitive (no two players in the same game can share a name). `(game_id, color)` unique (no two players in the same game can share a color).
@@ -207,20 +209,20 @@ Rails.application.routes.draw do
 end
 ```
 
-URL surface. Every action a phone or the board POSTs answers `204 No Content`; the broadcast updates the screens (§7).
+URL surface. Every action a player screen or the big screen POSTs answers `204 No Content`; the broadcast updates the screens (§7).
 
 | Method | Path | Purpose |
 | --- | --- | --- |
 | GET | `/` | Landing: start a game, start a quick game, or join by code |
 | GET | `/join?code=` | Find the room by code, redirect to its join page or back with "Room not found" |
 | POST | `/games` | Create room (`mode=quick` for first to 5), redirect to `/games/:code` |
-| GET | `/games/:code` | Board view (TV) |
-| GET | `/games/:code/players/join` | Phone landing after QR scan: name + color form |
-| POST | `/games/:code/players` | Create player, set cookie, redirect to controller |
-| GET | `/games/:code/controller` | Phone controller view |
-| POST | `/games/:code/ready` | Phone votes to start; the game starts when every player (2+) has voted. Once ended, phone votes to play again; the room restarts when every active player has voted |
-| POST | `/games/:code/start` | Host starts the game from the board |
-| POST | `/games/:code/restart` | Play again from the board (host): reset deck, clear scores and votes, status `playing`, at once |
+| GET | `/games/:code` | Big screen, optional: any room can open it at any time |
+| GET | `/games/:code/players/join` | Join page, after the QR scan or a code: name + color form |
+| POST | `/games/:code/players` | Create player, set cookie, redirect to the player screen |
+| GET | `/games/:code/controller` | Player screen |
+| POST | `/games/:code/ready` | A player votes to start; the game starts when every player (2+) has voted. Once ended, a player votes to play again; the room restarts when every active player has voted |
+| POST | `/games/:code/start` | Host starts the game from the big screen |
+| POST | `/games/:code/restart` | Play again from the big screen (host): reset deck, clear scores and votes, status `playing`, at once |
 | POST | `/games/:code/claims` | Try to take the claim lock; a lost race changes nothing |
 | PATCH | `/games/:code/claims/:id` | Submit `card_ids` for a held claim |
 | POST | `/games/:code/no_set` | Initiate No-Set countdown OR join existing call |
@@ -280,7 +282,7 @@ Use Turbo Streams via `broadcasts_to` for almost all updates. Drop down to a cus
 ### Streams
 
 - **`game:#{code}`** — broadcast to everyone in the room. Used for: board state, scoreboard, claim/no-set announcements, game phase transitions.
-- **`player:#{player.id}`** — broadcast to a single phone. Used for: lockout-state UI on the controller, "your claim is active, pick 3 cards", error toasts.
+- **`player:#{player.id}`** — broadcast to a single player screen. Used for: lockout-state UI, "your claim is active, pick 3 cards", error toasts.
 
 ### Pattern
 
@@ -302,11 +304,11 @@ after_update_commit -> {
 }
 ```
 
-The board view subscribes to `game:CODE` only. The phone view subscribes to **both** `game:CODE` (so it sees the board state) **and** `player:ID`.
+The big screen subscribes to `game:CODE` only. The player screen subscribes to **both** `game:CODE` (so it sees the game state) **and** `player:ID`.
 
 ### Actions answer 204, broadcasts update the screen
 
-Every POST from a phone or the board (SET!, card submit, No Set, agree, End game, ready, Start game, Play again) answers `204 No Content`. Turbo leaves the page alone, and the broadcast the action triggers updates every screen, including the one that acted.
+Every POST from a player screen or the big screen (SET!, card submit, No Set, agree, End game, ready, Start game, Play again) answers `204 No Content`. Turbo leaves the page alone, and the broadcast the action triggers updates every screen, including the one that acted.
 
 Do not redirect back to the same page. A redirect reloads it, which drops its stream subscriptions for about 500 ms, and any broadcast in that window is lost. Do not send per-player broadcasts for bookkeeping either (see `last_seen_at`): the `async` adapter can deliver two messages to the same stream out of order, and a stale one can win.
 
@@ -314,13 +316,13 @@ Do not redirect back to the same page. A redirect reloads it, which drops its st
 
 Turbo Streams replace these by id, so each stays the outermost element of its region:
 
-- Board: `#board` (holds the waiting state and `#start_button`), `#scoreboard`, `#announcement`, `#start_button`
-- Phone: `#controller_status` (wraps the header, the state body and the found-set banner)
+- Big screen: `#board` (holds the waiting state and `#start_button`), `#scoreboard`, `#announcement`, `#start_button`
+- Player screen: `#controller_status` (wraps the header, the state body and the found-set banner)
 
 Stimulus attributes stay on whatever element plays the role:
 
 - `card-selection`: `card` targets with `data-card-id` and `click->card-selection#toggle`, plus `form`, `input`, `slot` and `count` targets
-- Idle landscape board: each card carries `data-card-id` and its tap posts the SET! claim (§8, Phone controller, Idle); whatever Stimulus controller does it lists its attributes here
+- Idle landscape board: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle); whatever Stimulus controller does it lists its attributes here
 - `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
 
 ### Why this works
@@ -342,25 +344,25 @@ One page for phones and desktops, split at `md:`. Brand on the left: the **Onset
 
 On phones the join form comes first, since joining is what phones come here for.
 
-### Board (`/games/:code`)
+### Big screen (`/games/:code`)
 
 Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wide. Two columns: the play area (`#board` over `#announcement`) and a 26rem right rail with the room tile (room code and host, no QR) and the **Players** scoreboard. The room tile is hidden while waiting, since the join hero carries the code, and appears once the game starts without a reload. The join hero holds the only QR on the screen: once play starts, late joining is blocked, so nothing needs one.
 
 - **Scoreboard**: rows sorted by score, dot, name, big score. The claiming player's row turns solid yellow. A locked-out player is greyed with a red **Locked** tag.
 - **Waiting**: a join hero with a 288px QR and, under it, a **Join from this computer →** link that opens the join page in a new tab, for someone playing on the same computer as the big screen. A browser holds one player (one `player_token` cookie), so a second player on that computer needs a private window or another browser. Beside the QR, "Scan to join, or open HOST and enter" and the room code at up to 10rem, shrinking with the viewport so it never runs past the play area into the rail. The hero's text wraps or shrinks the same way. Player pills with a ✓ once ready. `#start_button`: **Start game** with "n of m ready" beside it, or disabled with "Need at least 2 players".
 - **Playing**: "N cards left in the deck" top right, or an orange "Deck is empty" pill. The card grid (§10). Cards dealt by the last replace get a green outline that fades over 3s.
-- **Announcement band**: always 9rem tall so the grid never jumps. Empty while playing: "Spot a Set? Hit SET! on your phone." Otherwise one tinted panel:
+- **Announcement band**: always 9rem tall so the grid never jumps. Empty while playing: "Spot a Set? Hit SET! on your screen." Otherwise one tinted panel:
   - Claiming (yellow): countdown ring, "Alex is calling SET!".
-  - No Set (purple): ring, "Alex called No Set", "Agree on your phone, or find one first", and "n/m agreed".
+  - No Set (purple): ring, "Alex called No Set", "Agree on your screen, or find one first", and "n/m agreed".
   - Correct (green): the three cards, "Alex found a Set", "+1". Fades after 3s.
   - Wrong / Time's up (red): the cards for a wrong claim, the reason with the 5-second lockout, "−1".
 - **Ended**: "Game over", then "Alex wins" or "It's a tie". Podium in 2-1-3 order; bars carry the real rank, so a tie reads #1 #1, and only a sole winner gets the ★. **Play again**, which restarts the room at once whatever the player screens have voted.
 
-### Phone join (`/games/:code/players/join`)
+### Join page (`/games/:code/players/join`)
 
 Portrait. "Joining room" with the code in large type, since the code is what people check. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken, none is selected. The page does not update live as others join. **Join** sits at the bottom, under the thumb. Field errors show under their field; base errors (game already started) in a red box.
 
-### Phone controller (`/games/:code/controller`)
+### Player screen (`/games/:code/controller`)
 
 Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. Portrait: header with dot, name and score. Landscape: three columns, the board on the left, a 9rem action column, a 5rem info column (dot, name, score). The board is read-only in every state but idle and claiming (mine).
 
@@ -395,7 +397,7 @@ Colorblind-safe (IBM 3-color palette):
 - **Orange**: `#FE6100`
 - **Magenta**: `#DC267F`
 
-Background: near-white (`#FAFAFA`). Card border: subtle, `#E5E5E5`. Selected card on phone: `ring-4 ring-blue-400 scale-95`.
+Background: near-white (`#FAFAFA`). Card border: subtle, `#E5E5E5`. Selected card on the player screen: `ring-4 ring-blue-400 scale-95`.
 
 ### Component
 
@@ -410,22 +412,22 @@ Single ERB partial: `app/views/cards/_card.html.erb` taking a `card:` local. Ren
 - Shading:
   - **Solid**: `fill=color`.
   - **Outline**: `fill=none stroke=color stroke-width=5`.
-  - **Striped**: `fill="url(#stripes-#{color}-#{suffix})"`, a 40° hatch of 3.5px lines on a 7px pitch. Each SVG defines its own `<pattern>`, with an id unique to that rendered SVG, never to the card alone: the same card can appear twice on one page, and a browser resolves `url(#id)` to the first element with that id, so a duplicate inside a hidden element paints the shape empty. A copy made in the browser (the phone tray, §11) gets fresh ids too.
+  - **Striped**: `fill="url(#stripes-#{color}-#{suffix})"`, a 40° hatch of 3.5px lines on a 7px pitch. Each SVG defines its own `<pattern>`, with an id unique to that rendered SVG, never to the card alone: the same card can appear twice on one page, and a browser resolves `url(#id)` to the first element with that id, so a duplicate inside a hidden element paints the shape empty. A copy made in the browser (the player screen tray, §11) gets fresh ids too.
 
 The SVG fills its wrapper; wrappers set the size with a 5:7 aspect ratio. The partial is never restyled, only sized.
 
-- **Board grid**: 3 rows flowing into columns, centered, no horizontal scroll at 18 cards. Cards are `15rem` tall at 1080px and shrink with the viewport (`min(15rem, (100dvh - 22rem) / 3)`) so the third row never runs under the announcement band.
-- **Phone, portrait claim**: the grid fits the width (`auto-cols-fr`), about 84px wide with 12 cards.
-- **Phone, landscape**: the grid fills the height and scrolls sideways.
+- **Big screen grid**: 3 rows flowing into columns, centered, no horizontal scroll at 18 cards. Cards are `15rem` tall at 1080px and shrink with the viewport (`min(15rem, (100dvh - 22rem) / 3)`) so the third row never runs under the announcement band.
+- **Player screen, portrait claim**: the grid fits the width (`auto-cols-fr`), about 84px wide with 12 cards.
+- **Player screen, landscape**: the grid fills the height and scrolls sideways.
 
 ### Visual system
 
 Dark UI where the cards are the only bright surfaces. Tailwind default palette plus these tokens in `app/assets/tailwind/application.css`:
 
 - `font-display`: Bricolage Grotesque (Google Fonts link in the layout). Only for display text: wordmark, room code, scores, SET!, headlines, countdown digits. Body copy stays on the default sans.
-- `animate-shake`: once, 0.4s. Locked-out phone panel.
+- `animate-shake`: once, 0.4s. Locked-out player screen panel.
 - `animate-arrive`: green outline that holds 1.5s and fades by 3s. Cards dealt by the last replace (`Game#last_dealt`).
-- `.found-set-flash`: holds 1.5s, fades by 3s. Correct-claim panels on the board and the phone.
+- `.found-set-flash`: holds 1.5s, fades by 3s. Correct-claim panels on the big screen and the player screen.
 
 Surfaces: page `gray-950`, panels `gray-900`, borders `gray-700`/`gray-800`. Secondary text `gray-400`, muted `gray-500` (not `gray-600`, which fails contrast on `gray-950`).
 
@@ -435,13 +437,13 @@ Each color means one thing everywhere:
 |---|---|
 | blue-600 | SET! and primary actions |
 | violet-600 | quick game |
-| yellow-400 | a claim in progress (board panel, scoreboard row, phone claim bar) |
+| yellow-400 | a claim in progress (big screen panel, scoreboard row, player screen claim bar) |
 | purple | No Set. It used to be red; red now only means wrong or locked |
 | red | wrong claim, timeout, lockout |
 | green | ready, correct, start, play again |
 | orange | deck empty and the End game vote (`orange-700` for white text; `orange-600` is only about 3.3:1) |
 
-Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberately apart from the card palette. They show as dots, the phone's top border strip and podium bars.
+Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberately apart from the card palette. They show as dots, the player screen's top border strip and podium bars.
 
 Countdown rings: `r=45` in a 100 viewBox, gray track, colored progress with round caps, rotated -90° so they drain clockwise from the top. Seconds sit inside the ring, or inside the button the ring surrounds.
 
@@ -451,7 +453,7 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 
 ## 11. Selection submission UX (decision)
 
-After the third tap on the phone, **auto-submit with a 250ms delay** so a player can deselect a misclick before commit. The card grid dims to 50% during the delay. Each tap also copies the card into the portrait tray's next free slot and updates the n/3 count.
+After the third tap on the player screen, **auto-submit with a 250ms delay** so a player can deselect a misclick before commit. The card grid dims to 50% during the delay. Each tap also copies the card into the portrait tray's next free slot and updates the n/3 count.
 
 ---
 

@@ -14,11 +14,11 @@ Replaces "Play again from the big screen" on the player screen's game over. "Pla
 
 ## Spec references
 
-- §8 Views & UX > Phone controller (`/games/:code/controller`) > 8. Game over (Play again vote, waiting line, restart rule, accepted risk)
+- §8 Views & UX > Player screen (`/games/:code/controller`) > 8. Game over (Play again vote, waiting line, restart rule, accepted risk)
 - §2 Game Rules > Round flow > 6. Game end (big screen restarts at once, player screens vote)
 - §5 Routes (`POST /games/:code/ready` once ended, `POST /games/:code/restart`)
 - §4 Data Model > `Game` > `start_voters`
-- §8 Views & UX > Board (`/games/:code`) > Ended (big screen Play again restarts at once)
+- §8 Views & UX > Big screen (`/games/:code`) > Ended (big screen Play again restarts at once)
 
 ## Scope
 

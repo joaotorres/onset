@@ -16,8 +16,8 @@ The overlapping text was not pinned down. Best guess: the 10rem room code runnin
 
 ## Spec references
 
-- §8 Views & UX > Board (`/games/:code`) (room tile is room code and host with no QR, hidden while waiting, shown from the start of play; fits a laptop down to 1280px wide)
-- §8 Views & UX > Board > Waiting (the join hero holds the only QR; room code at up to 10rem, shrinking with the viewport; hero text never runs into the rail)
+- §8 Views & UX > Big screen (`/games/:code`) (room tile is room code and host with no QR, hidden while waiting, shown from the start of play; fits a laptop down to 1280px wide)
+- §8 Views & UX > Big screen > Waiting (the join hero holds the only QR; room code at up to 10rem, shrinking with the viewport; hero text never runs into the rail)
 - §10 Cards and visual system > Visual system (QR: dark modules on a white tile, unchanged)
 
 ## Scope

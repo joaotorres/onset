@@ -14,7 +14,7 @@ Taken colors are already greyed out when the join page renders, and the server a
 
 ## Spec references
 
-- §8 Views & UX > Phone join (`/games/:code/players/join`) (first free color selected, next free after a clash, none when all are taken, no live update)
+- §8 Views & UX > Join page (`/games/:code/players/join`) (first free color selected, next free after a clash, none when all are taken, no live update)
 - §4 Data Model > `Player` > Validations (`(game_id, color)` unique, documenting the existing validation)
 
 ## Scope
