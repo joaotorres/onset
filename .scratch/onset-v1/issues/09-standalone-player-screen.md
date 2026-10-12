@@ -33,3 +33,5 @@ Decided: the computer layout is the viewport at 1024px wide and up (Tailwind lg:
 Decided: tapping a card while idle calls SET! in every layout, SPEC §2 and §7 updated to match, because ticket 06's request applies it wherever the board shows while idle; 06 keeps its landscape scope and its spec references were renamed, and this ticket's build covers portrait and computer, so it will be blocked by 06. Instead of: a read-only portrait board while idle.
 
 Decided: no page scroll with 8 players and 18 cards at 375×667 portrait, 667×375 landscape and 1024×640 computer in every state, cards shrinking to fit and portrait fitting the scoreboard in at most two rows, because §8 bars page scroll and 8 preset colors cap a room at 8 players, as ticket 07 set its sizes. Instead of: page scroll or a capped scoreboard.
+
+Decided: the 07, 08, 09, 10 brief draws every screen fresh on a new empty canvas and says the code is the truth for what it does not change, because the canvas has no boards to redraw. Instead of: first drawing the built landing, join page and player screen on the canvas from the code.

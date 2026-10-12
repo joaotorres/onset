@@ -29,3 +29,5 @@ Decided: the link shows to the browser whose `host_game` cookie matches the room
 Decided: the creator does not become `host_player_id`; hosting stays with the creating browser's `host_game` cookie on both paths, as today, and §4 now says the column is unused, because start and play again are ready votes on player screens and the big screen's Start game and Play again already check the cookie. Instead of: setting `host_player_id` on the creator's join.
 
 Decided: the big screen room tile is unchanged and §8 now says its "host" line is the site address (`join_host`), because the code shows the hostname there, never a host player. Instead of: adding or removing a host player line.
+
+Decided: the 07, 08, 09, 10 brief draws every screen fresh on a new empty canvas and says the code is the truth for what it does not change, because the canvas has no boards to redraw. Instead of: first drawing the built landing, join page and player screen on the canvas from the code.

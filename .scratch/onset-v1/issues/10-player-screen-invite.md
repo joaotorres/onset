@@ -29,3 +29,5 @@ Decided: a room update re-rendering `#controller_status` closes an open QR sheet
 Decided: Show on a big screen opens `/games/:code` in a new tab, because leaving the player screen mid-waiting would make the player find their way back, and Join from this computer already opens a new tab. Instead of: the same tab, as the creator's join page link does.
 
 Decided: the invite shows the room code with "or open HOST and enter the code", the "Room CODE" footer staying, because that is the big screen's wording and the footer is shared by every state. Instead of: dropping the footer while waiting.
+
+Decided: the 07, 08, 09, 10 brief draws every screen fresh on a new empty canvas and says the code is the truth for what it does not change, because the canvas has no boards to redraw. Instead of: first drawing the built landing, join page and player screen on the canvas from the code.

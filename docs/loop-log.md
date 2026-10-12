@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  design-brief 07, 08, 09, 10: v1, brief written for a new empty Onset canvas, design-handoff.md created. Next: the user's design pass, then /design-entry.
 - 2026-10-12  request 13: filed, behavioural. Next: triage.
 - 2026-10-12  context cap: 162k, over 100k with the review and the 07 to 10 brief next. Next: /clear, then /skills-loop:auto.
 - 2026-10-12  build 12: done, big screen announcement band says "on your screen" for the idle SET! line and the No Set agree line, verification 230 examples 0 failures. Next: next ready ticket.

@@ -27,3 +27,5 @@ Decided: the own row gets a surface tint and "you" after the name, because §10 
 Decided: no page scroll with 8 players at 375×667 portrait and 667×375 landscape, the list scrolling inside itself on shorter screens, because §8 says the player screen never scrolls and the 8 preset colors cap a room at 8 players. Instead of: page scroll or showing only the top rows.
 
 Decided: the list holds every player in the room, sorted by score with ties in join order and ranks shared as "1, 1, 3", because Game#standings and Game#rank_of already work that way and "of N players" counts every player. Instead of: only active players.
+
+Decided: the 07, 08, 09, 10 brief draws every screen fresh on a new empty canvas and says the code is the truth for what it does not change, because the canvas has no boards to redraw. Instead of: first drawing the built landing, join page and player screen on the canvas from the code.
