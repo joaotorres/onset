@@ -1,6 +1,6 @@
 # 06: Tapping a card calls SET!
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
@@ -70,3 +70,5 @@ Decided: a tapped card no longer on the board is dropped and the claim opens at 
 Decided: no new hover or pressed style, only `cursor-pointer` and buttons, so the ticket stays behavioural with the design system's existing card. Instead of: a hover lift that would need a design pass.
 
 Decided: the big screen's "Hit SET! on your phone" line stays, because the phone SET! still works and ticket 12 owns player-facing wording for devices-first. Instead of: rewording it here.
+
+Decided: criterion 4's wrong case checks the wrong result and the lockout, not a score of -1, because `Claim#resolve_wrong!` keeps the score at 0 or above. Instead of: asserting a negative score.

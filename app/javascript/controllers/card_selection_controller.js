@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { takePendingCardTap } from "controllers/card_tap_controller"
 
 const SELECTED = ["ring-4", "ring-blue-400", "scale-95"]
 const EMPTY_SLOT = ["border-2", "border-dashed", "border-gray-700"]
@@ -9,6 +10,11 @@ export default class extends Controller {
   connect() {
     this.selected = []
     this.submitTimer = null
+
+    // A claim started by tapping an idle card opens with that card selected.
+    const tapped = takePendingCardTap()
+    const card = this.cardTargets.find(c => parseInt(c.dataset.cardId) === tapped)
+    if (card) this.toggleCard(card)
   }
 
   disconnect() {
@@ -18,7 +24,10 @@ export default class extends Controller {
   toggle(event) {
     if (this.submitTimer) return // grace window in progress, ignore taps
 
-    const card = event.currentTarget
+    this.toggleCard(event.currentTarget)
+  }
+
+  toggleCard(card) {
     const id = parseInt(card.dataset.cardId)
 
     if (this.selected.includes(id)) {

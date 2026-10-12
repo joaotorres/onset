@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  build 06: done, tapping an idle landscape card posts the SET! claim and opens it with that card selected via a new card-tap controller, verification 50 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 05: done, No Set countdown puts SET! in its round idle slot above the agree pill, verification 39 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 04: done, join form preselects the first free color and the next free after a clash, bundle exec rspec 200 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 03: done, Join from this computer link under the waiting QR opens the join page in a new tab, bundle exec rspec 193 examples 0 failures. Next: next ready ticket.

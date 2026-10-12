@@ -215,7 +215,7 @@
   <% elsif game.playing? %>
     <%# Idle. %>
     <div class="flex-1 min-h-0 flex portrait:flex-col portrait:items-center portrait:justify-center landscape:gap-3">
-      <%= render "players/controller/board_strip", game: game %>
+      <%= render "players/controller/board_strip", game: game, tappable: true %>
       <div class="flex flex-col items-center justify-center gap-6 landscape:w-36 landscape:shrink-0 landscape:gap-3">
         <div class="grid place-items-center portrait:size-76 landscape:w-full landscape:flex-1">
           <%= button_to "SET!", game_claims_path(game.code), method: :post,
