@@ -1,6 +1,6 @@
 # 06: Tapping a card calls SET!
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

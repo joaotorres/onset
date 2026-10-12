@@ -1,6 +1,6 @@
 # 13: How to play describes devices-first play
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by: 16
 Model:

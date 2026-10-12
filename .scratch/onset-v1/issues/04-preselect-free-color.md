@@ -1,6 +1,6 @@
 # 04: Pre-select the first free color
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

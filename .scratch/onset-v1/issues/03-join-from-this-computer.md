@@ -1,6 +1,6 @@
 # 03: Join from this computer link on the big screen
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by: 02
 Model:

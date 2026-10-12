@@ -1,6 +1,6 @@
 # 12: Spec update for devices-first play
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

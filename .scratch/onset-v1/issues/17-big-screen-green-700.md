@@ -1,6 +1,6 @@
 # 17: Big screen green buttons on green-700
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

@@ -1,6 +1,6 @@
 # 14: Player screen stands alone in portrait
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Model:

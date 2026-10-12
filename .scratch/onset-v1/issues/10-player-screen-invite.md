@@ -1,6 +1,6 @@
 # 10: Invite from the player screen waiting room
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Model:

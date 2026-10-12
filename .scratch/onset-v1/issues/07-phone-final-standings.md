@@ -1,6 +1,6 @@
 # 07: Full standings on the player screen game over
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Model:

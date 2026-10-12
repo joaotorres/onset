@@ -1,6 +1,6 @@
 # 02: One QR on the big screen, room code fits
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

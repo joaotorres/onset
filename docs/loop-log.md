@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  deploy deploy-20261012-2151: 01, 02, 03, 04, 05, 06, 07, 08, 10, 11, 12, 13, 14, 15, 16, 17 deployed. Next: new requests.
 - 2026-10-12  context cap: 174k, over 100k with the review next, nothing else ready. Next: /clear, then /skills-loop:auto.
 - 2026-10-12  build 17: big screen Start game and Play again on green-700 hovering to green-800, Known gaps cleared, 339 examples green. Next: auto.
 - 2026-10-12  triage 17: ready, SPEC §10 green row notes green-700 for white text, three Decided lines. Next: build.

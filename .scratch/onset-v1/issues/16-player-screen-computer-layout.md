@@ -1,6 +1,6 @@
 # 16: Player screen computer layout during play
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by: 15
 Model:

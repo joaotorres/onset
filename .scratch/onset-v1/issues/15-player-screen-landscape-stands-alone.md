@@ -1,6 +1,6 @@
 # 15: Player screen stands alone in landscape
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by: 14
 Model:

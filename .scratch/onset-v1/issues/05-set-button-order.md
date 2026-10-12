@@ -1,6 +1,6 @@
 # 05: SET! stays on top in every state
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

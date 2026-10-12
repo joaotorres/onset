@@ -1,6 +1,6 @@
 # 11: Play again as a vote on player screens
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

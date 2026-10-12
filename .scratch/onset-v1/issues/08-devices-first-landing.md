@@ -1,6 +1,6 @@
 # 08: Devices-first landing and creator join
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Model:
