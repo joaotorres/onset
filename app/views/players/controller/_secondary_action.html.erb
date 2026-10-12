@@ -1,8 +1,8 @@
 <%# The pill under SET!: No Set, the agree vote during a No Set countdown, or the End game vote once the deck is empty.
     Filled purple pills are purple-700 with white text in every layout. %>
-<% size = "rounded-full portrait:h-11 portrait:w-[220px] landscape:min-h-12 landscape:w-full landscape:px-2" %>
+<% size = "h-11 rounded-full portrait:w-[220px] landscape:w-full landscape:px-2" %>
 <% pill = "#{size} font-bold text-white" %>
-<% outlined = "grid place-items-center rounded-full border-2 px-4 text-center text-sm font-semibold portrait:h-11 portrait:max-w-full landscape:min-h-12 landscape:w-full landscape:px-2 landscape:py-1" %>
+<% outlined = "grid h-11 max-w-full place-items-center rounded-full border-2 px-4 text-center text-sm font-semibold landscape:w-full landscape:px-3 landscape:text-[11.5px] landscape:leading-tight" %>
 <% if local_assigns[:disabled] %>
   <button type="button" disabled class="<%= pill %> cursor-not-allowed bg-purple-700 opacity-35">No Set</button>
 <% elsif game.no_set_active? %>

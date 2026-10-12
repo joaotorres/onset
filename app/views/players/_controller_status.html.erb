@@ -3,13 +3,15 @@
   flash_claim = local_assigns[:flash_claim]
   my_claim = (game.claim_player_id == player.id) ? game.claims.find_by(player: player, result: :pending) : nil
   locked = player.locked?
-  # Portrait: the scoreboard, the board, the 64px status slot, then the 128px SET! slot and its pill (§8).
-  set_round = "portrait:size-[104px] portrait:rounded-full landscape:size-full landscape:rounded-3xl"
-  ring_round = "portrait:size-[100px] portrait:rounded-full portrait:bg-gray-800 landscape:size-full landscape:rounded-3xl landscape:bg-gray-900"
-  set_idle = "bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display font-extrabold tracking-widest shadow-[0_0_36px_rgba(37,99,235,0.55)] ring-8 ring-blue-600/25 portrait:text-[30px] landscape:text-3xl #{set_round}"
-  body = "flex-1 min-h-0 flex portrait:flex-col landscape:gap-3"
-  column = "flex flex-col items-center portrait:h-44 portrait:shrink-0 portrait:gap-1 landscape:w-36 landscape:shrink-0 landscape:justify-center landscape:gap-2 landscape:py-2"
-  slot = "relative grid shrink-0 place-items-center portrait:size-32 landscape:w-full landscape:flex-1 landscape:min-h-0"
+  # During play (§8). Portrait: the scoreboard, the board, the 64px status slot, then the 128px SET! slot and its pill.
+  # Landscape: three columns, the board, the 9rem action column (status slot, SET!, pill), the scores column.
+  # The action column is display: contents in portrait, so its slots stack under the board; the scoreboard moves last in landscape.
+  body = "flex-1 min-h-0 flex portrait:flex-col landscape:gap-2.5"
+  column = "flex w-36 shrink-0 flex-col items-center justify-center gap-2.5 portrait:contents"
+  slot = "relative grid size-32 shrink-0 place-items-center self-center"
+  pill_slot = "flex h-11 max-w-full shrink-0 items-center justify-center self-center portrait:mt-1 landscape:w-full"
+  set_idle = "size-[104px] rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display text-[30px] font-extrabold tracking-widest shadow-[0_0_36px_rgba(37,99,235,0.55)] ring-8 ring-blue-600/25"
+  set_ring = "relative flex size-[100px] flex-col items-center justify-center rounded-full bg-gray-800 cursor-not-allowed"
 %>
 <div id="controller_status" class="relative flex-1 min-h-0 flex flex-col">
   <% if flash_claim&.correct? && flash_claim.card_ids.present? %>
@@ -81,132 +83,105 @@
     </div>
 
   <% elsif my_claim %>
-    <%# Claiming (mine): pick 3 cards. Portrait: the claim bar in the status slot, the tray in place of SET! and its pill. %>
+    <%# Claiming (mine): pick 3 cards. Portrait: the claim bar in the status slot, the tray in place of SET! and its pill.
+        Landscape: one yellow block in place of the status panel and SET!, the pill slot empty. %>
     <div data-controller="card-selection" class="<%= body %>">
-      <%= render "players/controller/scoreboard", game: game, player: player, class: "landscape:hidden" %>
+      <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game, mode: :select, claim: my_claim %>
-      <%= render "players/controller/status_panel", game: game, player: player, variant: :claim, class: "landscape:hidden" %>
-
-      <div class="landscape:hidden flex h-44 shrink-0 items-center justify-center gap-3.5">
-        <% 3.times do |i| %>
-          <div data-card-selection-target="slot" class="w-[72px] aspect-[5/7] grid place-items-center overflow-hidden rounded-[7px] border-2 border-dashed border-gray-700 font-display text-2xl font-bold text-gray-500"><%= i + 1 %></div>
-        <% end %>
+      <div data-action-column class="<%= column %>">
+        <%= render "players/controller/status_panel", game: game, player: player, variant: :claim, class: "landscape:hidden" %>
+        <div class="landscape:hidden flex h-44 shrink-0 items-center justify-center gap-3.5">
+          <% 3.times do |i| %>
+            <div data-card-selection-target="slot" class="w-[72px] aspect-[5/7] grid place-items-center overflow-hidden rounded-[7px] border-2 border-dashed border-gray-700 font-display text-2xl font-bold text-gray-500"><%= i + 1 %></div>
+          <% end %>
+        </div>
+        <div data-claim-block role="status" class="portrait:hidden flex h-[242px] w-full shrink-0 flex-col items-center justify-center gap-2 rounded-2xl bg-yellow-400 px-2.5 py-3.5 text-center text-gray-950"
+             data-controller="countdown"
+             data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
+             data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
+          <%= render "players/controller/small_ring", size: "size-16", track: "stroke-gray-950/20", stroke: "stroke-gray-950", digits: "text-2xl", duration: Game::CLAIM_TIMEOUT %>
+          <p class="font-display text-[22px] font-extrabold leading-none">Your SET!</p>
+          <p class="text-[13px] font-semibold">Tap 3 cards</p>
+          <p class="font-display text-[30px] font-extrabold tabular-nums"><span data-card-selection-target="count">0</span>/3</p>
+        </div>
+        <div data-pill-slot class="portrait:hidden <%= pill_slot %>"></div>
       </div>
-
-      <div class="portrait:hidden w-36 shrink-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-yellow-400 p-3 text-center text-gray-950"
-           data-controller="countdown"
-           data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
-           data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
-        <%= render "players/controller/small_ring", size: "size-16", track: "stroke-yellow-600", stroke: "stroke-gray-950", digits: "text-2xl", duration: Game::CLAIM_TIMEOUT %>
-        <p class="font-display text-xl font-bold leading-tight">Your SET!</p>
-        <p class="text-sm font-medium">Tap 3 cards</p>
-        <p class="font-display text-2xl font-bold tabular-nums"><span data-card-selection-target="count">0</span><span class="opacity-50">/3</span></p>
-      </div>
-
-      <%= render "players/controller/info_column", player: player %>
     </div>
 
   <% elsif game.claim_active? %>
     <%# Someone else is claiming: a read-only board, the seconds inside the yellow ring. %>
     <div class="<%= body %>">
-      <%= render "players/controller/scoreboard", game: game, player: player, class: "landscape:hidden" %>
+      <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game %>
-      <%= render "players/controller/status_panel", game: game, player: player, variant: :other, class: "landscape:hidden" %>
-      <div class="<%= column %>">
-        <div class="portrait:hidden text-center">
-          <p class="flex items-center justify-center gap-2 font-display text-xl font-bold"><span class="size-4 shrink-0 rounded-full" style="background-color: <%= game.claiming_player.color %>;"></span><%= game.claiming_player.name %></p>
-          <p class="mt-1 text-xs text-yellow-400">is calling SET!</p>
-        </div>
-        <div class="<%= slot %>"
+      <div data-action-column class="<%= column %>">
+        <%= render "players/controller/status_panel", game: game, player: player, variant: :other %>
+        <div data-set-slot class="<%= slot %>"
              data-controller="countdown"
              data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
              data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
           <%= render "players/controller/button_ring", stroke: "stroke-yellow-400" %>
-          <button type="button" disabled class="relative flex flex-col items-center justify-center cursor-not-allowed text-gray-500 <%= ring_round %>">
-            <span class="font-display font-extrabold portrait:order-last portrait:font-sans portrait:text-[11px] portrait:font-semibold portrait:text-gray-400 landscape:text-2xl landscape:tracking-widest">SET!</span>
-            <span class="text-yellow-400 portrait:font-display portrait:text-[38px] portrait:font-extrabold portrait:leading-none portrait:text-gray-200 landscape:mt-2 landscape:text-sm"><span data-countdown-target="display" class="tabular-nums"><%= Game::CLAIM_TIMEOUT %></span><span class="portrait:hidden"> s</span></span>
+          <button type="button" disabled aria-label="SET! unavailable, <%= game.claiming_player.name %> is claiming" class="<%= set_ring %> gap-0.5 text-gray-200">
+            <span data-countdown-target="display" class="font-display text-[38px] font-extrabold leading-none tabular-nums"><%= Game::CLAIM_TIMEOUT %></span>
+            <span class="text-[11px] font-semibold text-gray-400">SET!</span>
           </button>
         </div>
-        <%= render "players/controller/secondary_action", game: game, player: player, disabled: true %>
+        <div data-pill-slot class="<%= pill_slot %>"><%= render "players/controller/secondary_action", game: game, player: player, disabled: true %></div>
       </div>
-      <%= render "players/controller/info_column", player: player %>
     </div>
 
   <% elsif game.no_set_active? %>
     <%# No Set countdown: the status panel, then SET! in its idle slot, then the agree pill. %>
     <div class="<%= body %>">
-      <%= render "players/controller/scoreboard", game: game, player: player, class: "landscape:hidden" %>
+      <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game %>
-      <%= render "players/controller/status_panel", game: game, player: player, variant: :no_set, class: "landscape:hidden" %>
-      <div class="<%= column %>">
-        <div class="portrait:hidden flex w-full flex-col items-center gap-1 rounded-2xl bg-purple-950/60 p-2 text-center ring-1 ring-inset ring-purple-800"
-             data-controller="countdown"
-             data-countdown-started-at-value="<%= game.no_set_started_at.iso8601 %>"
-             data-countdown-duration-value="15">
-          <%= render "players/controller/small_ring", size: "size-12", track: "stroke-gray-700", stroke: "stroke-purple-400", digits: "text-lg text-purple-300", duration: 15 %>
-          <div class="min-w-0">
-            <p class="text-xs text-purple-300">No Set called by</p>
-            <p class="flex items-center justify-center gap-2 truncate font-display text-base font-bold"><span class="size-3 shrink-0 rounded-full" style="background-color: <%= game.no_set_caller.color %>;"></span><%= game.no_set_caller.name %></p>
-          </div>
-        </div>
-        <div class="<%= slot %>">
+      <div data-action-column class="<%= column %>">
+        <%= render "players/controller/status_panel", game: game, player: player, variant: :no_set %>
+        <div data-set-slot class="<%= slot %>">
           <% if locked %>
-            <button type="button" disabled class="cursor-not-allowed bg-gray-800 text-gray-500 font-display font-extrabold tracking-widest portrait:text-[30px] landscape:text-2xl <%= set_round %>">SET!</button>
+            <button type="button" disabled class="size-[104px] rounded-full cursor-not-allowed bg-gray-800 font-display text-[30px] font-extrabold tracking-widest text-gray-500">SET!</button>
           <% else %>
             <%= button_to "SET!", game_claims_path(game.code), method: :post,
                   form_class: "contents", data: {turbo_submits_with: "…"}, class: set_idle %>
           <% end %>
         </div>
-        <%= render "players/controller/secondary_action", game: game, player: player %>
+        <div data-pill-slot class="<%= pill_slot %>"><%= render "players/controller/secondary_action", game: game, player: player %></div>
       </div>
-      <%= render "players/controller/info_column", player: player %>
     </div>
 
   <% elsif game.playing? && locked %>
-    <%# Locked out after a wrong or expired claim: SET! becomes the countdown. Portrait shakes the status slot. %>
-    <div class="<%= body %> landscape:rounded-3xl landscape:bg-red-950/40 landscape:animate-shake">
-      <%= render "players/controller/scoreboard", game: game, player: player, class: "landscape:hidden" %>
+    <%# Locked out after a wrong or expired claim: the status panel shakes red, SET! becomes the countdown. %>
+    <div class="<%= body %>">
+      <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game %>
-      <%= render "players/controller/status_panel", game: game, player: player, variant: :locked, class: "landscape:hidden" %>
-      <div class="<%= column %>">
-        <div class="portrait:hidden text-center">
-          <% if player.lockout_reason == "expired" %>
-            <p class="font-display text-xl font-bold text-red-400">Time's up! −1</p>
-            <p class="mt-1 text-xs text-red-200">Out of time · locked for 5 s</p>
-          <% else %>
-            <p class="font-display text-xl font-bold text-red-400">Wrong! −1</p>
-            <p class="mt-1 text-xs text-red-200">Not a Set · locked for 5 s</p>
-          <% end %>
-        </div>
-        <div class="<%= slot %>"
+      <div data-action-column class="<%= column %>">
+        <%= render "players/controller/status_panel", game: game, player: player, variant: :locked %>
+        <div data-set-slot class="<%= slot %>"
              data-controller="countdown"
              data-countdown-started-at-value="<%= (player.locked_until - 5.seconds).iso8601 %>"
              data-countdown-duration-value="5">
           <%= render "players/controller/button_ring", stroke: "stroke-red-500" %>
-          <button type="button" disabled class="relative flex flex-col items-center justify-center cursor-not-allowed text-red-400 portrait:text-gray-200 landscape:ring-1 landscape:ring-inset landscape:ring-red-900 <%= ring_round %>">
-            <span data-countdown-target="display" class="font-display font-extrabold leading-none tabular-nums portrait:text-[38px] landscape:text-5xl">5</span>
-            <span class="font-semibold text-red-300 portrait:text-xs portrait:font-bold landscape:mt-2 landscape:text-xs landscape:uppercase landscape:tracking-[0.3em]">Locked</span>
+          <button type="button" disabled aria-label="SET! locked" class="<%= set_ring %> gap-0.5 text-gray-200">
+            <span data-countdown-target="display" class="font-display text-[38px] font-extrabold leading-none tabular-nums">5</span>
+            <span class="text-xs font-bold text-red-300">Locked</span>
           </button>
         </div>
-        <%= render "players/controller/secondary_action", game: game, player: player %>
+        <div data-pill-slot class="<%= pill_slot %>"><%= render "players/controller/secondary_action", game: game, player: player %></div>
       </div>
-      <%= render "players/controller/info_column", player: player, score_class: "text-red-400" %>
     </div>
 
   <% elsif game.playing? %>
     <%# Idle: a card tap calls SET! (§8); the status slot stays empty. %>
     <div class="<%= body %>">
-      <%= render "players/controller/scoreboard", game: game, player: player, class: "landscape:hidden" %>
+      <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game, mode: :tap %>
-      <%= render "players/controller/status_panel", game: game, player: player, class: "landscape:hidden" %>
-      <div class="<%= column %>">
-        <div class="<%= slot %>">
+      <div data-action-column class="<%= column %>">
+        <%= render "players/controller/status_panel", game: game, player: player %>
+        <div data-set-slot class="<%= slot %>">
           <%= button_to "SET!", game_claims_path(game.code), method: :post,
                 form_class: "contents", data: {turbo_submits_with: "…"}, class: set_idle %>
         </div>
-        <%= render "players/controller/secondary_action", game: game, player: player %>
+        <div data-pill-slot class="<%= pill_slot %>"><%= render "players/controller/secondary_action", game: game, player: player %></div>
       </div>
-      <%= render "players/controller/info_column", player: player %>
     </div>
   <% end %>
 </div>

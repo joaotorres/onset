@@ -1,11 +1,12 @@
-<%# Found-set banner: over the scoreboard in portrait, ignores taps, fades with .found-set-flash. %>
-<div data-found-banner role="status" class="found-set-flash pointer-events-none absolute inset-x-0 top-0 z-10 flex h-[74px] items-center gap-3 rounded-2xl border-2 border-green-500 bg-green-950 px-3.5 shadow-2xl shadow-black/60">
+<%# Found-set banner: over the scoreboard in portrait, over the top of the board in landscape (clear of the 144px action
+    and 132px scores columns and their two 10px gaps). Ignores taps, fades with .found-set-flash. %>
+<div data-found-banner role="status" class="found-set-flash pointer-events-none absolute inset-x-0 top-0 z-10 flex h-[74px] items-center gap-3 rounded-2xl border-2 border-green-500 bg-green-950 px-3.5 shadow-2xl shadow-black/60 landscape:top-1 landscape:right-[296px] landscape:h-16 landscape:gap-2.5 landscape:rounded-[14px] landscape:px-3">
   <div class="flex shrink-0 gap-1">
     <% claim.card_ids.map { |cid| Card.new(cid) }.each do |card| %>
-      <div class="h-12 aspect-[5/7]"><%= render "cards/card", card: card %></div>
+      <div class="h-12 aspect-[5/7] landscape:h-[42px]"><%= render "cards/card", card: card %></div>
     <% end %>
   </div>
   <span class="size-2.5 shrink-0 rounded-full" style="background-color: <%= claim.player.color %>;"></span>
-  <p class="min-w-0 flex-1 truncate font-bold"><%= claim.player.name %> found a Set</p>
-  <p class="font-display text-[28px] font-extrabold text-green-400">+1</p>
+  <p class="min-w-0 flex-1 truncate font-bold landscape:text-[15px]"><%= claim.player.name %> found a Set</p>
+  <p class="font-display text-[28px] font-extrabold text-green-400 landscape:text-[26px]">+1</p>
 </div>

@@ -1,6 +1,6 @@
 # 15: Player screen stands alone in landscape
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by: 14
 Model:
@@ -49,3 +49,9 @@ Write first:
 - Keyboard shortcuts, waiting, game over, the big screen
 
 ## Comments
+
+Decided: the deck line stays under the board in landscape, as the acceptance criteria say, because the spec puts the deck "with the board". Instead of: the foot of the scores column, as on the PlayLandscape board.
+
+Decided: kept the page's 16px padding and the "Room CODE" footer under the columns, so 18 cards at 667×375 come out about 52×73 rather than 55×77, because changing the shared frame would also move the waiting and game over screens. Instead of: an 8px landscape padding with the room code in the scores column, as on the board.
+
+Decided: one scoreboard and one status slot per state, placed by CSS (the scoreboard `landscape:order-last`, the action column `portrait:contents`), and SET!, its rings and the pill now share one size in both layouts per the 128px slot rule, because duplicate renders would double ids and countdown targets. Instead of: separate portrait and landscape copies.

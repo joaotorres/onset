@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  build 15: done, landscape player screen stands alone during play (board with deck line, 9rem action column with the 144x104 status slot, SET! and pill, 132px scores column), width-fitted cards with no sideways scroll, bundle exec rspec green, three Decided lines. Next: build 16.
 - 2026-10-12  build 14: done, portrait player screen stands alone during play (chip scoreboard, full-width board with deck line, 64px status slot, 128px SET! slot), found-set banner, purple-700 pills and arrive outline in every layout, bundle exec rspec green, three Decided lines. Next: build 15.
 - 2026-10-12  build 10: done, waiting invite on every player screen (code, Copy link / Share link, QR sheet, big screen link) in portrait, landscape and computer, bundle exec rspec green, three Decided lines. Next: build 11.
 - 2026-10-12  build 08: done, devices-first landing with mode toggle, Start a game opens the creator's join page with the big screen link, full room disables Join, bundle exec rspec green, one Decided line. Next: build 09.

@@ -31,8 +31,7 @@ ERB partials, no component library.
 - `games/_start_button`: Start game with "n of m ready", or disabled with the reason
 - `games/_announcement`: the 9rem announcement band and its tinted panels
 - `players/controller/_header`: header with dot, name and score, on Waiting and Game over
-- `players/controller/_info_column`: landscape right column, dot, name, score
-- `players/controller/_board_strip`: landscape card grid
+- `players/controller/_board_strip`: the play card grid with the deck line, sized by the card size rule in portrait and landscape
 - `players/controller/_button_ring`: thin ring around the round SET! button
 - `players/controller/_small_ring`: countdown ring with seconds, any size
 - `players/controller/_secondary_action`: the pill under SET!: No Set, the End game vote, or during a No Set countdown I agree, no Set (filled purple) or the waiting text (outlined purple)
