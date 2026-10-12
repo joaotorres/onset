@@ -47,7 +47,7 @@ Three cards form a Set if, for **each** of the four attributes, the three values
    - Otherwise, the countdown expires.
    - On resolution: deal 3 additional cards from the deck (board grows to 15, then 18 if called again). Hard cap at **18 cards**.
    - If anyone calls **"SET!"** during the countdown, the No-Set call is **cancelled** and the claim flow begins.
-6. **Game end**: when the deck is empty and **no valid Set exists** on the remaining board cards. Once the deck is empty, players can also end early: every active player taps **"End game"**. In quick mode the game ends when a player reaches 5 points (`Game::QUICK_WIN_SCORE`). The board shows the podium and a "Play again" button.
+6. **Game end**: when the deck is empty and **no valid Set exists** on the remaining board cards. Once the deck is empty, players can also end early: every active player taps **"End game"**. In quick mode the game ends when a player reaches 5 points (`Game::QUICK_WIN_SCORE`). The board shows the podium and a "Play again" button that restarts the room at once. Each player screen shows **Play again** as a ready vote: the room restarts once every active player has voted (§8, Phone controller, Game over).
 
 ### Edge cases
 
@@ -100,7 +100,7 @@ The room.
 | `no_set_caller_id` | bigint | nullable; the player who called No Set |
 | `no_set_voters` | json | Array of player ids who joined the call (default `[]`) |
 | `mode` | enum | `standard`, `quick` (first to `QUICK_WIN_SCORE` points) |
-| `start_voters` | json | Player ids who tapped "I'm ready" (default `[]`) |
+| `start_voters` | json | Player ids who tapped "I'm ready" while waiting, or "Play again" once ended (default `[]`) |
 | `end_game_voters` | json | Player ids who voted to end once the deck is empty (default `[]`) |
 | `flash_claim_id` | bigint | nullable; the just-resolved claim the screens announce for 3s |
 | `last_dealt` | json | Card ids dealt by the last replace, outlined on the board for 3s (default `[]`) |
@@ -218,9 +218,9 @@ URL surface. Every action a phone or the board POSTs answers `204 No Content`; t
 | GET | `/games/:code/players/join` | Phone landing after QR scan: name + color form |
 | POST | `/games/:code/players` | Create player, set cookie, redirect to controller |
 | GET | `/games/:code/controller` | Phone controller view |
-| POST | `/games/:code/ready` | Phone votes to start; the game starts when every player (2+) has voted |
+| POST | `/games/:code/ready` | Phone votes to start; the game starts when every player (2+) has voted. Once ended, phone votes to play again; the room restarts when every active player has voted |
 | POST | `/games/:code/start` | Host starts the game from the board |
-| POST | `/games/:code/restart` | Play again: reset deck, clear scores, status `playing` |
+| POST | `/games/:code/restart` | Play again from the board (host): reset deck, clear scores and votes, status `playing`, at once |
 | POST | `/games/:code/claims` | Try to take the claim lock; a lost race changes nothing |
 | PATCH | `/games/:code/claims/:id` | Submit `card_ids` for a held claim |
 | POST | `/games/:code/no_set` | Initiate No-Set countdown OR join existing call |
@@ -354,7 +354,7 @@ Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wid
   - No Set (purple): ring, "Alex called No Set", "Agree on your phone, or find one first", and "n/m agreed".
   - Correct (green): the three cards, "Alex found a Set", "+1". Fades after 3s.
   - Wrong / Time's up (red): the cards for a wrong claim, the reason with the 5-second lockout, "−1".
-- **Ended**: "Game over", then "Alex wins" or "It's a tie". Podium in 2-1-3 order; bars carry the real rank, so a tie reads #1 #1, and only a sole winner gets the ★. **Play again**.
+- **Ended**: "Game over", then "Alex wins" or "It's a tie". Podium in 2-1-3 order; bars carry the real rank, so a tie reads #1 #1, and only a sole winner gets the ★. **Play again**, which restarts the room at once whatever the player screens have voted.
 
 ### Phone join (`/games/:code/players/join`)
 
@@ -373,7 +373,7 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
 5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
 6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked".
 7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
-8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9" or "Tied for first"), "Play again from the big screen".
+8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9" or "Tied for first"), then a green **Play again** button, the ready vote (§5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more", n being the active players who have not voted. The room restarts with the same mode, fresh deck and zero scores once every active player has voted, straight into play. Accepted risk: active means seen in the last 30s and only a player's own requests refresh it, so after 30s on this screen the first tap may restart the room alone.
 
 Stimulus: `card-selection` (selection, tray, count, auto-submit) and `countdown` (every ring and seconds display).
 
