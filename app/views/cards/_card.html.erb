@@ -7,16 +7,18 @@
   step     = 72           # 56px shape + 16px gap
   first_cy = 140 - (count - 1) * step / 2
   cx = 100; hw = 55; hh = 28
+  # Unique per rendered SVG (§10): the same card can render twice on one page.
+  pattern_id = "stripes-#{cname}-#{SecureRandom.hex(4)}"
   fill = case card.shading
          when 0 then hex
-         when 1 then "url(#stripes-#{cname})"
+         when 1 then "url(##{pattern_id})"
          else        "none"
          end
   sw = [0, 2, 5][card.shading]  # stroke-width per shading
 %>
 <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-sm">
   <defs>
-    <pattern id="stripes-<%= cname %>" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(40)">
+    <pattern id="<%= pattern_id %>" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(40)">
       <rect width="3.5" height="7" fill="<%= hex %>"/>
     </pattern>
   </defs>

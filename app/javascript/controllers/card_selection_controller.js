@@ -52,7 +52,23 @@ export default class extends Controller {
 
     slot.dataset.slotCardId = id
     slot.classList.remove(...EMPTY_SLOT)
-    slot.replaceChildren(svg.cloneNode(true))
+    slot.replaceChildren(this.copyWithFreshIds(svg))
+  }
+
+  // A copy keeps its pattern ids unique (§10): a browser resolves url(#id)
+  // to the first match, and the tray can sit hidden ahead of the grid.
+  copyWithFreshIds(svg) {
+    const copy = svg.cloneNode(true)
+    const suffix = Math.random().toString(36).slice(2, 10)
+
+    copy.querySelectorAll("[id]").forEach(el => {
+      const oldId = el.id
+      el.id = `${oldId}-tray-${suffix}`
+      copy.querySelectorAll(`[fill="url(#${oldId})"]`).forEach(shape => {
+        shape.setAttribute("fill", `url(#${el.id})`)
+      })
+    })
+    return copy
   }
 
   emptySlot(id) {

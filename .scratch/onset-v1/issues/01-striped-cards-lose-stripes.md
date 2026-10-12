@@ -1,6 +1,6 @@
 # 01: Striped cards lose their stripes after a tap
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
