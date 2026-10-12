@@ -1,6 +1,6 @@
 # 18: Landing cards overlap the start game form at narrow desktop widths
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:
