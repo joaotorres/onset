@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  triage 04: ready, SPEC §8 Phone join first free color selected and next free after a clash, §4 color uniqueness documented, five Decided lines. Next: build.
 - 2026-10-12  triage 03: ready, SPEC §8 Board > Waiting link under the hero QR to the join page in a new tab, blocked by 02, four Decided lines. Next: build after 02.
 - 2026-10-12  triage 02: ready, SPEC §8 Board one QR (hero only), room tile from start of play, room code fits at 1280px, four Decided lines. Next: build.
 - 2026-10-12  triage 01: ready, SPEC §10 striped pattern ids unique per rendered SVG, three Decided lines. Next: build.

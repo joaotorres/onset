@@ -127,7 +127,7 @@ A participant in a Game.
 | `last_seen_at` | datetime | updated on every phone request via `Player#seen!`, which skips callbacks so it never broadcasts |
 | `left_at` | datetime | nullable; for graceful disconnect |
 
-**Validations**: `name` present, length 1..20. `color` matches a hex pattern. `(game_id, name)` unique-case-insensitive (no two players in the same game can share a name).
+**Validations**: `name` present, length 1..20. `color` matches a hex pattern. `(game_id, name)` unique-case-insensitive (no two players in the same game can share a name). `(game_id, color)` unique (no two players in the same game can share a color).
 
 **Methods**: `active?` (last_seen within 30s), `locked?`, `host?`.
 
@@ -357,7 +357,7 @@ Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wid
 
 ### Phone join (`/games/:code/players/join`)
 
-Portrait. "Joining room" with the code in large type, since the code is what people check. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. **Join** sits at the bottom, under the thumb. Field errors show under their field; base errors (game already started) in a red box.
+Portrait. "Joining room" with the code in large type, since the code is what people check. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken, none is selected. The page does not update live as others join. **Join** sits at the bottom, under the thumb. Field errors show under their field; base errors (game already started) in a red box.
 
 ### Phone controller (`/games/:code/controller`)
 
