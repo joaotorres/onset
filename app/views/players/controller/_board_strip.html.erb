@@ -1,12 +1,12 @@
 <%# The board during play, with the deck line. mode: :tap (idle, a card tap calls SET!, §8), :select (claiming, mine, needs claim:) or read-only.
-    In portrait and landscape the cards take the largest size at which cards / 3 columns fit the board's width and 3 rows
-    its height (§10), so the board never scrolls sideways. %>
+    In every layout the cards take the largest size at which cards / 3 columns fit the board's width and 3 rows
+    its height (§10), with a 5px gap on phones and 12px on computer, so the board never scrolls sideways. %>
 <% mode = local_assigns[:mode] %>
-<% grid = "h-full grid grid-rows-[repeat(3,auto)] grid-flow-col content-center justify-center gap-[5px]" %>
-<% size = "aspect-[5/7] rounded-lg w-[min(calc((100cqw_-_(var(--cols)_-_1)_*_5px)_/_var(--cols)),calc((100cqh_-_10px)_*_5_/_21))]" %>
+<% grid = "h-full grid grid-rows-[repeat(3,auto)] grid-flow-col content-center justify-center gap-(--gap)" %>
+<% size = "aspect-[5/7] rounded-lg w-[min(calc((100cqw_-_(var(--cols)_-_1)_*_var(--gap))_/_var(--cols)),calc((100cqh_-_2_*_var(--gap))_*_5_/_21))]" %>
 <% arrive = ->(card) { "outline-3 outline-green-400 animate-arrive" if game.just_dealt?(card.id) } %>
-<div class="<%= local_assigns[:class] %> flex min-h-0 min-w-0 flex-1 flex-col">
-  <div data-board class="min-h-0 flex-1 [container-type:size]" style="--cols: <%= [game.board.size / 3, 1].max %>;">
+<div class="<%= local_assigns[:class] %> flex min-h-0 min-w-0 flex-1 flex-col lg:col-start-1 lg:row-span-2 lg:row-start-1">
+  <div data-board class="min-h-0 flex-1 [container-type:size] [--gap:5px] lg:[--gap:12px]" style="--cols: <%= [game.board.size / 3, 1].max %>;">
     <% if mode == :tap %>
       <%= form_with url: game_claims_path(game.code), method: :post, class: grid, data: {controller: "card-tap"} do %>
         <% game.board_cards.each do |card| %>

@@ -1,6 +1,6 @@
 # 16: Player screen computer layout during play
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by: 15
 Model:
@@ -47,3 +47,7 @@ Write first:
 - Waiting, game over, the big screen
 
 ## Comments
+
+Decided: the play partials scope their portrait and landscape classes with `max-lg:`, because Tailwind emits the orientation variants after `lg:` so they would beat the computer classes in a 1024x1366 viewport. Instead of: a custom variant overriding `portrait:`/`landscape:` globally, which would also change the waiting and ended branches.
+
+Decided: the deck line stays under the board on computer, as in portrait and landscape, because `_board_strip` owns it in every layout and the ticket only asks for it with the board. Instead of: the PlayComputer board's line above the cards beside the room code.

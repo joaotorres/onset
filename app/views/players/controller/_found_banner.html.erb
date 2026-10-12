@@ -1,12 +1,13 @@
 <%# Found-set banner: over the scoreboard in portrait, over the top of the board in landscape (clear of the 144px action
-    and 132px scores columns and their two 10px gaps). Ignores taps, fades with .found-set-flash. %>
-<div data-found-banner role="status" class="found-set-flash pointer-events-none absolute inset-x-0 top-0 z-10 flex h-[74px] items-center gap-3 rounded-2xl border-2 border-green-500 bg-green-950 px-3.5 shadow-2xl shadow-black/60 landscape:top-1 landscape:right-[296px] landscape:h-16 landscape:gap-2.5 landscape:rounded-[14px] landscape:px-3">
+    and 132px scores columns and their two 10px gaps) and on computer (clear of the 248px side column, its 32px gap and
+    the 8px padding). Ignores taps, fades with .found-set-flash. %>
+<div data-found-banner role="status" class="found-set-flash pointer-events-none absolute inset-x-0 top-0 z-10 flex h-[74px] items-center gap-3 rounded-2xl border-2 border-green-500 bg-green-950 px-3.5 shadow-2xl shadow-black/60 landscape:max-lg:top-1 landscape:max-lg:right-[296px] landscape:max-lg:h-16 landscape:max-lg:gap-2.5 landscape:max-lg:rounded-[14px] landscape:max-lg:px-3 lg:left-2 lg:right-[288px] lg:h-[84px] lg:gap-4 lg:rounded-[18px] lg:px-5">
   <div class="flex shrink-0 gap-1">
     <% claim.card_ids.map { |cid| Card.new(cid) }.each do |card| %>
-      <div class="h-12 aspect-[5/7] landscape:h-[42px]"><%= render "cards/card", card: card %></div>
+      <div class="h-12 aspect-[5/7] landscape:max-lg:h-[42px] lg:h-[59px]"><%= render "cards/card", card: card %></div>
     <% end %>
   </div>
   <span class="size-2.5 shrink-0 rounded-full" style="background-color: <%= claim.player.color %>;"></span>
-  <p class="min-w-0 flex-1 truncate font-bold landscape:text-[15px]"><%= claim.player.name %> found a Set</p>
-  <p class="font-display text-[28px] font-extrabold text-green-400 landscape:text-[26px]">+1</p>
+  <p class="min-w-0 flex-1 truncate font-bold landscape:max-lg:text-[15px] lg:text-xl"><%= claim.player.name %> found a Set</p>
+  <p class="font-display text-[28px] font-extrabold text-green-400 landscape:max-lg:text-[26px] lg:text-[34px]">+1</p>
 </div>

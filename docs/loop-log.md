@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  build 16: done, computer player screen during play (board on the left with 12px-gap cards at about 106x148, 248px side column with the scoreboard panel above the 248x76 status slot, 108px SET! and pill), applied at 1024px wide in either orientation, bundle exec rspec green, two Decided lines. Next: the auto run picks the next step.
 - 2026-10-12  build 15: done, landscape player screen stands alone during play (board with deck line, 9rem action column with the 144x104 status slot, SET! and pill, 132px scores column), width-fitted cards with no sideways scroll, bundle exec rspec green, three Decided lines. Next: build 16.
 - 2026-10-12  build 14: done, portrait player screen stands alone during play (chip scoreboard, full-width board with deck line, 64px status slot, 128px SET! slot), found-set banner, purple-700 pills and arrive outline in every layout, bundle exec rspec green, three Decided lines. Next: build 15.
 - 2026-10-12  build 10: done, waiting invite on every player screen (code, Copy link / Share link, QR sheet, big screen link) in portrait, landscape and computer, bundle exec rspec green, three Decided lines. Next: build 11.
