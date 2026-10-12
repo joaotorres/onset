@@ -323,7 +323,7 @@ Stimulus attributes stay on whatever element plays the role:
 
 - `card-selection`: `card` targets with `data-card-id` and `click->card-selection#toggle`, plus `form`, `input`, `slot` and `count` targets
 - Idle board, in every player screen layout: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle). `card-tap`: `data-controller="card-tap"` on the claim form around the cards, each card a submit button with `click->card-tap#tap`. It remembers the tapped card in memory, and `card-selection` selects it on connect
-- Waiting invite (§8, Player screen, Waiting): the Copy link / Share link button and the Show QR sheet; whatever Stimulus controller drives them lists its attributes here
+- Waiting invite (§8, Player screen, Waiting): `data-controller="invite"` around the invite with `url` (the join page URL) and `code` values. The Copy link / Share link button is the `link` target with `click->invite#share`; the QR sheet is a `<dialog>`, the `sheet` target, inside `#controller_status`, opened by Show QR with `click->invite#open` and closed by Done with `click->invite#close`
 - `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
 
 ### Why this works
@@ -381,7 +381,7 @@ Shared by all three during play:
 
 SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**.
 
-1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more".
+1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more". Alone in the room, a player cannot vote: "Waiting for more players to join…" takes the place of I'm ready, so the voted line never reads "waiting for 0 more".
 
    Every player's waiting screen also carries the **invite**, so anyone in the room can bring in the next player; it goes once play starts, since late joining stays blocked, remote players included:
    - The room code in large type, with "or open HOST and enter the code" (`join_host`), as on the big screen.
@@ -400,7 +400,7 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
 
    The standings list every player in the room, as many as "of N players" counts, one compact row each: rank, dot, name and score. Rows run by score, ties in join order, and tied players share a rank ("1, 1, 3"), as on the big screen podium. No ★, Locked tag or ready marks in the rows: the winner line carries the ★. Names truncate with an ellipsis. The player's own row is highlighted with a surface tint, not a color from the §10 meaning table, and says "you" after the name, as the waiting roster does. The rank is the shared one on a tie, a plain ordinal ("1st", never "=1st"): the winner line and the standings already say who tied. Portrait stacks everything; landscape and computer put the rank, the winner line and Play again in a left column and the standings on the right. With 8 players, one per preset color, the screen keeps no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer. On a shorter screen the list scrolls inside itself, never the page.
 
-Stimulus: `card-selection` (selection, tray, count, auto-submit), `countdown` (every ring and seconds display) and whatever controller shares or copies the invite link and opens the QR sheet, its attributes listed in §7.
+Stimulus: `card-selection` (selection, tray, count, auto-submit), `countdown` (every ring and seconds display) and `invite` (shares or copies the invite link, opens the QR sheet), its attributes listed in §7.
 
 ---
 
