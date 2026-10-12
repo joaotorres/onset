@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  split 09: into 14 (portrait), 15 (landscape, blocked by 14) and 16 (computer, blocked by 15), all ready-for-agent, 13 now blocked by 16, two Decided lines. Next: triage 10.
 - 2026-10-12  triage 09: split, both design conflicts and both proposals settled in SPEC §2, §8 and §10 (no landscape sideways scroll, stacked computer side column, No Set enabled while locked out, own-claim layout), three Decided lines. Next: split 09 into tickets.
 - 2026-10-12  triage 08: ready, the design proposal and question settled in SPEC §8 (plain "Room not found" under an empty field, "This room is full" with Join disabled), four Decided lines. Next: triage 09.
 - 2026-10-12  triage 07: ready, both design questions settled in SPEC §8 game over (plain "1st" on a tie, "You win"), computer layout and 1024×640 no-scroll added, five Decided lines. Next: triage 08.

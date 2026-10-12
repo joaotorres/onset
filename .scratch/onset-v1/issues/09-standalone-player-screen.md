@@ -1,6 +1,6 @@
 # 09: Player screen stands alone, computer layout
 
-Status: needs-triage
+Status: split
 Kind: visual
 Blocked by:
 Model:
@@ -52,3 +52,9 @@ Decided: SPEC §10 Component's landscape line now shrinks the cards to fit with 
 Decided: the design proposal is accepted: locked out, the pill slot keeps No Set or the End game vote enabled, written into SPEC §2 Edge cases and §8 Player screen > 6. Locked out, because §2 says lockout only blocks SET!, the code already renders No Set enabled there and Game#call_no_set! allows it. Instead of: disabling the pill while locked out.
 
 Decided: the design proposal is accepted: during my claim portrait puts the claim bar in the status slot and the tray in place of SET! and its pill, landscape and computer show one yellow block in place of the panel and SET! with the pill slot empty, and No Set is not offered, written into SPEC §8 Player screen > 3. Claiming (mine), because Game#call_no_set! refuses a call during a claim and it keeps the slots fixed. Instead of: a disabled No Set pill during my claim.
+
+Decided: split by layout into 14 (portrait, plus the found-set banner, filled purple pills and arrive outline every layout shares), 15 (landscape, blocked by 14) and 16 (computer, blocked by 15), published without waiting for approval, because six play states in three layouts with no-scroll specs at each viewport do not fit one fresh session and each layout is verifiable alone at its viewport. Instead of: one ticket, or a split by concern (scoreboard, status panel, layouts).
+
+Decided: ticket 13's Blocked by moves from 09 to 16, because a split ticket never reaches done and 16 is the last child. Instead of: leaving 13 blocked forever.
+
+Split into 14, 15, 16.
