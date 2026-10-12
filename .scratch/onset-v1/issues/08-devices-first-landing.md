@@ -1,6 +1,6 @@
 # 08: Devices-first landing and creator join
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Model:
@@ -104,3 +104,5 @@ Decided: with every color taken the join page says "This room is full" in the ba
 Decided: the tagline reads "Set, played live in the room. Everyone plays on their own screen, and a big screen is optional.", because SPEC §8 Landing asks for that meaning in the §1 terms and it keeps today's first sentence. Instead of: new copy that drops "played live in the room".
 
 Decided: no Blocked by, because 08 touches only the landing, `POST /games`'s redirect and the join page, which no open ticket builds. Instead of: blocking on 10 for the big screen wording.
+
+Decided: the landing keeps today's card caption ("That's a Set: same number, same shading, every shape and color different.") over the board's new one, because the ticket changes only the tagline and the shown cards match today's caption. Instead of: the board's "number, color, shape and shading are each all different" caption.

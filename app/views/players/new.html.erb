@@ -1,11 +1,12 @@
 <main class="min-h-dvh bg-gray-950 text-white px-5 pt-10 pb-6 flex flex-col">
   <div class="w-full max-w-sm mx-auto flex-1 flex flex-col">
-    <p class="text-center text-sm uppercase tracking-widest text-gray-400">Joining room</p>
-    <p class="mt-1 text-center font-display text-5xl font-bold tracking-[0.2em]"><%= @game.code %></p>
+    <p class="text-center text-[0.9375rem] text-gray-400">Joining room</p>
+    <p class="mt-0.5 text-center font-display text-6xl font-extrabold leading-none tracking-[0.08em]"><%= @game.code %></p>
 
     <% base_errors = [flash[:alert], *@player.errors.full_messages_for(:base), *@player.errors.full_messages_for(:session_token)].compact %>
-    <% if base_errors.any? %>
-      <div class="mt-6 rounded-xl border border-red-700 bg-red-900/50 p-3 text-sm text-red-300"><%= base_errors.to_sentence %></div>
+    <% base_errors << "This room is full" if full? %>
+    <% if base_errors.uniq.any? %>
+      <div role="alert" class="mt-6 rounded-xl border border-red-700 bg-red-950 px-3.5 py-3 text-[0.9375rem] font-medium text-red-200"><%= base_errors.uniq.to_sentence %></div>
     <% end %>
 
     <%= form_with model: [@game, @player], url: game_players_path(@game.code), class: "mt-10 flex-1 flex flex-col gap-8" do |f| %>
@@ -30,12 +31,12 @@
           <% PlayersController::PRESET_COLORS.each_with_index do |hex, i| %>
             <% owner = @color_owners[hex] %>
             <% if owner %>
-              <label class="aspect-square grid place-items-center cursor-not-allowed rounded-2xl opacity-30" style="background-color: <%= hex %>;" title="Taken by <%= owner.name %>">
+              <label class="h-14 grid place-items-center cursor-not-allowed rounded-xl" style="background-color: color-mix(in srgb, <%= hex %> 30%, var(--color-gray-950));" title="Taken by <%= owner.name %>">
                 <%= f.radio_button :color, hex, id: "color_#{i}", disabled: true, class: "sr-only" %>
-                <span class="text-lg font-bold text-gray-950"><%= owner.name.first.upcase %></span>
+                <span class="font-display text-xl font-bold text-gray-300"><%= owner.name.first.upcase %></span>
               </label>
             <% else %>
-              <label class="group aspect-square grid place-items-center cursor-pointer rounded-2xl has-checked:ring-4 has-checked:ring-white has-checked:ring-offset-4 has-checked:ring-offset-gray-950" style="background-color: <%= hex %>;">
+              <label class="group h-14 grid place-items-center cursor-pointer rounded-xl has-checked:ring-3 has-checked:ring-white has-checked:ring-offset-3 has-checked:ring-offset-gray-950" style="background-color: <%= hex %>;">
                 <%= f.radio_button :color, hex, id: "color_#{i}", class: "sr-only" %>
                 <span class="hidden text-2xl font-bold text-white group-has-checked:block">✓</span>
               </label>
@@ -50,7 +51,16 @@
         <% end %>
       </fieldset>
 
-      <%= f.submit "Join", class: "mt-auto h-16 w-full cursor-pointer rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display text-2xl font-bold" %>
+      <div class="mt-auto flex flex-col gap-3.5">
+        <% if full? %>
+          <%= f.submit "Join", disabled: true, class: "h-14 w-full cursor-not-allowed rounded-2xl bg-gray-800 font-display text-[1.375rem] font-bold text-gray-500" %>
+        <% else %>
+          <%= f.submit "Join", class: "h-14 w-full cursor-pointer rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display text-[1.375rem] font-bold" %>
+        <% end %>
+        <% if creator? %>
+          <%= link_to "Use this screen as the big screen instead", game_path(@game.code), class: "self-center px-1 py-1.5 text-[0.9375rem] text-blue-300 underline underline-offset-3 hover:text-blue-200" %>
+        <% end %>
+      </div>
     <% end %>
   </div>
 </main>

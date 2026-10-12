@@ -1,50 +1,57 @@
-<main class="min-h-dvh bg-gray-950 text-white flex items-center justify-center px-5 py-8 md:p-16">
-  <div class="w-full max-w-sm grid gap-10 md:max-w-6xl md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-center md:gap-24">
-    <section class="flex flex-col items-center text-center md:items-start md:text-left">
-      <h1 class="font-display text-7xl font-extrabold leading-none tracking-tight md:text-[10rem]">Onset</h1>
-      <p class="mt-4 max-w-md text-base text-gray-400 md:text-2xl">Set, played live in the room. The cards go on the big screen, everyone buzzes in from their phone.</p>
-      <figure class="mt-8 md:mt-14">
-        <div class="flex items-end justify-center gap-3 md:justify-start md:gap-5">
-          <% [[28, "-rotate-6 translate-y-2"], [40, ""], [52, "rotate-6 translate-y-2"]].each do |id, tilt| %>
-            <div class="h-28 aspect-[5/7] md:h-64 <%= tilt %>"><%= render "cards/card", card: Card.new(id) %></div>
-          <% end %>
-        </div>
-        <figcaption class="mt-5 text-sm text-gray-500 md:text-base">That's a Set: same number, same shading, every shape and color different.</figcaption>
-      </figure>
-      <%= link_to "New to Set? How to play →", how_to_play_path, class: "mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-blue-400 hover:text-blue-300 md:text-base" %>
-    </section>
+<main class="min-h-dvh bg-gray-950 text-white flex items-center justify-center px-5 py-7 md:p-16">
+  <div class="w-full max-w-sm flex flex-col gap-6 md:max-w-6xl md:grid md:grid-cols-[minmax(0,1fr)_448px] md:grid-rows-[auto_auto] md:gap-x-20 md:gap-y-10">
+    <header class="order-1 flex flex-col gap-2 md:col-start-1 md:row-start-1 md:self-end md:gap-7">
+      <h1 class="font-display text-[3.25rem] font-extrabold leading-none tracking-tight md:text-[8.5rem]">Onset</h1>
+      <p class="max-w-lg text-base text-gray-300 md:text-2xl">Set, played live in the room. Everyone plays on their own screen, and a big screen is optional.</p>
+    </header>
 
-    <section class="flex flex-col gap-4">
-      <div class="order-3 flex flex-col gap-3 md:order-1">
-        <%= button_to games_path, method: :post,
-              class: "w-full rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 transition px-6 py-4 text-left md:py-6" do %>
-          <span class="block text-xl font-bold md:text-2xl">Start a game</span>
-          <span class="block text-sm text-blue-100 md:text-base">This screen becomes the board</span>
-        <% end %>
-        <%= button_to games_path, method: :post, params: {mode: "quick"},
-              class: "w-full rounded-2xl bg-violet-600 hover:bg-violet-500 active:scale-95 transition px-6 py-4 text-left md:py-6" do %>
-          <span class="block text-xl font-bold md:text-2xl">Start quick game</span>
-          <span class="block text-sm text-violet-100 md:text-base">First to <%= Game::QUICK_WIN_SCORE %> points wins</span>
-        <% end %>
-      </div>
-      <div class="order-2 flex items-center gap-3 text-sm text-gray-500">
-        <div class="h-px flex-1 bg-gray-800"></div>
-        <span>or</span>
-        <div class="h-px flex-1 bg-gray-800"></div>
-      </div>
-      <%= form_with url: join_by_code_path, method: :get, class: "order-1 md:order-3" do |f| %>
-        <%= f.label :code, "Have a room code?", for: "room_code", class: "mb-2 block text-sm font-medium text-gray-400" %>
+    <section class="order-2 flex flex-col gap-6 md:col-start-2 md:row-span-2 md:row-start-1 md:self-center md:rounded-3xl md:border md:border-gray-800 md:bg-gray-900 md:p-9 md:gap-7">
+      <%= form_with url: games_path, method: :post, class: "order-3 flex flex-col gap-3 md:order-1" do %>
+        <fieldset>
+          <legend class="sr-only">Game mode</legend>
+          <div class="grid grid-cols-2 gap-1 rounded-2xl border border-gray-700 bg-gray-900 p-1 md:bg-gray-950">
+            <label class="flex h-11 cursor-pointer items-center justify-center rounded-xl font-semibold text-gray-400 has-checked:bg-gray-700 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-blue-500">
+              <%= radio_button_tag :mode, "standard", true, class: "sr-only" %>
+              Standard
+            </label>
+            <label class="flex h-11 cursor-pointer items-center justify-center rounded-xl font-semibold text-gray-400 has-checked:bg-violet-600 has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-blue-500">
+              <%= radio_button_tag :mode, "quick", false, class: "sr-only" %>
+              First to <%= Game::QUICK_WIN_SCORE %>
+            </label>
+          </div>
+        </fieldset>
+        <button type="submit" class="h-14 w-full cursor-pointer rounded-2xl bg-blue-600 font-display text-xl font-bold hover:bg-blue-500 active:scale-95 transition md:h-15 md:text-[1.375rem]">Start a game</button>
+        <p class="text-center text-sm text-gray-400">Play from this screen, then invite the others</p>
+      <% end %>
+
+      <div class="order-2 h-px bg-gray-800"></div>
+
+      <%= form_with url: join_by_code_path, method: :get, class: "order-1 flex flex-col gap-2 md:order-3" do |f| %>
+        <%= f.label :code, "Have a room code?", for: "room_code", class: "font-semibold" %>
         <div class="flex gap-2">
           <%= f.text_field :code, id: "room_code", maxlength: 6, placeholder: "Room code", autocomplete: "off",
                 autocapitalize: "characters", required: true,
-                class: "h-14 min-w-0 flex-1 rounded-xl border border-gray-700 bg-gray-900 px-4 text-center font-display text-2xl font-bold uppercase tracking-[0.3em] placeholder:font-sans placeholder:text-base placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+                aria: flash[:alert] ? {invalid: true, describedby: "room_code_error"} : {},
+                class: "h-13 min-w-0 flex-1 rounded-xl border-2 bg-gray-900 px-4 font-display text-[1.375rem] font-bold uppercase tracking-[0.18em] placeholder:font-sans placeholder:text-base placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-gray-500 focus:outline-none focus:ring-2 md:bg-gray-950 #{flash[:alert] ? "border-red-500 focus:ring-red-500" : "border-gray-700 focus:ring-blue-500"}" %>
           <%= f.submit "Join", name: nil,
-                class: "h-14 cursor-pointer rounded-xl bg-white px-6 font-bold text-gray-950 hover:bg-gray-200 active:scale-95 transition md:bg-gray-700 md:text-white md:hover:bg-gray-600" %>
+                class: "h-13 w-21 cursor-pointer rounded-xl border border-gray-700 bg-gray-800 font-semibold hover:bg-gray-700 active:scale-95 transition md:w-24" %>
         </div>
         <% if flash[:alert] %>
-          <p class="mt-2 text-sm text-red-400"><%= flash[:alert] %></p>
+          <p id="room_code_error" class="text-sm text-red-400"><%= flash[:alert] %></p>
         <% end %>
       <% end %>
     </section>
+
+    <figure class="order-3 flex items-center gap-4 md:col-start-1 md:row-start-2 md:flex-col md:items-start md:gap-5">
+      <div class="flex flex-none items-end gap-2 md:gap-5">
+        <% [[28, "-rotate-6 translate-y-1 md:translate-y-2"], [40, ""], [52, "rotate-6 translate-y-1 md:translate-y-2"]].each do |id, tilt| %>
+          <div class="h-20 aspect-[5/7] md:h-48 <%= tilt %>"><%= render "cards/card", card: Card.new(id) %></div>
+        <% end %>
+      </div>
+      <figcaption class="flex flex-col gap-1 text-sm text-gray-400 md:text-base">
+        <span>That's a Set: same number, same shading, every shape and color different.</span>
+        <%= link_to "New to Set? How to play →", how_to_play_path, class: "inline-flex min-h-11 items-center font-semibold text-blue-400 hover:text-blue-300" %>
+      </figcaption>
+    </figure>
   </div>
 </main>

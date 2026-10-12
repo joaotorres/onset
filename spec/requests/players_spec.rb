@@ -19,7 +19,9 @@ RSpec.describe "Players" do
       game.players.create!(name: "marta", color: "#1ABC9C")
       get join_game_players_path(game.code)
       expect(response.body).to include('title="Taken by marta"')
-      expect(response.body).to match(%r{<span class="text-lg font-bold text-gray-950">M</span>})
+      initial = Nokogiri::HTML(response.body).at_css("label[title='Taken by marta'] span")
+      expect(initial.text).to eq("M")
+      expect(initial["class"]).to include("text-gray-300", "font-display")
     end
 
     it "selects the first preset color on an empty game" do
@@ -38,11 +40,44 @@ RSpec.describe "Players" do
       end
     end
 
-    it "selects nothing and still renders the form when every color is taken" do
+    it "says the room is full and disables Join when every color is taken" do
       presets.each_with_index { |hex, i| game.players.create!(name: "p#{i}", color: hex) }
       get join_game_players_path(game.code)
       expect(checked_colors).to be_empty
-      expect(response.body).to include('value="Join"')
+      doc = Nokogiri::HTML(response.body)
+      expect(doc.at_css(".border-red-700")&.text).to include("This room is full")
+      submit = doc.at_css("input[type=submit][value=Join]")
+      expect(submit["disabled"]).to be_present
+    end
+
+    it "keeps Join enabled while a color is free" do
+      get join_game_players_path(game.code)
+      submit = Nokogiri::HTML(response.body).at_css("input[type=submit][value=Join]")
+      expect(submit["disabled"]).to be_nil
+      expect(response.body).not_to include("This room is full")
+    end
+
+    describe "the big screen link" do
+      def big_screen_link = Nokogiri::HTML(response.body).at_css("a:contains('Use this screen as the big screen instead')")
+
+      it "shows to the browser that created the room, linking to its big screen in the same tab" do
+        post games_path
+        code = Game.last.code
+        get join_game_players_path(code)
+        expect(big_screen_link["href"]).to eq(game_path(code))
+        expect(big_screen_link["target"]).to be_nil
+      end
+
+      it "is absent without the host cookie" do
+        get join_game_players_path(game.code)
+        expect(big_screen_link).to be_nil
+      end
+
+      it "is absent with another room's host cookie" do
+        post games_path
+        get join_game_players_path(game.code)
+        expect(big_screen_link).to be_nil
+      end
     end
   end
 
@@ -74,6 +109,14 @@ RSpec.describe "Players" do
         expect(response.body).to include("Try again in a minute.")
         expect(checked_colors).to eq([presets[0]])
       end
+    end
+
+    it "does not make the creator the host player" do
+      post games_path
+      created = Game.last
+      post game_players_path(created.code), params: valid_params
+      expect(created.players.count).to eq(1)
+      expect(created.reload.host_player_id).to be_nil
     end
 
     it "creates a player and redirects to the controller view" do

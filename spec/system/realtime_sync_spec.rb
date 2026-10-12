@@ -21,6 +21,7 @@ RSpec.describe "Realtime sync", type: :system do
   before do
     visit root_path
     click_button "Start a game"
+    click_link "Use this screen as the big screen instead"
     @code = find("[data-room-code]").text
     expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
 

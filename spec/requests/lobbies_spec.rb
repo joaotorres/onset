@@ -6,6 +6,40 @@ RSpec.describe "Lobbies", type: :request do
       get root_path
       expect(response).to have_http_status(:ok)
     end
+
+    def doc = Nokogiri::HTML(response.body)
+
+    it "has one Start a game form with a Standard / First to 5 toggle, Standard checked" do
+      get root_path
+      forms = doc.css("form[action='#{games_path}'][method=post]")
+      expect(forms.size).to eq(1)
+      radios = forms.first.css("input[type=radio][name=mode]")
+      expect(radios.map { |r| r["value"] }).to eq(%w[standard quick])
+      expect(radios.select { |r| r["checked"] }.map { |r| r["value"] }).to eq(["standard"])
+      expect(forms.first.text).to include("Standard", "First to #{Game::QUICK_WIN_SCORE}")
+      expect(forms.first.css("button, input[type=submit]").map { |b| b.text.strip.presence || b["value"] })
+        .to eq(["Start a game"])
+      expect(forms.first.text).to include("Play from this screen, then invite the others")
+    end
+
+    it "uses the devices-first copy and no old wording" do
+      get root_path
+      text = doc.at_css("body").text
+      expect(text).to include("Set, played live in the room. Everyone plays on their own screen, and a big screen is optional.")
+      expect(text).not_to include("Start quick game")
+      expect(text).not_to include("This screen becomes the board")
+      expect(text).not_to match(/phone|controller|\bTV\b/i)
+      expect(text).to include("New to Set? How to play")
+    end
+
+    it "shows Room not found under an empty, red-bordered code field" do
+      get join_by_code_path, params: {code: "ZZZZZZ"}
+      follow_redirect!
+      expect(doc.at_css("p.text-red-400")&.text).to eq("Room not found")
+      field = doc.at_css("input#room_code")
+      expect(field["value"]).to be_blank
+      expect(field["class"]).to include("border-red-500")
+    end
   end
 
   describe "GET /join" do
@@ -19,7 +53,7 @@ RSpec.describe "Lobbies", type: :request do
     it "sends unknown codes back to the landing page with an alert" do
       get join_by_code_path, params: {code: "ZZZZZZ"}
       expect(response).to redirect_to(root_path)
-      expect(flash[:alert]).to match(/Room not found/)
+      expect(flash[:alert]).to eq("Room not found")
     end
   end
 

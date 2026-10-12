@@ -3,6 +3,7 @@ class PlayersController < ApplicationController
 
   before_action :set_game
   before_action :set_color_owners, only: [:new, :join, :create]
+  helper_method :creator?, :full?
   rate_limit to: 20, within: 1.minute, only: :create, with: -> {
     @player = Player.new(color: first_free_color)
     flash.now[:alert] = "Too many join attempts. Try again in a minute."
@@ -42,6 +43,10 @@ class PlayersController < ApplicationController
   def set_color_owners
     @color_owners = @game.players.index_by(&:color)
   end
+
+  def creator? = cookies.encrypted[:host_game] == @game.code
+
+  def full? = first_free_color.nil?
 
   def free?(hex) = PRESET_COLORS.include?(hex) && !@color_owners.key?(hex)
 

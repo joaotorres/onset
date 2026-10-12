@@ -8,10 +8,9 @@ RSpec.describe "Stimulus polish", type: :system do
   def setup_claim_state
     visit root_path
     click_button "Start a game"
-    expect(page).to have_current_path(%r{\A/games/\w+\z})
-    game_code = current_path.split("/").last
+    expect(page).to have_current_path(%r{\A/games/\w+/players/join\z})
+    game_code = current_path.split("/")[2]
 
-    visit join_game_players_path(game_code)
     fill_in "player[name]", with: "Alice"
     all("label.cursor-pointer").first.click
     click_button "Join"

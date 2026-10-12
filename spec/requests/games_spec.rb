@@ -2,9 +2,9 @@ require "rails_helper"
 
 RSpec.describe "Games" do
   describe "POST /games" do
-    it "creates a game and redirects to its board" do
+    it "creates a game and redirects to the creator's join page" do
       expect { post games_path }.to change(Game, :count).by(1)
-      expect(response).to redirect_to(game_path(Game.last.code))
+      expect(response).to redirect_to(join_game_players_path(Game.last.code))
     end
 
     it "sets the host cookie" do
@@ -20,6 +20,11 @@ RSpec.describe "Games" do
     it "creates a quick game when mode=quick" do
       post games_path, params: {mode: "quick"}
       expect(Game.last).to be_quick
+    end
+
+    it "creates a standard game when mode=standard" do
+      post games_path, params: {mode: "standard"}
+      expect(Game.last).to be_standard
     end
 
     context "when rate limited" do

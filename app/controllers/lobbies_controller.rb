@@ -4,7 +4,7 @@ class LobbiesController < ApplicationController
 
   def join
     game = Game.find_by(code: params[:code].to_s.strip.upcase)
-    return redirect_to(root_path, alert: "Room not found. Check the code on the big screen.") unless game
+    return redirect_to(root_path, alert: "Room not found") unless game
 
     redirect_to join_game_players_path(game.code)
   end
