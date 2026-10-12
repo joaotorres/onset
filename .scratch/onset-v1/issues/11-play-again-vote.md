@@ -1,6 +1,6 @@
 # 11: Play again as a vote on player screens
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
@@ -69,3 +69,5 @@ Decided: a vote restart goes straight into play with the same mode, as `restart!
 Decided: the big screen's Play again stays host-only and restarts at once whatever the votes, clearing them, because the request keeps it as is. Instead of: making it count as a vote.
 
 Decided: the button and waiting line reuse the I'm ready button and status box, so Kind stays behavioural. Instead of: a design pass.
+
+Decided: the vote lives in `Game#vote_play_again!` and the controller picks it over `vote_start!` when ended, because the start vote's rule (every player, 2+) stays untouched. Instead of: one method branching on status.

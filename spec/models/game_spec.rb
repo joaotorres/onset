@@ -344,6 +344,51 @@ RSpec.describe Game do
     end
   end
 
+  describe "#vote_play_again!" do
+    let(:game) { Game.create!(mode: :quick).tap(&:start!) }
+    let!(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current, score: 4) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current, score: 5) }
+
+    before { game.update!(status: :ended, deck: [], board: [1, 2, 3]) }
+
+    it "records the vote without restarting while an active player has not voted" do
+      game.vote_play_again!(alice)
+      game.reload
+      expect(game).to be_ended
+      expect(game.start_voters).to eq([alice.id])
+    end
+
+    it "ignores a repeat vote" do
+      game.vote_play_again!(alice)
+      game.vote_play_again!(alice)
+      expect(game.reload.start_voters).to eq([alice.id])
+    end
+
+    it "restarts once every active player has voted" do
+      game.vote_play_again!(alice)
+      game.vote_play_again!(bob)
+      game.reload
+      expect(game).to be_playing
+      expect(game.board.size).to eq(12)
+      expect(game.deck.size).to eq(69)
+      expect(game.start_voters).to be_empty
+      expect(game).to be_quick
+      expect([alice.reload.score, bob.reload.score]).to eq([0, 0])
+    end
+
+    it "does not wait on an inactive player" do
+      bob.update!(last_seen_at: 1.minute.ago)
+      game.vote_play_again!(alice)
+      expect(game.reload).to be_playing
+    end
+
+    it "does nothing unless the game is ended" do
+      game.update!(status: :playing)
+      expect(game.vote_play_again!(alice)).to be_nil
+      expect(game.reload.start_voters).to be_empty
+    end
+  end
+
   describe "#standings and #winner" do
     let(:game) { Game.create! }
     let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", score: 3) }

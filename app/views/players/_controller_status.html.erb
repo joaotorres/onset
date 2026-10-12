@@ -70,7 +70,15 @@
       <% else %>
         <p class="mt-10 text-lg landscape:mt-5"><span class="text-yellow-400">★</span> Tied for first at <%= game.standings.first&.score %></p>
       <% end %>
-      <p class="mt-8 text-sm text-gray-500 landscape:mt-4">Play again from the big screen</p>
+      <div class="mt-8 flex w-full max-w-sm landscape:mt-4 landscape:h-16">
+        <% if game.start_voters.include?(player.id) %>
+          <p class="grid h-16 w-full place-items-center rounded-2xl border-2 border-green-600 px-3 text-center font-semibold text-green-400">Ready ✓ · waiting for <%= game.play_again_waiting_count %> more</p>
+        <% else %>
+          <%= button_to "Play again", ready_game_path(game.code), method: :post,
+                form_class: "contents", data: {turbo_submits_with: "…"},
+                class: "h-16 w-full rounded-2xl bg-green-600 hover:bg-green-500 active:scale-95 transition font-display text-2xl font-bold shadow-xl" %>
+        <% end %>
+      </div>
     </div>
 
   <% elsif my_claim %>

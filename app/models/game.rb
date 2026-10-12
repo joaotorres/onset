@@ -59,6 +59,23 @@ class Game < ApplicationRecord
     end
   end
 
+  # Once ended, "Play again" is a ready vote over start_voters: every active player, the voter included.
+  def vote_play_again!(player)
+    with_lock do
+      return nil unless ended?
+      return self if start_voters.include?(player.id)
+
+      new_voters = start_voters + [player.id]
+      update!(start_voters: new_voters)
+      restart! if (players.select(&:active?).map(&:id) - new_voters).empty?
+      self
+    end
+  end
+
+  def play_again_waiting_count
+    (players.select(&:active?).map(&:id) - start_voters).size
+  end
+
   def broadcast_lobby_state
     broadcast_replace_to "game:#{code}",
       target: "board",

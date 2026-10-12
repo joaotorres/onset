@@ -35,7 +35,8 @@ class GamesController < ApplicationController
     player = @game.players.find_by(session_token: cookies.encrypted[:player_token])
     head :forbidden and return unless player
 
-    @game.vote_start!(player)
+    player.seen!
+    @game.ended? ? @game.vote_play_again!(player) : @game.vote_start!(player)
     head :no_content
   end
 
