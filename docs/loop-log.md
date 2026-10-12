@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  triage 10: gap settled, SPEC §8 Player screen Waiting gets an invite for every player (room code, Copy link or Share link, Show QR sheet, Show on a big screen in a new tab), §7 hook line added, seven Decided lines. Next: design brief.
 - 2026-10-12  triage 09: gap settled, SPEC §8 Player screen shows board, scoreboard and deck count in portrait, landscape and a computer layout from 1024px, arrive outline, card tap calls SET! in every layout, §2, §7 and §10 updated, ticket 06 references renamed, eight Decided lines. Next: design brief.
 - 2026-10-12  triage 08: gap settled, SPEC §8 Landing Standard / First to 5 toggle above one Start a game leading to the creator's join page, Join page "Use this screen as the big screen instead" link for the creating browser, hosting stays the host_game cookie, §4 and §5 updated, six Decided lines. Next: design brief.
 - 2026-10-12  triage 07: gap settled, SPEC §8 Player screen game over standings under the winner line, own row tinted with "you", fits 8 players without page scroll, five Decided lines. Next: design brief.

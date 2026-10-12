@@ -323,6 +323,7 @@ Stimulus attributes stay on whatever element plays the role:
 
 - `card-selection`: `card` targets with `data-card-id` and `click->card-selection#toggle`, plus `form`, `input`, `slot` and `count` targets
 - Idle board, in every player screen layout: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle); whatever Stimulus controller does it lists its attributes here
+- Waiting invite (§8, Player screen, Waiting): the Copy link / Share link button and the Show QR sheet; whatever Stimulus controller drives them lists its attributes here
 - `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
 
 ### Why this works
@@ -381,6 +382,14 @@ Shared by all three during play:
 SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**.
 
 1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more".
+
+   Every player's waiting screen also carries the **invite**, so anyone in the room can bring in the next player; it goes once play starts, since late joining stays blocked, remote players included:
+   - The room code in large type, with "or open HOST and enter the code" (`join_host`), as on the big screen.
+   - **Copy link**: copies the join page URL (`/games/:code/players/join`, the URL the big screen QR encodes) and reads "Copied ✓" for 2s. Where the browser has the Web Share API and a touch screen (`pointer: coarse`), it reads **Share link** and opens the native share sheet with that URL and "Room CODE" instead. A cancelled share changes nothing; a failed copy reads "Couldn't copy" for 2s, the code and host staying on screen to share by hand.
+   - **Show QR**: opens a sheet over the player screen with the join URL's QR on a white tile, as large as fits up to 18rem, the room code under it and **Done** to close it. The QR stays behind this tap so the waiting screen fits without it. Any room update (someone joins or votes) re-renders `#controller_status` and closes the sheet; one tap reopens it.
+   - **Show on a big screen →**: a text link that opens the room's big screen `/games/:code` in a new tab, as **Join from this computer →** does, so the player screen stays open.
+
+   With 8 players and the invite there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640. The exact layout comes from the design pass.
 2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
 3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait adds a tray of three slots that fill as cards are tapped. A claim started by tapping a card opens with that card selected (1/3) if it is still on the board. Tap a card to select, tap again to deselect, auto-submit per §11.
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
@@ -391,7 +400,7 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
 
    The standings list every player in the room, as many as "of N players" counts, one compact row each: rank, dot, name and score. Rows run by score, ties in join order, and tied players share a rank ("1, 1, 3"), as on the big screen podium. No ★, Locked tag or ready marks in the rows: the winner line carries the ★. Names truncate with an ellipsis. The player's own row is highlighted with a surface tint, not a color from the §10 meaning table, and says "you" after the name, as the waiting roster does. With 8 players, one per preset color, the screen keeps no page scroll at 375×667 portrait and 667×375 landscape. On a shorter screen the list scrolls inside itself, never the page.
 
-Stimulus: `card-selection` (selection, tray, count, auto-submit) and `countdown` (every ring and seconds display).
+Stimulus: `card-selection` (selection, tray, count, auto-submit), `countdown` (every ring and seconds display) and whatever controller shares or copies the invite link and opens the QR sheet, its attributes listed in §7.
 
 ---
 
