@@ -1,0 +1,15 @@
+<%# The join QR sheet: a bottom sheet in portrait, a card with the QR left in landscape, a 352px modal on computer. %>
+<dialog data-invite-target="sheet" aria-label="Join QR code"
+        class="m-0 mt-auto w-full max-w-none rounded-t-3xl border-t border-gray-700 bg-gray-900 px-5 pt-6 pb-5 text-gray-50 backdrop:bg-gray-950/85
+               landscape:max-lg:m-auto landscape:max-lg:w-fit landscape:max-lg:rounded-[22px] landscape:max-lg:border landscape:max-lg:p-4
+               lg:m-auto lg:w-[352px] lg:rounded-3xl lg:border lg:p-8">
+  <div class="flex flex-col items-center gap-3.5 landscape:max-lg:flex-row landscape:max-lg:gap-6 lg:gap-[18px]">
+    <div data-qr-tile class="size-[min(18rem,calc(100vw-2.5rem))] shrink-0 overflow-hidden rounded-2xl bg-white p-4 landscape:max-lg:size-[min(18rem,calc(100dvh-4rem))] landscape:max-lg:rounded-[14px] lg:size-72">
+      <%= join_qr_svg(game, "size-full") %>
+    </div>
+    <div class="flex w-full flex-col items-center gap-3.5 landscape:max-lg:w-[180px] landscape:max-lg:items-stretch landscape:max-lg:gap-5 landscape:max-lg:pr-2 lg:gap-[18px]">
+      <span class="font-display text-[38px] font-extrabold leading-none tracking-[0.1em] landscape:max-lg:text-[34px] landscape:max-lg:tracking-[0.08em] lg:text-[42px]"><%= game.code %></span>
+      <button type="button" data-action="click->invite#close" class="h-[52px] w-full rounded-[14px] bg-blue-600 text-lg font-bold text-white hover:bg-blue-500 active:scale-95 transition landscape:max-lg:h-[50px] cursor-pointer">Done</button>
+    </div>
+  </div>
+</dialog>

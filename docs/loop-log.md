@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  build 10: done, waiting invite on every player screen (code, Copy link / Share link, QR sheet, big screen link) in portrait, landscape and computer, bundle exec rspec green, three Decided lines. Next: build 11.
 - 2026-10-12  build 08: done, devices-first landing with mode toggle, Start a game opens the creator's join page with the big screen link, full room disables Join, bundle exec rspec green, one Decided line. Next: build 09.
 - 2026-10-12  build 07: done, game over standings in portrait, landscape and computer, Play again on green-700, bundle exec rspec green, two Decided lines. Next: build 08.
 - 2026-10-12  triage 10: ready, the design question settled in SPEC §8 Waiting (alone in the room, no I'm ready), the `invite` controller's hooks named in SPEC §7, three Decided lines. Next: build 07.

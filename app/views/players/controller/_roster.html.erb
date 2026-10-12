@@ -1,0 +1,11 @@
+<%# Waiting roster: two columns, dot, name, "you" and a ✓ once ready. %>
+<ul data-roster class="grid grid-cols-2 gap-x-3.5 gap-y-1.5 landscape:max-lg:gap-x-3 landscape:max-lg:gap-y-1 lg:gap-x-6 lg:gap-y-2">
+  <% game.players.each do |p| %>
+    <li class="flex h-7 min-w-0 items-center gap-2 landscape:max-lg:h-[26px] landscape:max-lg:gap-[7px] lg:h-9 lg:gap-2.5">
+      <span class="size-2.5 shrink-0 rounded-full lg:size-3" style="background-color: <%= p.color %>;"></span>
+      <span class="min-w-0 truncate font-medium landscape:max-lg:text-[15px] lg:text-lg"><%= p.name %></span>
+      <% if p.id == player.id %><span class="shrink-0 text-[13px] text-gray-400 landscape:max-lg:text-xs lg:text-sm">you</span><% end %>
+      <% if game.start_voters.include?(p.id) %><span aria-label="ready" class="ml-auto shrink-0 font-bold text-green-400 landscape:max-lg:text-[15px] lg:text-lg">✓</span><% end %>
+    </li>
+  <% end %>
+</ul>

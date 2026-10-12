@@ -11,7 +11,7 @@ RSpec.describe "Realtime sync", type: :system do
       fill_in "player[name]", with: name
       all("label.cursor-pointer")[swatch].click
       click_button "Join"
-      expect(page).to have_content("Waiting for players")
+      expect(page).to have_content("You're in")
       expect(page).to have_css("turbo-cable-stream-source[connected]", count: 2, visible: :all)
     end
   end

@@ -1,6 +1,6 @@
 # 10: Invite from the player screen waiting room
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Model:
@@ -90,3 +90,9 @@ Decided: with one player in the room no I'm ready shows and "Waiting for more pl
 Decided: the invite is driven by one `invite` Stimulus controller with `url` and `code` values, a `link` target and a `<dialog>` `sheet` target inside `#controller_status`, written into SPEC §7 hooks, because §7 asked for the controller's attributes and a native dialog gives Done, Escape and the overlay without extra markup. Instead of: leaving the names to the build, or a hidden div toggled by class.
 
 Decided: no blocker on tickets 14 to 16, because they leave the waiting branch alone and this ticket builds the waiting computer layout itself. Instead of: blocking 10 on 16.
+
+Decided: the QR tile is 18rem (288px) in landscape too, shrinking to fit a shorter viewport, because SPEC §8 caps the QR at 18rem and the board's 300px would pass it. Instead of: the board's 300px landscape tile.
+
+Decided: a Web Share call that fails with anything but AbortError falls back to copying the link, with the copy feedback, because the player still wants the link out. Instead of: leaving the button as it was.
+
+Decided: Waiting drops the "Waiting for players…" subtitle and the landscape info column, keeps the How to play link and puts the name and score row atop the roster column in landscape and computer, because the boards draw it that way and the header partial is landscape-hidden. Instead of: keeping the info column beside the invite.

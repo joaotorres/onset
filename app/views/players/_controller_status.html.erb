@@ -24,38 +24,32 @@
   <%= render "players/controller/header", player: player, score_class: (game.playing? && locked && !my_claim && !game.claim_active? && !game.no_set_active?) ? "text-red-400" : nil %>
 
   <% if game.waiting? %>
+    <%# Waiting: portrait stacks the roster, the invite and I'm ready; landscape and computer put the invite beside them. %>
     <% total = game.players.count %>
-    <% voted = game.start_voters.size %>
-    <% status_box = "grid h-16 w-full place-items-center rounded-2xl border-2 px-3 text-center font-semibold landscape:h-full" %>
-    <div class="flex-1 min-h-0 flex portrait:flex-col landscape:gap-4">
-      <div class="flex-1 min-h-0 flex flex-col justify-center landscape:min-w-0">
-        <h2 class="font-display text-4xl font-bold landscape:text-2xl">You're in</h2>
-        <p class="mt-1 text-gray-400">Waiting for players…</p>
-        <ul class="mt-6 grid grid-cols-2 gap-2 landscape:mt-4">
-          <% game.players.each do |p| %>
-            <% ready = game.start_voters.include?(p.id) %>
-            <li class="flex items-center gap-2 rounded-xl bg-gray-900 px-3 py-3">
-              <span class="size-3 shrink-0 rounded-full" style="background-color: <%= p.color %>;"></span>
-              <span class="truncate font-medium"><%= p.name %></span>
-              <% if p.id == player.id %><span class="ml-auto text-sm text-gray-500">you</span><% end %>
-              <% if ready %><span class="<%= "ml-auto" unless p.id == player.id %> text-green-400">✓</span><% end %>
-            </li>
+    <% ready_box = "h-14 w-full rounded-[14px] landscape:max-lg:h-[50px]" %>
+    <div class="flex-1 min-h-0 flex flex-col gap-3.5 landscape:flex-row landscape:gap-4 lg:gap-8 lg:px-6 lg:py-4">
+      <div class="portrait:contents flex min-h-0 min-w-0 flex-1 flex-col gap-2.5 lg:gap-[18px] lg:rounded-[20px] lg:border lg:border-gray-800 lg:bg-gray-900 lg:p-7">
+        <div class="hidden landscape:flex h-8 shrink-0 items-center gap-2.5">
+          <span class="size-3 shrink-0 rounded-full lg:size-3.5" style="background-color: <%= player.color %>;"></span>
+          <span class="min-w-0 flex-1 truncate font-semibold lg:text-xl"><%= player.name %></span>
+          <span class="shrink-0 font-display text-[22px] font-bold tabular-nums lg:text-[28px]"><%= player.score %></span>
+        </div>
+        <h2 class="font-display text-[30px] font-extrabold leading-none landscape:max-lg:text-2xl lg:text-4xl">You're in</h2>
+        <%= render "players/controller/roster", game: game, player: player %>
+        <%= link_to "New to Set? How to play →", how_to_play_path(return_to: game_controller_path(game.code)), class: "-my-1.5 inline-flex min-h-8 items-center self-start text-sm font-semibold text-blue-400 hover:text-blue-300" %>
+        <div class="portrait:order-last portrait:mt-auto landscape:mt-auto">
+          <% if total < 2 %>
+            <p class="<%= ready_box %> grid place-items-center border-2 border-gray-700 px-3 text-center font-semibold text-gray-400">Waiting for more players to join…</p>
+          <% elsif game.start_voters.include?(player.id) %>
+            <p class="<%= ready_box %> grid place-items-center border-2 border-green-700 bg-green-700/12 px-3 text-center text-[17px] font-semibold text-green-300 landscape:max-lg:text-base lg:text-lg">Ready ✓ · waiting for <%= total - game.start_voters.size %> more</p>
+          <% else %>
+            <%= button_to "I'm ready", ready_game_path(game.code), method: :post,
+                  form_class: "contents", data: {turbo_submits_with: "…"},
+                  class: "#{ready_box} bg-green-700 hover:bg-green-800 active:scale-95 transition font-display text-[22px] font-bold text-white shadow-xl landscape:max-lg:text-xl" %>
           <% end %>
-        </ul>
-        <%= link_to "New to Set? How to play →", how_to_play_path(return_to: game_controller_path(game.code)), class: "mt-4 inline-flex min-h-11 items-center self-start text-sm font-semibold text-blue-400 hover:text-blue-300 landscape:mt-2" %>
+        </div>
       </div>
-      <div class="flex portrait:mt-6 landscape:w-36 landscape:shrink-0">
-        <% if total < 2 %>
-          <p class="<%= status_box %> border-gray-700 text-gray-400">Waiting for more players to join…</p>
-        <% elsif game.start_voters.include?(player.id) %>
-          <p class="<%= status_box %> border-green-600 text-green-400">Ready ✓ · waiting for <%= total - voted %> more</p>
-        <% else %>
-          <%= button_to "I'm ready", ready_game_path(game.code), method: :post,
-                form_class: "contents", data: {turbo_submits_with: "…"},
-                class: "h-16 w-full rounded-2xl bg-green-600 hover:bg-green-500 active:scale-95 transition font-display text-2xl font-bold shadow-xl landscape:h-full" %>
-        <% end %>
-      </div>
-      <%= render "players/controller/info_column", player: player %>
+      <%= render "players/controller/invite", game: game, class: "shrink-0 landscape:max-lg:w-[292px] lg:w-[400px]" %>
     </div>
 
   <% elsif game.ended? %>

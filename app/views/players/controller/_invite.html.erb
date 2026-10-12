@@ -1,0 +1,25 @@
+<%# Waiting invite (SPEC §8): the code, the host line, Copy link / Share link, Show QR and the big screen link. The QR sheet sits inside, so a #controller_status replace closes it. %>
+<% button = "flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border border-gray-700 bg-gray-800 font-semibold text-gray-50 hover:bg-gray-700 active:scale-95 transition landscape:max-lg:h-[46px] landscape:max-lg:text-[15px] lg:h-[50px] cursor-pointer" %>
+<section aria-label="Invite" data-controller="invite"
+         data-invite-url-value="<%= join_game_players_url(game.code) %>"
+         data-invite-code-value="<%= game.code %>"
+         class="flex flex-col justify-center gap-3 rounded-[18px] border border-gray-800 bg-gray-900 p-4 landscape:max-lg:flex-1 landscape:max-lg:gap-3.5 lg:gap-[22px] lg:rounded-[20px] lg:p-7 <%= local_assigns[:class] %>">
+  <div class="flex flex-col items-center gap-1 text-center landscape:max-lg:gap-1.5 lg:gap-2">
+    <span class="font-display text-[46px] font-extrabold leading-none tracking-[0.1em] landscape:max-lg:text-[44px] lg:text-[64px]"><%= game.code %></span>
+    <span class="text-sm text-gray-400 lg:text-base">or open <strong class="font-semibold text-gray-200"><%= join_host %></strong> and enter the code</span>
+  </div>
+  <div class="flex gap-2.5 landscape:max-lg:gap-2 lg:gap-3">
+    <button type="button" class="<%= button %>" data-invite-target="link" data-action="click->invite#share">
+      <svg data-invite-target="copyIcon" class="size-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      <svg data-invite-target="shareIcon" class="hidden size-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
+      <span data-invite-target="label">Copy link</span>
+    </button>
+    <button type="button" class="<%= button %>" data-action="click->invite#open">
+      <svg class="size-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M21 14v7h-7"/></svg>
+      <span>Show QR</span>
+    </button>
+  </div>
+  <%= link_to "Show on a big screen →", game_path(game.code), target: "_blank", rel: "noopener",
+        class: "self-center p-1 text-[15px] text-blue-300 underline-offset-[3px] hover:underline landscape:max-lg:text-sm lg:text-base" %>
+  <%= render "players/controller/qr_sheet", game: game %>
+</section>
