@@ -14,9 +14,9 @@ Applies where the player screen shows cards while idle (landscape, a computer). 
 
 ## Spec references
 
-- SPEC §2 "Round flow" item 3: a card tap in landscape is a way to call SET!
-- SPEC §8 "Player screen": the landscape sentence (board read-only except idle and claiming (mine)), item 2 Idle (tap calls SET! with that card selected, first tap only, lost race does nothing, never carries into a later claim), item 3 Claiming (mine) (opens with the tapped card selected, 1/3)
-- SPEC §7 "Hooks that must survive any markup change": the idle landscape board line
+- SPEC §2 "Round flow" item 3: a card tap on the board is a way to call SET!
+- SPEC §8 "Player screen": the Board bullet under "Shared by all three" (board read-only except idle and claiming (mine)), item 2 Idle (tap calls SET! with that card selected, first tap only, lost race does nothing, never carries into a later claim), item 3 Claiming (mine) (opens with the tapped card selected, 1/3)
+- SPEC §7 "Hooks that must survive any markup change": the idle board line
 
 ## Scope
 
@@ -26,7 +26,7 @@ Applies where the player screen shows cards while idle (landscape, a computer). 
 - A pending tap must not survive into a later claim: clear it when the claiming (mine) view consumes it and whenever the idle view connects again (a lost race passes through someone else claiming and back to idle)
 - After the first tap, further taps on the idle board are ignored until the screen re-renders, the way SET! uses `turbo_submits_with`
 - Tappable cards get `cursor-pointer` and are buttons (keyboard and screen reader reachable); no new hover or pressed style
-- If the implementation adds a Stimulus controller, list its identifier, targets and actions on the §7 idle landscape board line
+- If the implementation adds a Stimulus controller, list its identifier, targets and actions on the §7 idle board line
 - Must not touch: portrait idle (shows no cards), the big screen, `Game`, `Claim`, `ClaimsController`, the auto-submit timing (§11), the No Set countdown branch (ticket 05 rebuilds it)
 
 ## Acceptance criteria

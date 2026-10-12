@@ -39,7 +39,7 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 
 1. The board shows 12 face-up cards drawn from the deck.
 2. Players race to spot a Set.
-3. A player taps **"SET!"** on their player screen, or, in landscape, a card on the board their player screen shows (§8, Player screen), which also selects that card. Server timestamps the request and atomically locks the claim to the first arrival.
+3. A player taps **"SET!"** on their player screen, or a card on the board their player screen shows (§8, Player screen), which also selects that card. Server timestamps the request and atomically locks the claim to the first arrival.
 4. The claiming player has **15 seconds** (`Game::CLAIM_TIMEOUT`) to tap 3 cards on their player screen.
    - **Correct Set**: +1 point, those 3 cards are removed, 3 new cards are dealt from the deck. Board unfreezes.
    - **Wrong Set**: −1 point, claiming player is locked out for 5 seconds (cannot claim again). Board unfreezes immediately for everyone else.
@@ -317,12 +317,12 @@ Do not redirect back to the same page. A redirect reloads it, which drops its st
 Turbo Streams replace these by id, so each stays the outermost element of its region:
 
 - Big screen: `#board` (holds the waiting state and `#start_button`), `#scoreboard`, `#announcement`, `#start_button`
-- Player screen: `#controller_status` (wraps the header, the state body and the found-set banner)
+- Player screen: `#controller_status` (wraps the header or scoreboard, the deck count, the state body and the found-set banner)
 
 Stimulus attributes stay on whatever element plays the role:
 
 - `card-selection`: `card` targets with `data-card-id` and `click->card-selection#toggle`, plus `form`, `input`, `slot` and `count` targets
-- Idle landscape board: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle); whatever Stimulus controller does it lists its attributes here
+- Idle board, in every player screen layout: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle); whatever Stimulus controller does it lists its attributes here
 - `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
 
 ### Why this works
@@ -364,15 +364,27 @@ Portrait. "Joining room" with the code in large type, since the code is what peo
 
 ### Player screen (`/games/:code/controller`)
 
-Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. Portrait: header with dot, name and score. Landscape: three columns, the board on the left, a 9rem action column, a 5rem info column (dot, name, score). The board is read-only in every state but idle and claiming (mine).
+Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. The player screen stands alone (§1): in every playing state it shows the board, the scoreboard and the deck count, so a room needs no big screen. Waiting and game over keep a header with dot, name and score, since their bodies already list every player. Three layouts, chosen by the viewport alone, whatever the input:
+
+- **Portrait** (narrower than tall, under 1024px wide): the scoreboard across the top, the board under it at the full width, then the state's panel, SET! and its pill at the bottom, under the thumb.
+- **Landscape** (wider than tall, under 1024px wide): three columns, the board on the left, a 9rem action column, a scores column.
+- **Computer** (1024px wide and up, Tailwind `lg:`): a board-sized card grid on the left and a side panel with the scoreboard and, beside it, the state's panel, SET! and its pill. The exact layout comes from the design pass.
+
+Shared by all three during play:
+
+- **Scoreboard**: every player in score order, ties in join order, each a dot, the name (truncated) and the score. The claiming player's entry turns solid yellow and a locked-out player's is greyed with a red **Locked** tag, as on the big screen. The player's own entry has a surface tint, as in the game over standings. Portrait fits 8 players in at most two rows.
+- **Deck**: "N cards left in the deck" with the board, or an orange "Deck is empty" pill once it runs out.
+- **Board**: cards dealt by the last replace get the green outline that fades over 3s (§10 `animate-arrive`), in every state that shows the board. The board is read-only in every state but idle and claiming (mine).
+- Other players' wrong claims and time's ups show only on the scoreboard (their Locked tag and score), with no banner.
+- With 8 players and 18 cards there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer, in every state: the cards shrink to fit.
 
 SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**.
 
 1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more".
-2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Landscape: tapping a card on the board calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
+2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
 3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait adds a tray of three slots that fill as cards are tapped. A claim started by tapping a card opens with that card selected (1/3) if it is still on the board. Tap a card to select, tap again to deselect, auto-submit per §11.
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
-5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
+5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed in every layout) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
 6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked".
 7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
 8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9" or "Tied for first"), the standings, then a green **Play again** button, the ready vote (§5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more", n being the active players who have not voted. The room restarts with the same mode, fresh deck and zero scores once every active player has voted, straight into play. Accepted risk: active means seen in the last 30s and only a player's own requests refresh it, so after 30s on this screen the first tap may restart the room alone.
@@ -419,8 +431,9 @@ Single ERB partial: `app/views/cards/_card.html.erb` taking a `card:` local. Ren
 The SVG fills its wrapper; wrappers set the size with a 5:7 aspect ratio. The partial is never restyled, only sized.
 
 - **Big screen grid**: 3 rows flowing into columns, centered, no horizontal scroll at 18 cards. Cards are `15rem` tall at 1080px and shrink with the viewport (`min(15rem, (100dvh - 22rem) / 3)`) so the third row never runs under the announcement band.
-- **Player screen, portrait claim**: the grid fits the width (`auto-cols-fr`), about 84px wide with 12 cards.
+- **Player screen, portrait**: in every playing state the grid fits the width (`auto-cols-fr`) and shrinks to the height left, so SET! and its pill never leave the screen.
 - **Player screen, landscape**: the grid fills the height and scrolls sideways.
+- **Player screen, computer**: 3 rows flowing into columns, sized to the height as on the big screen, no horizontal scroll at 18 cards.
 
 ### Visual system
 
@@ -428,7 +441,7 @@ Dark UI where the cards are the only bright surfaces. Tailwind default palette p
 
 - `font-display`: Bricolage Grotesque (Google Fonts link in the layout). Only for display text: wordmark, room code, scores, SET!, headlines, countdown digits. Body copy stays on the default sans.
 - `animate-shake`: once, 0.4s. Locked-out player screen panel.
-- `animate-arrive`: green outline that holds 1.5s and fades by 3s. Cards dealt by the last replace (`Game#last_dealt`).
+- `animate-arrive`: green outline that holds 1.5s and fades by 3s. Cards dealt by the last replace (`Game#last_dealt`), on the big screen and the player screen board.
 - `.found-set-flash`: holds 1.5s, fades by 3s. Correct-claim panels on the big screen and the player screen.
 
 Surfaces: page `gray-950`, panels `gray-900`, borders `gray-700`/`gray-800`. Secondary text `gray-400`, muted `gray-500` (not `gray-600`, which fails contrast on `gray-950`).
@@ -439,7 +452,7 @@ Each color means one thing everywhere:
 |---|---|
 | blue-600 | SET! and primary actions |
 | violet-600 | quick game |
-| yellow-400 | a claim in progress (big screen panel, scoreboard row, player screen claim bar) |
+| yellow-400 | a claim in progress (big screen panel, scoreboard entries, player screen claim bar) |
 | purple | No Set. It used to be red; red now only means wrong or locked |
 | red | wrong claim, timeout, lockout |
 | green | ready, correct, start, play again |
