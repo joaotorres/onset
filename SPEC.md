@@ -316,7 +316,7 @@ Do not redirect back to the same page. A redirect reloads it, which drops its st
 
 Turbo Streams replace these by id, so each stays the outermost element of its region:
 
-- Big screen: `#board` (holds the waiting state and `#start_button`), `#scoreboard`, `#announcement`, `#start_button`
+- Big screen: `#board` (holds the waiting state and `#start_button`), `#scoreboard`, `#announcement`, `#start_button`, `#room_tile`
 - Player screen: `#controller_status` (wraps the header or scoreboard, the deck count, the state body and the found-set banner)
 
 Stimulus attributes stay on whatever element plays the role:

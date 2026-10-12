@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  build 02: done, one QR on the waiting big screen, room tile broadcast from start, hero code fits at 1280px, bundle exec rspec 188 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 01: done, card pattern ids unique per render and tray copies get fresh ids, bundle exec rspec 181 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  triage 10: gap settled, SPEC §8 Player screen Waiting gets an invite for every player (room code, Copy link or Share link, Show QR sheet, Show on a big screen in a new tab), §7 hook line added, seven Decided lines. Next: design brief.
 - 2026-10-12  triage 09: gap settled, SPEC §8 Player screen shows board, scoreboard and deck count in portrait, landscape and a computer layout from 1024px, arrive outline, card tap calls SET! in every layout, §2, §7 and §10 updated, ticket 06 references renamed, eight Decided lines. Next: design brief.

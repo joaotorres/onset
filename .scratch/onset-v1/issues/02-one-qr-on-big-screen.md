@@ -1,6 +1,6 @@
 # 02: One QR on the big screen, room code fits
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
@@ -58,3 +58,9 @@ Decided: the room code sizes with the viewport (capped at 10rem) and the QR stay
 Decided: the fit requirement covers every line of hero text, not only the code, because the request's overlap was not pinned down and the rules line's unbroken URL can overflow the same 350px column. Instead of: fixing the code alone.
 
 Decided: the room tile becomes something a broadcast renders so it appears on start without a reload, because the waiting to playing switch happens by broadcast and the rail is outside every broadcast target today. Instead of: a full-page refresh on start.
+
+Decided: the room tile is its own broadcast target, `#room_tile`, added to the §7 hook list and replaced by `broadcast_game_state`, because the rail sits outside every existing target. Instead of: moving the tile inside `#scoreboard`.
+
+Decided: the hero code sizes as `min(10rem, 17cqi)` of its text column, because the column is what the rail bounds and 17cqi keeps six wide glyphs plus tracking inside it. Instead of: viewport units, which ignore the fixed rail and QR widths.
+
+Decided: `stimulus_polish_spec` reads the room code from the URL, because at its 420px portrait window the big screen's hero column collapses and the code has no width. Instead of: keeping a visible code at phone widths, which the big screen does not support.

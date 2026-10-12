@@ -2,10 +2,11 @@
   <div id="board" class="flex-1 min-h-0 flex flex-col justify-center gap-12">
     <div class="flex items-center gap-14">
       <div class="shrink-0 rounded-3xl bg-white p-6"><%= join_qr_svg(game, "size-72") %></div>
-      <div class="min-w-0">
+      <%# The code shrinks with this column so it never runs into the rail at laptop widths. %>
+      <div class="@container min-w-0 flex-1" data-hero-text>
         <p class="text-3xl text-gray-300">Scan to join, or open <span class="font-semibold text-white"><%= join_host %></span> and enter</p>
-        <p class="mt-3 font-display text-[10rem] font-bold leading-none tracking-[0.12em]"><%= game.code %></p>
-        <p class="mt-6 text-2xl text-gray-400">New to Set? The rules are at <span class="font-semibold text-white"><%= join_host %>/how-to-play</span></p>
+        <p class="mt-3 whitespace-nowrap font-display text-[length:min(10rem,17cqi)] font-bold leading-none tracking-[0.12em]" data-room-code><%= game.code %></p>
+        <p class="mt-6 text-2xl text-gray-400 wrap-anywhere">New to Set? The rules are at <span class="font-semibold text-white"><%= join_host %>/how-to-play</span></p>
       </div>
     </div>
 

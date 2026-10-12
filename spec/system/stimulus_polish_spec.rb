@@ -8,7 +8,8 @@ RSpec.describe "Stimulus polish", type: :system do
   def setup_claim_state
     visit root_path
     click_button "Start a game"
-    game_code = find("p.text-5xl").text
+    expect(page).to have_current_path(%r{\A/games/\w+\z})
+    game_code = current_path.split("/").last
 
     visit join_game_players_path(game_code)
     fill_in "player[name]", with: "Alice"

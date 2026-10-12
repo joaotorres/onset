@@ -1,0 +1,10 @@
+<%# Hidden while waiting: the join hero carries the code and the only QR (§8, Big screen). %>
+<div id="room_tile">
+  <% unless game.waiting? %>
+    <div class="rounded-3xl bg-gray-900 p-5">
+      <p class="text-lg uppercase tracking-widest text-gray-400">Room</p>
+      <p class="font-display text-5xl font-bold leading-none tracking-wider"><%= game.code %></p>
+      <p class="mt-2 truncate text-lg text-gray-400"><%= join_host %></p>
+    </div>
+  <% end %>
+</div>

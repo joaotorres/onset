@@ -213,6 +213,10 @@ class Game < ApplicationRecord
       target: "start_button",
       partial: "games/start_button",
       locals: {game: self}
+    broadcast_replace_to "game:#{code}",
+      target: "room_tile",
+      partial: "games/room_tile",
+      locals: {game: self}
     players.each do |player|
       player.broadcast_replace_to "player:#{player.id}",
         target: "controller_status",

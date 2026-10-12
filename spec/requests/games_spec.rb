@@ -54,6 +54,31 @@ RSpec.describe "Games" do
       get game_path("XXXXXX")
       expect(response).to have_http_status(:not_found)
     end
+
+    def qr_svgs = Nokogiri::HTML(response.body).css("svg[shape-rendering='crispEdges']")
+    def room_tile = Nokogiri::HTML(response.body).at_css("#room_tile")
+
+    it "shows only the hero QR and no room tile while waiting" do
+      get game_path(game.code)
+      expect(qr_svgs.size).to eq(1)
+      expect(qr_svgs.first["class"]).to include("size-72")
+      expect(room_tile.text.strip).to be_empty
+    end
+
+    it "keeps the QR modules dark on a white tile" do
+      get game_path(game.code)
+      expect(qr_svgs.first.at_css("path")["fill"]).to eq("#030712")
+      expect(qr_svgs.first.parent["class"]).to include("bg-white")
+    end
+
+    %i[playing ended].each do |state|
+      it "shows the room tile with no QR while #{state}" do
+        game.update!(status: state, board: (0..11).to_a, deck: (12..80).to_a)
+        get game_path(game.code)
+        expect(qr_svgs).to be_empty
+        expect(room_tile.text).to include("Room", game.code, "www.example.com")
+      end
+    end
   end
 
   describe "POST /games/:code/start" do
