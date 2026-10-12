@@ -150,10 +150,9 @@
     </div>
 
   <% elsif game.no_set_active? %>
+    <%# No Set countdown: the status panel, then SET! in its idle slot, then the agree pill. %>
     <% active_count = game.players.select(&:active?).size %>
     <% voted = game.no_set_voters.size %>
-    <% waiting_for = [active_count - voted, 0].max %>
-    <% status_box = "grid h-20 w-full place-items-center rounded-2xl border-2 border-purple-700 px-3 text-center font-semibold text-purple-200 landscape:h-auto landscape:flex-1 landscape:text-sm" %>
     <div class="flex-1 min-h-0 flex portrait:flex-col landscape:gap-3">
       <%= render "players/controller/board_strip", game: game %>
       <div class="flex flex-col portrait:flex-1 portrait:gap-4 landscape:w-36 landscape:shrink-0 landscape:gap-2">
@@ -168,24 +167,17 @@
           </div>
           <p class="ml-auto text-right landscape:hidden"><span class="font-display text-3xl font-bold tabular-nums"><%= voted %></span><span class="text-gray-400">/<%= active_count %></span><span class="block text-xs uppercase tracking-widest text-gray-400">agreed</span></p>
         </div>
-        <div class="mt-auto flex flex-col gap-3 landscape:mt-0 landscape:flex-1 landscape:gap-2">
-          <% if game.no_set_caller == player %>
-            <p class="<%= status_box %>">You called No Set · waiting for <%= waiting_for %> more</p>
-          <% elsif game.no_set_voters.include?(player.id) %>
-            <p class="<%= status_box %>">You agreed · waiting for <%= waiting_for %> more</p>
-          <% else %>
-            <%= button_to "I agree, no Set", game_no_set_path(game.code), method: :post,
-                  form_class: "contents", data: {turbo_submits_with: "…"},
-                  class: "h-20 w-full rounded-2xl bg-purple-600 hover:bg-purple-500 active:scale-95 transition font-display text-2xl font-bold landscape:h-auto landscape:flex-1 landscape:text-base" %>
-          <% end %>
-          <p class="text-center text-sm text-gray-500 landscape:hidden">Spotted one after all?</p>
-          <% if locked %>
-            <button type="button" disabled class="h-16 w-full cursor-not-allowed rounded-2xl bg-gray-900 font-display text-2xl font-extrabold tracking-widest text-gray-500 landscape:h-12 landscape:text-lg">SET!</button>
-          <% else %>
-            <%= button_to "SET!", game_claims_path(game.code), method: :post,
-                  form_class: "contents", data: {turbo_submits_with: "…"},
-                  class: "h-16 w-full rounded-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display text-2xl font-extrabold tracking-widest landscape:h-12 landscape:text-lg" %>
-          <% end %>
+        <div class="flex-1 min-h-0 flex flex-col items-center justify-center gap-6 landscape:gap-2">
+          <div class="grid place-items-center portrait:size-76 landscape:w-full landscape:flex-1 landscape:min-h-0">
+            <% if locked %>
+              <button type="button" disabled class="cursor-not-allowed bg-gray-900 text-gray-500 font-display font-extrabold tracking-widest portrait:text-5xl landscape:text-2xl <%= set_round %>">SET!</button>
+            <% else %>
+              <%= button_to "SET!", game_claims_path(game.code), method: :post,
+                    form_class: "contents", data: {turbo_submits_with: "…"},
+                    class: "bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display font-extrabold tracking-widest shadow-2xl ring-8 ring-blue-500/20 portrait:text-5xl landscape:text-3xl #{set_round}" %>
+            <% end %>
+          </div>
+          <%= render "players/controller/secondary_action", game: game, player: player %>
         </div>
       </div>
       <%= render "players/controller/info_column", player: player %>

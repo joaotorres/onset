@@ -31,7 +31,7 @@ ERB partials, no component library.
 - `players/controller/_board_strip`: landscape read-only card grid
 - `players/controller/_button_ring`: thin ring around the round SET! button, portrait
 - `players/controller/_small_ring`: countdown ring with seconds, any size
-- `players/controller/_secondary_action`: the pill under SET!, No Set or the End game vote
+- `players/controller/_secondary_action`: the pill under SET!, No Set, the End game vote, or during a No Set countdown I agree, no Set (filled purple) or the waiting text (outlined purple)
 - Stimulus: `card-selection` (selection, tray, count, auto-submit), `countdown` (rings and seconds)
 
 ## Visual rules

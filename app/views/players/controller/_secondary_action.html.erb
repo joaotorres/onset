@@ -1,7 +1,19 @@
-<%# The pill under SET!: No Set, or the End game vote once the deck is empty. %>
+<%# The pill under SET!: No Set, the agree vote during a No Set countdown, or the End game vote once the deck is empty. %>
 <% pill = "min-h-12 rounded-full px-8 font-semibold landscape:w-full landscape:px-2" %>
 <% if local_assigns[:disabled] %>
   <button type="button" disabled class="<%= pill %> cursor-not-allowed bg-gray-900 text-gray-600">No Set</button>
+<% elsif game.no_set_active? %>
+  <% waiting_for = [game.players.select(&:active?).size - game.no_set_voters.size, 0].max %>
+  <% waiting = "grid min-h-12 place-items-center rounded-full border-2 border-purple-700 px-6 py-2 text-center text-sm font-semibold text-purple-300 landscape:w-full landscape:px-2" %>
+  <% if game.no_set_caller == player %>
+    <p class="<%= waiting %>">You called No Set · waiting for <%= waiting_for %> more</p>
+  <% elsif game.no_set_voters.include?(player.id) %>
+    <p class="<%= waiting %>">You agreed · waiting for <%= waiting_for %> more</p>
+  <% else %>
+    <%= button_to "I agree, no Set", game_no_set_path(game.code), method: :post,
+          form_class: "contents", data: {turbo_submits_with: "…"},
+          class: "#{pill} bg-purple-600 hover:bg-purple-500 active:scale-95 transition text-white" %>
+  <% end %>
 <% elsif game.deck.empty? %>
   <% active_count = game.players.select(&:active?).size %>
   <% voters = game.end_game_voters.size %>

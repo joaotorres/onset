@@ -1,6 +1,6 @@
 # 05: SET! stays on top in every state
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
