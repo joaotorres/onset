@@ -1,6 +1,6 @@
 # 12: Spec update for devices-first play
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:

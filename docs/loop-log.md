@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  build 12: done, big screen announcement band says "on your screen" for the idle SET! line and the No Set agree line, verification 230 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 11: done, Play again on player screens is a ready vote over start_voters that restarts once every active player voted, verification 228 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 06: done, tapping an idle landscape card posts the SET! claim and opens it with that card selected via a new card-tap controller, verification 50 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 05: done, No Set countdown puts SET! in its round idle slot above the agree pill, verification 39 examples 0 failures. Next: next ready ticket.

@@ -108,6 +108,24 @@ RSpec.describe "Games" do
         expect(room_tile.text).to include("Room", game.code, "www.example.com")
       end
     end
+
+    describe "announcement band" do
+      before { game.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a) }
+
+      it "invites a SET! call on your screen while idle" do
+        get game_path(game.code)
+        expect(response.body).to include("Spot a Set? Hit SET! on your screen.")
+        expect(response.body).not_to include("on your phone")
+      end
+
+      it "asks to agree on your screen during a No Set call" do
+        alice = game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current)
+        game.update!(no_set_caller_id: alice.id, no_set_started_at: Time.current, no_set_voters: [alice.id])
+        get game_path(game.code)
+        expect(response.body).to include("Agree on your screen, or find one first")
+        expect(response.body).not_to include("on your phone")
+      end
+    end
   end
 
   describe "POST /games/:code/start" do

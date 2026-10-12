@@ -43,7 +43,7 @@
             stroke: "stroke-purple-400", digits: "text-purple-300" %>
       <div class="min-w-0 flex-1">
         <p class="font-display text-5xl font-bold"><span class="text-purple-400"><%= game.no_set_caller.name %></span> called No Set</p>
-        <p class="mt-2 text-2xl text-gray-300">Agree on your phone, or find one first</p>
+        <p class="mt-2 text-2xl text-gray-300">Agree on your screen, or find one first</p>
       </div>
       <div class="shrink-0 text-right">
         <p class="font-display text-6xl font-bold leading-none tabular-nums"><%= game.no_set_voters.size %><span class="text-gray-500">/<%= game.players.select(&:active?).size %></span></p>
@@ -52,6 +52,6 @@
     </div>
 
   <% elsif game.playing? %>
-    <p class="text-2xl text-gray-500">Spot a Set? Hit SET! on your phone.</p>
+    <p class="text-2xl text-gray-500">Spot a Set? Hit SET! on your screen.</p>
   <% end %>
 </div>
