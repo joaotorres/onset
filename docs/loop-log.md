@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  request 13: filed, behavioural. Next: triage.
 - 2026-10-12  context cap: 162k, over 100k with the review and the 07 to 10 brief next. Next: /clear, then /skills-loop:auto.
 - 2026-10-12  build 12: done, big screen announcement band says "on your screen" for the idle SET! line and the No Set agree line, verification 230 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 11: done, Play again on player screens is a ready vote over start_voters that restarts once every active player voted, verification 228 examples 0 failures. Next: next ready ticket.
