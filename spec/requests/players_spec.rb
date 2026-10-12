@@ -2,6 +2,11 @@ require "rails_helper"
 
 RSpec.describe "Players" do
   let(:game) { Game.create! }
+  let(:presets) { PlayersController::PRESET_COLORS }
+
+  def color_radios = Nokogiri::HTML(response.body).css("input[type=radio][name='player[color]']")
+  def checked_colors = color_radios.select { |r| r["checked"] }.map { |r| r["value"] }
+  def radio_for(hex) = color_radios.find { |r| r["value"] == hex }
 
   describe "GET /games/:code/players/join" do
     it "returns 200 and shows the join form" do
@@ -15,6 +20,37 @@ RSpec.describe "Players" do
       get join_game_players_path(game.code)
       expect(response.body).to include('title="Taken by marta"')
       expect(response.body).to match(%r{<span class="text-lg font-bold text-gray-950">M</span>})
+    end
+
+    it "selects the first preset color on an empty game" do
+      get join_game_players_path(game.code)
+      expect(checked_colors).to eq([presets[0]])
+    end
+
+    it "selects the first free color when the first two are taken" do
+      game.players.create!(name: "a", color: presets[0])
+      game.players.create!(name: "b", color: presets[1])
+      get join_game_players_path(game.code)
+      expect(checked_colors).to eq([presets[2]])
+      [presets[0], presets[1]].each do |hex|
+        expect(radio_for(hex)["checked"]).to be_nil
+        expect(radio_for(hex)["disabled"]).to be_present
+      end
+    end
+
+    it "selects nothing and still renders the form when every color is taken" do
+      presets.each_with_index { |hex, i| game.players.create!(name: "p#{i}", color: hex) }
+      get join_game_players_path(game.code)
+      expect(checked_colors).to be_empty
+      expect(response.body).to include('value="Join"')
+    end
+  end
+
+  describe "GET /games/:code/players/new" do
+    it "selects the first free color" do
+      game.players.create!(name: "a", color: presets[0])
+      get new_game_player_path(game.code)
+      expect(checked_colors).to eq([presets[1]])
     end
   end
 
@@ -36,6 +72,7 @@ RSpec.describe "Players" do
         expect { post game_players_path(game.code), params: valid_params }.not_to change(Player, :count)
         expect(response).to have_http_status(:too_many_requests)
         expect(response.body).to include("Try again in a minute.")
+        expect(checked_colors).to eq([presets[0]])
       end
     end
 
@@ -55,6 +92,29 @@ RSpec.describe "Players" do
       expect(response).to have_http_status(:unprocessable_content)
     end
 
+    it "keeps the posted free color on a name error" do
+      post game_players_path(game.code), params: {player: {name: "", color: presets[3]}}
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(checked_colors).to eq([presets[3]])
+    end
+
+    it "joins with the preselected color and a name" do
+      get join_game_players_path(game.code)
+      preselected = checked_colors.first
+      post game_players_path(game.code), params: {player: {name: "Zed", color: preselected}}
+      expect(response).to redirect_to(game_controller_path(game.code))
+      expect(game.players.last.color).to eq(presets[0])
+    end
+
+    it "selects the next free color after a clash, wrapping past the last" do
+      game.players.create!(name: "a", color: presets[0])
+      game.players.create!(name: "h", color: presets[7])
+      post game_players_path(game.code), params: {player: {name: "Bob", color: presets[7]}}
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(checked_colors).to eq([presets[1]])
+      expect(radio_for(presets[7])["checked"]).to be_nil
+    end
+
     it "redirects with an alert when the game has already started" do
       game.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: [])
       post game_players_path(game.code), params: valid_params
@@ -66,6 +126,8 @@ RSpec.describe "Players" do
       post game_players_path(game.code), params: {player: {name: "Bob", color: "#E74C3C"}}
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("has already been taken in this game")
+      expect(checked_colors).to eq([presets[1]])
+      expect(radio_for("#E74C3C")["checked"]).to be_nil
     end
   end
 

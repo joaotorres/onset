@@ -1,6 +1,6 @@
 # 04: Pre-select the first free color
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:

@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  build 04: done, join form preselects the first free color and the next free after a clash, bundle exec rspec 200 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 03: done, Join from this computer link under the waiting QR opens the join page in a new tab, bundle exec rspec 193 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 02: done, one QR on the waiting big screen, room tile broadcast from start, hero code fits at 1280px, bundle exec rspec 188 examples 0 failures. Next: next ready ticket.
 - 2026-10-12  build 01: done, card pattern ids unique per render and tray copies get fresh ids, bundle exec rspec 181 examples 0 failures. Next: next ready ticket.
