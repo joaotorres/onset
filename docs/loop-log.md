@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  build 07: done, game over standings in portrait, landscape and computer, Play again on green-700, bundle exec rspec green, two Decided lines. Next: build 08.
 - 2026-10-12  triage 10: ready, the design question settled in SPEC §8 Waiting (alone in the room, no I'm ready), the `invite` controller's hooks named in SPEC §7, three Decided lines. Next: build 07.
 - 2026-10-12  split 09: into 14 (portrait), 15 (landscape, blocked by 14) and 16 (computer, blocked by 15), all ready-for-agent, 13 now blocked by 16, two Decided lines. Next: triage 10.
 - 2026-10-12  triage 09: split, both design conflicts and both proposals settled in SPEC §2, §8 and §10 (no landscape sideways scroll, stacked computer side column, No Set enabled while locked out, own-claim layout), three Decided lines. Next: split 09 into tickets.

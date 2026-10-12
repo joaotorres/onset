@@ -1,0 +1,15 @@
+<%# Game over standings: every player by score, ties in join order, sharing a rank. %>
+<% standings = game.standings %>
+<ol data-standings aria-label="Standings" class="<%= local_assigns[:class] %> flex min-h-0 flex-col gap-1 overflow-y-auto lg:gap-1.5 lg:rounded-[20px] lg:border lg:border-gray-800 lg:bg-gray-900 lg:p-4">
+  <% standings.each do |p| %>
+    <% rank = standings.index { |q| q.score == p.score } + 1 %>
+    <% own = p.id == player.id %>
+    <li class="flex h-8 shrink-0 items-center gap-2.5 rounded-lg border px-2.5 landscape:max-lg:h-[34px] landscape:max-lg:px-3 landscape:max-lg:first:mt-auto landscape:max-lg:last:mb-auto lg:first:mt-auto lg:last:mb-auto lg:h-11 lg:gap-3.5 lg:rounded-[10px] lg:px-4 <%= own ? "border-gray-600 bg-gray-800" : "border-transparent" %>">
+      <span data-row-rank class="w-[18px] shrink-0 font-display text-[15px] font-bold text-gray-400 lg:w-[22px] lg:text-lg"><%= rank %></span>
+      <span class="size-2.5 shrink-0 rounded-full lg:size-3" style="background-color: <%= p.color %>;"></span>
+      <span data-name class="min-w-0 truncate font-medium lg:text-lg"><%= p.name %></span>
+      <% if own %><span class="shrink-0 text-[13px] text-gray-400 lg:text-sm">you</span><% end %>
+      <span data-row-score class="ml-auto shrink-0 font-display text-[17px] font-bold tabular-nums landscape:max-lg:text-lg lg:text-[22px]"><%= p.score %></span>
+    </li>
+  <% end %>
+</ol>

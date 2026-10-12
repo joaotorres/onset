@@ -1,6 +1,6 @@
 # 07: Full standings on the player screen game over
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Model:
@@ -87,3 +87,7 @@ Decided: 07 builds game over in all three layouts, the computer one too, adding 
 Decided: Play again moves to `green-700` and the voted line to the v2 Waiting look in this ticket, because docs/design-system.md v2 game over anatomy names them and green-600 fails contrast under white text. Instead of: leaving the v1 green-600 button.
 
 Decided: no Blocked by, because 07 touches only the ended branch and ticket 11, which built the Play again vote, is done. Instead of: blocking on 09 for the computer layout.
+
+Decided: landscape and computer game over show the player's dot, name and score atop the left column, because the shared header is hidden in landscape and §8 keeps a header on game over, as the boards draw it. Instead of: no identity on landscape and computer, or changing the header partial.
+
+Decided: landscape-only sizes use `landscape:max-lg:`, because Tailwind sorts `landscape:` after `lg:` and a 1024×640 viewport is landscape too. Instead of: computer inheriting the 250px column and landscape type sizes.
