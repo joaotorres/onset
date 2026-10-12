@@ -1,21 +1,51 @@
-<%# Landscape-only board on the left. Idle passes tappable: a card tap calls SET! (§8). %>
-<% grid = "h-full grid grid-rows-3 grid-flow-col auto-cols-max gap-2" %>
-<div class="portrait:hidden flex-1 min-w-0 overflow-x-auto">
-  <% if local_assigns[:tappable] %>
-    <%= form_with url: game_claims_path(game.code), method: :post, class: grid, data: {controller: "card-tap"} do %>
-      <% game.board_cards.each do |card| %>
-        <button type="submit" class="h-full aspect-[5/7] cursor-pointer"
-                data-card-id="<%= card.id %>"
-                data-action="click->card-tap#tap">
-          <%= render "cards/card", card: card %>
-        </button>
+<%# The board during play, with the deck line. mode: :tap (idle, a card tap calls SET!, §8), :select (claiming, mine, needs claim:) or read-only.
+    Portrait: the cards take the largest size at which cards / 3 columns fit the width and 3 rows the height (§10). %>
+<% mode = local_assigns[:mode] %>
+<% grid = "h-full grid grid-rows-3 grid-flow-col gap-[5px] portrait:content-center portrait:justify-center landscape:auto-cols-max landscape:gap-2" %>
+<% size = "aspect-[5/7] rounded-lg landscape:h-full portrait:w-[min(calc((100cqw_-_(var(--cols)_-_1)_*_5px)_/_var(--cols)),calc((100cqh_-_10px)_*_5_/_21))]" %>
+<% arrive = ->(card) { "outline-3 outline-green-400 animate-arrive" if game.just_dealt?(card.id) } %>
+<div class="<%= local_assigns[:class] %> flex min-h-0 min-w-0 flex-1 flex-col">
+  <div class="min-h-0 flex-1 portrait:[container-type:size] landscape:overflow-x-auto" style="--cols: <%= [game.board.size / 3, 1].max %>;">
+    <% if mode == :tap %>
+      <%= form_with url: game_claims_path(game.code), method: :post, class: grid, data: {controller: "card-tap"} do %>
+        <% game.board_cards.each do |card| %>
+          <button type="submit" class="<%= size %> <%= arrive.call(card) %> cursor-pointer"
+                  data-card-id="<%= card.id %>"
+                  data-action="click->card-tap#tap">
+            <%= render "cards/card", card: card %>
+          </button>
+        <% end %>
       <% end %>
+    <% elsif mode == :select %>
+      <%= form_with url: game_claim_path(game.code, claim.id), method: :patch,
+            class: "h-full transition-opacity", data: {"card-selection-target": "form"} do |f| %>
+        <%= f.hidden_field :card_ids, value: "[]", data: {"card-selection-target": "input"} %>
+        <div class="<%= grid %>">
+          <% game.board_cards.each do |card| %>
+            <button type="button"
+                    class="<%= size %> <%= arrive.call(card) %> transition"
+                    aria-pressed="false"
+                    data-card-selection-target="card"
+                    data-card-id="<%= card.id %>"
+                    data-action="click->card-selection#toggle">
+              <%= render "cards/card", card: card %>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="<%= grid %>">
+        <% game.board_cards.each do |card| %>
+          <div class="<%= size %> <%= arrive.call(card) %>" data-card-id="<%= card.id %>"><%= render "cards/card", card: card %></div>
+        <% end %>
+      </div>
     <% end %>
-  <% else %>
-    <div class="<%= grid %>">
-      <% game.board_cards.each do |card| %>
-        <div class="h-full aspect-[5/7]"><%= render "cards/card", card: card %></div>
-      <% end %>
-    </div>
-  <% end %>
+  </div>
+  <p class="landscape:hidden flex h-6 shrink-0 items-center justify-center text-xs text-gray-400">
+    <% if game.deck.empty? %>
+      <span class="rounded-full bg-orange-700 px-2.5 py-0.5 font-semibold text-white">Deck is empty</span>
+    <% else %>
+      <%= game.deck.size %> cards left in the deck
+    <% end %>
+  </p>
 </div>

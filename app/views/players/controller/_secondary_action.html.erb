@@ -1,34 +1,35 @@
-<%# The pill under SET!: No Set, the agree vote during a No Set countdown, or the End game vote once the deck is empty. %>
-<% pill = "min-h-12 rounded-full px-8 font-semibold landscape:w-full landscape:px-2" %>
+<%# The pill under SET!: No Set, the agree vote during a No Set countdown, or the End game vote once the deck is empty.
+    Filled purple pills are purple-700 with white text in every layout. %>
+<% size = "rounded-full portrait:h-11 portrait:w-[220px] landscape:min-h-12 landscape:w-full landscape:px-2" %>
+<% pill = "#{size} font-bold text-white" %>
+<% outlined = "grid place-items-center rounded-full border-2 px-4 text-center text-sm font-semibold portrait:h-11 portrait:max-w-full landscape:min-h-12 landscape:w-full landscape:px-2 landscape:py-1" %>
 <% if local_assigns[:disabled] %>
-  <button type="button" disabled class="<%= pill %> cursor-not-allowed bg-gray-900 text-gray-600">No Set</button>
+  <button type="button" disabled class="<%= pill %> cursor-not-allowed bg-purple-700 opacity-35">No Set</button>
 <% elsif game.no_set_active? %>
   <% waiting_for = [game.players.select(&:active?).size - game.no_set_voters.size, 0].max %>
-  <% waiting = "grid min-h-12 place-items-center rounded-full border-2 border-purple-700 px-6 py-2 text-center text-sm font-semibold text-purple-300 landscape:w-full landscape:px-2" %>
   <% if game.no_set_caller == player %>
-    <p class="<%= waiting %>">You called No Set · waiting for <%= waiting_for %> more</p>
+    <p class="<%= outlined %> border-purple-500 text-purple-200">You called No Set · waiting for <%= waiting_for %> more</p>
   <% elsif game.no_set_voters.include?(player.id) %>
-    <p class="<%= waiting %>">You agreed · waiting for <%= waiting_for %> more</p>
+    <p class="<%= outlined %> border-purple-500 text-purple-200">You agreed · waiting for <%= waiting_for %> more</p>
   <% else %>
     <%= button_to "I agree, no Set", game_no_set_path(game.code), method: :post,
           form_class: "contents", data: {turbo_submits_with: "…"},
-          class: "#{pill} bg-purple-600 hover:bg-purple-500 active:scale-95 transition text-white" %>
+          class: "#{pill} bg-purple-700 hover:bg-purple-600 active:scale-95 transition" %>
   <% end %>
 <% elsif game.deck.empty? %>
-  <% active_count = game.players.select(&:active?).size %>
-  <% voters = game.end_game_voters.size %>
-  <div class="flex flex-col items-center gap-1.5 landscape:w-full">
-    <% if game.end_game_voters.include?(player.id) %>
-      <p class="grid min-h-12 place-items-center rounded-full border-2 border-orange-700 px-6 text-sm font-semibold text-orange-300 landscape:w-full landscape:px-2">Voted to end</p>
-    <% else %>
-      <%= button_to "End game", game_end_game_path(game.code), method: :post,
-            form_class: "contents", data: {turbo_submits_with: "…"},
-            class: "#{pill} bg-orange-700 hover:bg-orange-600 active:scale-95 transition text-white" %>
+  <% count = "Deck empty · #{game.end_game_voters.size}/#{game.players.select(&:active?).size} voted" %>
+  <% if game.end_game_voters.include?(player.id) %>
+    <p class="<%= outlined %> flex flex-col gap-0 border-orange-700 leading-tight text-orange-300">Voted to end<span class="text-[11px] font-medium"><%= count %></span></p>
+  <% else %>
+    <%= button_to game_end_game_path(game.code), method: :post,
+          form_class: "contents", data: {turbo_submits_with: "…"},
+          class: "#{pill} flex flex-col items-center justify-center leading-tight bg-orange-700 hover:bg-orange-600 active:scale-95 transition" do %>
+      <span class="text-[15px]">End game</span>
+      <span class="text-[11px] font-medium text-orange-50"><%= count %></span>
     <% end %>
-    <p class="text-sm text-gray-400 landscape:text-xs">Deck empty · <%= voters %>/<%= active_count %> voted</p>
-  </div>
+  <% end %>
 <% else %>
   <%= button_to "No Set", game_no_set_path(game.code), method: :post,
         form_class: "contents", data: {turbo_submits_with: "…"},
-        class: "#{pill} bg-purple-950 hover:bg-purple-900 active:scale-95 transition text-purple-200 ring-1 ring-inset ring-purple-800" %>
+        class: "#{pill} bg-purple-700 hover:bg-purple-600 active:scale-95 transition" %>
 <% end %>

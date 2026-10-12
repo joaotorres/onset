@@ -275,7 +275,7 @@ RSpec.describe "Players" do
       it "makes SET! the round idle button posting to claims" do
         game.call_no_set!(bob)
         show
-        expect(set_button["class"]).to include("portrait:size-64", "portrait:rounded-full", "landscape:size-full")
+        expect(set_button["class"]).to include("portrait:size-[104px]", "portrait:rounded-full", "landscape:size-full")
         form = set_button.ancestors("form").first
         expect(form["action"]).to eq(game_claims_path(game.code))
       end

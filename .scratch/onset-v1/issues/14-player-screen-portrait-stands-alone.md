@@ -1,6 +1,6 @@
 # 14: Player screen stands alone in portrait
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Model:
@@ -62,3 +62,9 @@ Write first:
 - New tokens or animations
 
 ## Comments
+
+Decided: the End game pill carries "Deck empty · n/m voted" inside the button in every layout, as the PlayPortrait board draws it, because the 44px pill slot leaves no room for a line under it. Instead of: the count on its own line under the pill.
+
+Decided: the portrait status slot is its own element hidden in landscape, and landscape keeps its current panel texts until ticket 15 adds the landscape variants, because Scope keeps the landscape columns untouched. Instead of: one shared status panel across layouts now.
+
+Decided: disabled No Set (someone else claiming) is `purple-700` at 35% opacity, as the board draws it. Instead of: the old `gray-900` with `gray-600` text, which fails contrast.

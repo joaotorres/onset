@@ -1,0 +1,21 @@
+<%# The play scoreboard: every player by score, ties in join order. Portrait: chips, 4 per row. %>
+<ol data-scoreboard aria-label="Scoreboard" class="<%= local_assigns[:class] %> flex shrink-0 flex-wrap content-start gap-1.5 pt-2">
+  <% game.standings.each do |p| %>
+    <% claiming = game.claim_player_id == p.id %>
+    <% locked = !claiming && p.locked? %>
+    <% look = if claiming then "border-yellow-400 bg-yellow-400 text-gray-950"
+              elsif p.id == player.id then "border-gray-500 bg-gray-800"
+              else "border-gray-800 bg-gray-900"
+              end %>
+    <li class="relative h-[30px] w-[calc((100%-18px)/4)] min-w-0 shrink-0 rounded-lg border px-[7px] <%= look %>">
+      <span data-entry-content class="flex h-full items-center gap-[5px] <%= "opacity-45" if locked %>">
+        <span class="size-2 shrink-0 rounded-full" style="background-color: <%= p.color %>;"></span>
+        <span data-name class="min-w-0 flex-1 truncate text-xs font-medium"><%= p.name %></span>
+        <span class="shrink-0 font-display text-[15px] font-bold tabular-nums"><%= p.score %></span>
+      </span>
+      <% if locked %>
+        <span class="absolute -top-2 right-1 rounded-md bg-red-600 px-[5px] py-px text-[9px] font-bold uppercase leading-tight tracking-wide text-white">Locked</span>
+      <% end %>
+    </li>
+  <% end %>
+</ol>

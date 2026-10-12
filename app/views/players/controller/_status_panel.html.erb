@@ -1,0 +1,36 @@
+<%# The fixed status slot above SET!, 64px in portrait in every state, empty while idle. %>
+<% panel = "flex h-full items-center rounded-[14px]" %>
+<div data-status-slot class="<%= local_assigns[:class] %> h-16 shrink-0">
+  <% case local_assigns[:variant] %>
+  <% when :claim %>
+    <div role="status" class="<%= panel %> gap-3 bg-yellow-400 px-3.5 text-gray-950"
+         data-controller="countdown"
+         data-countdown-started-at-value="<%= game.claim_started_at.iso8601 %>"
+         data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
+      <%= render "players/controller/small_ring", size: "size-11", track: "stroke-gray-950/20", stroke: "stroke-gray-950", digits: "text-[17px]", duration: Game::CLAIM_TIMEOUT %>
+      <div class="min-w-0 flex-1">
+        <p class="font-display text-[21px] font-extrabold leading-tight">Your SET!</p>
+        <p class="text-[13px] font-semibold">Tap 3 cards</p>
+      </div>
+      <p class="font-display text-[26px] font-extrabold tabular-nums"><span data-card-selection-target="count">0</span>/3</p>
+    </div>
+  <% when :other %>
+    <div role="status" class="<%= panel %> justify-center gap-2.5 border-2 border-yellow-400 bg-gray-900 px-4">
+      <span class="size-3 shrink-0 rounded-full" style="background-color: <%= game.claiming_player.color %>;"></span>
+      <p class="min-w-0 truncate"><span class="text-lg font-bold"><%= game.claiming_player.name %></span> <span class="text-gray-300">is calling SET!</span></p>
+    </div>
+  <% when :no_set %>
+    <div role="status" class="<%= panel %> gap-3 border-2 border-purple-500 bg-purple-950 px-3.5"
+         data-controller="countdown"
+         data-countdown-started-at-value="<%= game.no_set_started_at.iso8601 %>"
+         data-countdown-duration-value="15">
+      <%= render "players/controller/small_ring", size: "size-11", track: "stroke-white/15", stroke: "stroke-purple-400", digits: "text-[17px]", duration: 15 %>
+      <div class="min-w-0 flex-1">
+        <p class="truncate font-bold">No Set called by <%= game.no_set_caller.name %></p>
+        <p class="text-[13px] text-purple-200"><%= game.no_set_voters.size %>/<%= game.players.select(&:active?).size %> agreed</p>
+      </div>
+    </div>
+  <% when :locked %>
+    <p role="status" class="<%= panel %> animate-shake justify-center border-2 border-red-600 bg-red-950 font-display text-[28px] font-extrabold text-red-200"><%= (player.lockout_reason == "expired") ? "Time's up! −1" : "Wrong! −1" %></p>
+  <% end %>
+</div>
