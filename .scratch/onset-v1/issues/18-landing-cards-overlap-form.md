@@ -1,6 +1,6 @@
 # 18: Landing cards overlap the start game form at narrow desktop widths
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
@@ -59,3 +59,7 @@ Decided: behavioural, because the desktop and phone landing layouts both already
 Decided: the two-column landing starts at `lg:` (1024px) instead of `md:` (768px), because with a 448px actions card, 80px gap and 64px padding the brand column is 112px wide at 768px and 144px at 800px, where neither the 451px card fan nor the 136px wordmark can fit, so tablets get the phone layout. Instead of: keeping `md:` and shrinking the brand column's contents to a 112px column.
 
 Decided: between 1024px and 1280px the fanned cards and the wordmark shrink with the brand column, full size from 1280px, because at 1024px the column is 368px wide and the fan is 451px, so moving the breakpoint alone leaves the overlap in the 1024-1100px range. Instead of: a third breakpoint that keeps the fan full size and hides a card.
+
+Decided: the specs measure the first card wrapper (`figure div > div`, layout size) instead of `[data-card-id]`, because the landing cards render the card partial without that attribute and the ticket rules out touching the partial. Instead of: adding `data-card-id` to the landing cards.
+
+Decided: the wordmark scales as `min(8.5rem, 36cqw)` of the brand column and the cards as `min(12rem, (100cqw - 2.5rem) * 7/15)`, so both stay full size from about 1280px and fit the 368px column at 1024px. Instead of: fixed smaller sizes for a 1024-1279px breakpoint.
