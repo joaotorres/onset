@@ -178,7 +178,7 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 
 ## Known gaps
 
-- The big screen's Start game (`games/_start_button`) and Play again (`games/_board`) put white text on `green-600`, against the v2 `green-700` rule. Not covered by a ticket yet
+None
 
 ## Open questions
 
