@@ -95,7 +95,7 @@ The room.
 | `deck` | json | Array of remaining card ids `0..80`, in draw order |
 | `board` | json | Array of card ids currently face-up (length 12, 15, or 18) |
 | `discard` | json | Array of card ids already collected |
-| `host_player_id` | bigint | nullable; the player who created the room |
+| `host_player_id` | bigint | nullable; unused. The host is the browser that created the room, marked by its `host_game` cookie (§8 Landing), not a player |
 | `claim_player_id` | bigint | nullable; the player currently holding the claim lock |
 | `claim_started_at` | datetime | nullable; for the 15s claim window |
 | `no_set_started_at` | datetime | nullable; for 15s No-Set countdown |
@@ -213,15 +213,15 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| GET | `/` | Landing: start a game, start a quick game, or join by code |
+| GET | `/` | Landing: start a game, standard or first to 5, or join by code |
 | GET | `/join?code=` | Find the room by code, redirect to its join page or back with "Room not found" |
-| POST | `/games` | Create room (`mode=quick` for first to 5), redirect to `/games/:code` |
+| POST | `/games` | Create room (`mode=quick` for first to 5), give this browser the `host_game` cookie, redirect to the creator's join page `/games/:code/players/join` |
 | GET | `/games/:code` | Big screen, optional: any room can open it at any time |
-| GET | `/games/:code/players/join` | Join page, after the QR scan or a code: name + color form |
+| GET | `/games/:code/players/join` | Join page, after starting a game, the QR scan or a code: name + color form |
 | POST | `/games/:code/players` | Create player, set cookie, redirect to the player screen |
 | GET | `/games/:code/controller` | Player screen |
 | POST | `/games/:code/ready` | A player votes to start; the game starts when every player (2+) has voted. Once ended, a player votes to play again; the room restarts when every active player has voted |
-| POST | `/games/:code/start` | Host starts the game from the big screen |
+| POST | `/games/:code/start` | The host (the browser holding `host_game`) starts the game from the big screen |
 | POST | `/games/:code/restart` | Play again from the big screen (host): reset deck, clear scores and votes, status `playing`, at once |
 | POST | `/games/:code/claims` | Try to take the claim lock; a lost race changes nothing |
 | PATCH | `/games/:code/claims/:id` | Submit `card_ids` for a held claim |
@@ -337,16 +337,16 @@ Colors, type and animations are in §10. Hook ids and Stimulus attributes that m
 
 ### Landing (`/`)
 
-One page for phones and desktops, split at `md:`. Brand on the left: the **Onset** wordmark, a one-line tagline and three fanned cards that form a Set, with a caption saying why. Actions on the right:
+One page for phones and desktops, split at `md:`. Brand on the left: the **Onset** wordmark, a one-line tagline and three fanned cards that form a Set, with a caption saying why. The tagline says each player plays on their own screen and a big screen is optional, in the §1 terms. Actions on the right:
 
-- **Start a game** and **Start quick game** buttons, each with a sub-line ("This screen becomes the board", "First to 5 points wins").
+- A two-option toggle, **Standard** (selected by default) and **First to 5**, above one **Start a game** button with the sub-line "Play from this screen, then invite the others". Both sit in one form, with no JS: the toggle submits `mode` (`quick` for First to 5). Start a game creates the room in that mode, gives this browser the `host_game` cookie and opens the creator's join page (Join page below). Every room is the same: nothing about a big screen is stored on it.
 - **Have a room code?** field plus **Join**. `GET /join?code=` upcases the code and redirects to the room's join page, or back with "Room not found".
 
 On phones the join form comes first, since joining is what phones come here for.
 
 ### Big screen (`/games/:code`)
 
-Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wide. Two columns: the play area (`#board` over `#announcement`) and a 26rem right rail with the room tile (room code and host, no QR) and the **Players** scoreboard. The room tile is hidden while waiting, since the join hero carries the code, and appears once the game starts without a reload. The join hero holds the only QR on the screen: once play starts, late joining is blocked, so nothing needs one.
+Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wide. Two columns: the play area (`#board` over `#announcement`) and a 26rem right rail with the room tile (room code and the site address to open, `join_host`, no QR) and the **Players** scoreboard. The room tile is hidden while waiting, since the join hero carries the code, and appears once the game starts without a reload. The join hero holds the only QR on the screen: once play starts, late joining is blocked, so nothing needs one.
 
 - **Scoreboard**: rows sorted by score, dot, name, big score. The claiming player's row turns solid yellow. A locked-out player is greyed with a red **Locked** tag.
 - **Waiting**: a join hero with a 288px QR and, under it, a **Join from this computer →** link that opens the join page in a new tab, for someone playing on the same computer as the big screen. A browser holds one player (one `player_token` cookie), so a second player on that computer needs a private window or another browser. Beside the QR, "Scan to join, or open HOST and enter" and the room code at up to 10rem, shrinking with the viewport so it never runs past the play area into the rail. The hero's text wraps or shrinks the same way. Player pills with a ✓ once ready. `#start_button`: **Start game** with "n of m ready" beside it, or disabled with "Need at least 2 players".
@@ -360,7 +360,7 @@ Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wid
 
 ### Join page (`/games/:code/players/join`)
 
-Portrait. "Joining room" with the code in large type, since the code is what people check. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken, none is selected. The page does not update live as others join. **Join** sits at the bottom, under the thumb. Field errors show under their field; base errors (game already started) in a red box.
+Portrait. "Joining room" with the code in large type, since the code is what people check. The creator sees the same page after **Start a game**. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken, none is selected. The page does not update live as others join. **Join** sits at the bottom, under the thumb. In the browser that created the room (its `host_game` cookie matches), a **Use this screen as the big screen instead** text link sits under Join and opens the room's big screen `/games/:code` in the same tab; other browsers do not show it. Joining does not make the creator `host_player_id`: hosting stays with the browser, which gets the big screen's **Start game** and **Play again**, and on player screens everyone starts and plays again by the ready vote. Field errors show under their field; base errors (game already started) in a red box.
 
 ### Player screen (`/games/:code/controller`)
 
