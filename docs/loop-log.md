@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-12  review: 20261012-220205, no hard violations, one pending decision (tablets get the phone landing). Next: settle it, then bin/deploy.
 - 2026-10-12  build 18: done, landing stacks below 1024px and the cards and wordmark shrink with the brand column up to 1280px, 18 examples green, two Decided lines. Next: review.
 - 2026-10-12  triage 18: ready, SPEC §8 Landing splits at lg: with the brand column contents shrinking to fit, overlap reproduced at 768 to 1100px, two Decided lines. Next: build.
 - 2026-10-12  request 18: filed, behavioural, landing fanned cards overlap the Start a game card at narrow desktop widths. Next: triage.
