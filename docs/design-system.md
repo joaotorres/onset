@@ -59,7 +59,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 
 - Desktop: brand on the left (wordmark 136px, tagline 24px `gray-300`, three fanned cards with the caption in `gray-400`), actions on the right in a 448px `gray-900` card with a `gray-800` border: the mode toggle, Start a game (`blue-600`, 60px, display type), its sub-line in `gray-400`, a divider, then "Have a room code?", the code field and a `gray-800` Join button
 - Phone, top to bottom: wordmark and tagline, the join form, a divider, the mode toggle and Start a game, then the fanned cards and caption at the bottom
-- Room not found: the message in `red-400` under the code field, the field with a `red-500` border
+- Room not found: "Room not found" in `red-400` under the code field, the field empty with a `red-500` border
 
 ### Join page (ticket 08)
 
@@ -68,6 +68,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Field errors in `red-400` under their field, the field with a `red-500` border
 - Color grid 4×2, 56px swatches. Selected: a white ring offset by `gray-950`, with a white ✓. Taken: the preset blended 30% over `gray-950`, the taker's initial in `gray-300` in display type
 - Join at the bottom (`blue-600`, 56px). For the creating browser, "Use this screen as the big screen instead" under it as a `blue-300` text link
+- Full room (every color taken, triage 08): "This room is full" in the base error box, no swatch selected, Join disabled as `gray-800` with `gray-500` text, as the big screen's disabled Start game. Wins over the join-full board, which shows no message
 
 ### Player screen, Waiting (ticket 10)
 
