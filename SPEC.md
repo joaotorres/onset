@@ -40,10 +40,10 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 1. The board shows 12 face-up cards drawn from the deck.
 2. Players race to spot a Set.
 3. A player taps **"SET!"** on their player screen, or a card on the board their player screen shows (§8, Player screen), which also selects that card. Server timestamps the request and atomically locks the claim to the first arrival.
-4. The claiming player has **15 seconds** (`Game::CLAIM_TIMEOUT`) to tap 3 cards on their player screen.
-   - **Correct Set**: +1 point, those 3 cards are removed, 3 new cards are dealt from the deck. Board unfreezes.
-   - **Wrong Set**: −1 point, claiming player is locked out for 5 seconds (cannot claim again). Board unfreezes immediately for everyone else.
-   - **Timeout (no submission within 15s)**: same penalty as a wrong Set: −1 point and a 5-second lockout. Board unfreezes.
+4. The claiming player has **15 seconds** (`Game::CLAIM_TIMEOUT`) to pick 3 cards on their player screen. A tap picks a card, a second tap unpicks it, and the server keeps the current picks (§11). Nothing is judged before the 15 seconds run out; then the server judges the picks it holds:
+   - **Correct Set** (3 picks that form a Set): +1 point, those 3 cards are removed, 3 new cards are dealt from the deck. Board unfreezes.
+   - **Wrong Set** (3 picks that do not): −1 point, claiming player is locked out for 5 seconds (cannot claim again). Board unfreezes.
+   - **Time's up** (fewer than 3 picks): same penalty as a wrong Set: −1 point and a 5-second lockout. Board unfreezes.
 5. **No Set on the board**: any player can tap **"No Set"**. A 15-second countdown begins, visible on the big screen and every player screen. Resolution:
    - If **all currently active players** join the call before the countdown ends, it resolves immediately.
    - Otherwise, the countdown expires.
@@ -141,12 +141,12 @@ Audit record of every claim attempt. Useful for stats, debugging, and replay.
 | --- | --- | --- |
 | `game_id` | bigint | indexed |
 | `player_id` | bigint | indexed |
-| `card_ids` | json | Array of 3 ints, nullable until submission |
+| `card_ids` | json | The current picks, 0 to 3 ints, replaced on every tap while pending (§11); the picks judged at expiry once resolved |
 | `result` | enum | `pending`, `correct`, `wrong`, `expired` |
 | `started_at` | datetime | from server clock |
 | `resolved_at` | datetime | nullable |
 
-**Validations**: `card_ids`, when present, is an array of exactly 3 distinct integers in `0..80`.
+**Validations**: `card_ids`, when present, is an array of distinct integers in `0..80`: at most 3 while `pending` or `expired`, exactly 3 once `correct` or `wrong`.
 
 ### Card (PORO, no DB)
 
@@ -224,7 +224,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | POST | `/games/:code/start` | The host (the browser holding `host_game`) starts the game from the big screen |
 | POST | `/games/:code/restart` | Play again from the big screen (host): reset deck, clear scores and votes, status `playing`, at once |
 | POST | `/games/:code/claims` | Try to take the claim lock; a lost race changes nothing |
-| PATCH | `/games/:code/claims/:id` | Submit `card_ids` for a held claim |
+| PATCH | `/games/:code/claims/:id` | Replace the picks (`card_ids`, 0 to 3 board cards) of a held claim; nothing is judged until the time runs out (§11) |
 | POST | `/games/:code/no_set` | Initiate No-Set countdown OR join existing call |
 | DELETE | `/games/:code/no_set` | Withdraw your vote (rare; no UI button v1) |
 | POST | `/games/:code/end_game` | Vote to end once the deck is empty; ends when every active player has voted |
@@ -239,14 +239,14 @@ A round is the period between deals. Transitions are owned by the `Game` model a
                      ┌──────────────────────────────────────┐
                      │                                      │
    ┌─── (idle) ──────┼─── claim_lock_acquired ──→ claim_locked
+   │                 │                              │ pick / unpick (0..3 cards, stored)
    │                 │                              │
-   │                 │  ↑                           │ submit_set
-   │                 │  └─── 15s timeout ───────────┤
+   │                 │                              │ 15s timeout: judge the picks
    │                 │                              ↓
    │                 │                          ┌────┐
-   │                 │                          │ ✓  │ correct → score+1, deal
-   │                 │                          │ ✗  │ wrong → score-1, lockout
-   │                 │                          │ ⏰ │ expired → score-1, lockout
+   │                 │                          │ ✓  │ 3 picks, a Set → score+1, deal
+   │                 │                          │ ✗  │ 3 picks, no Set → score-1, lockout
+   │                 │                          │ ⏰ │ fewer than 3 → score-1, lockout
    │                 │                          └────┘
    │                 │                              │
    │                 │                              ↓ (back to idle)
@@ -308,7 +308,7 @@ The big screen subscribes to `game:CODE` only. The player screen subscribes to *
 
 ### Actions answer 204, broadcasts update the screen
 
-Every POST from a player screen or the big screen (SET!, card submit, No Set, agree, End game, ready, Start game, Play again) answers `204 No Content`. Turbo leaves the page alone, and the broadcast the action triggers updates every screen, including the one that acted.
+Every POST from a player screen or the big screen (SET!, a card pick, No Set, agree, End game, ready, Start game, Play again) answers `204 No Content`. Turbo leaves the page alone, and the broadcast the action triggers updates every screen, including the one that acted.
 
 Do not redirect back to the same page. A redirect reloads it, which drops its stream subscriptions for about 500 ms, and any broadcast in that window is lost. Do not send per-player broadcasts for bookkeeping either (see `last_seen_at`): the `async` adapter can deliver two messages to the same stream out of order, and a stale one can win.
 
@@ -321,7 +321,7 @@ Turbo Streams replace these by id, so each stays the outermost element of its re
 
 Stimulus attributes stay on whatever element plays the role:
 
-- `card-selection`: `card` targets with `data-card-id` and `click->card-selection#toggle`, plus `form`, `input`, `slot` and `count` targets
+- `card-selection`: `card` targets with `data-card-id`, `aria-pressed` (the server renders `true` for a picked card) and `click->card-selection#toggle`, plus `slot` and `count` targets, and the claim's PATCH URL in `data-card-selection-url-value`
 - Idle board, in every player screen layout: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle). `card-tap`: `data-controller="card-tap"` on the claim form around the cards, each card a submit button with `click->card-tap#tap`. It remembers the tapped card in memory, and `card-selection` selects it on connect
 - Waiting invite (§8, Player screen, Waiting): `data-controller="invite"` around the invite with `url` (the join page URL) and `code` values. The Copy link / Share link button is the `link` target with `click->invite#share`; the QR sheet is a `<dialog>`, the `sheet` target, inside `#controller_status`, opened by Show QR with `click->invite#open` and closed by Done with `click->invite#close`
 - `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
@@ -391,7 +391,7 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
 
    With 8 players and the invite there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640. The exact layout comes from the design pass.
 2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
-3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait puts the bar in the status slot above SET! and a tray of three slots, which fill as cards are tapped, in place of SET! and its pill. Landscape and computer show the bar as one block in place of the panel and SET!, the pill slot left empty. No Set is not offered during the player's own claim. A claim started by tapping a card opens with that card selected (1/3) if it is still on the board. Tap a card to select, tap again to deselect, auto-submit per §11.
+3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait puts the bar in the status slot above SET! and a tray of three slots, which fill as cards are tapped, in place of SET! and its pill. Landscape and computer show the bar as one block in place of the panel and SET!, the pill slot left empty. No Set is not offered during the player's own claim. A claim started by tapping a card opens with that card picked (1/3) if it is still on the board. Tap a card to pick it, tap again to unpick, up to three, until the time runs out: the picks are judged then, per §11, and three picks stay changeable until then. A redraw of the screen during the claim (any room update, §7) shows the picks again, tray and count included.
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
 5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed in every layout) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
 6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked". The pill slot keeps the idle secondary action, **No Set** or the **End game** vote, enabled: lockout only blocks SET! (§2 Edge cases).
@@ -400,7 +400,7 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
 
    The standings list every player in the room, as many as "of N players" counts, one compact row each: rank, dot, name and score. Rows run by score, ties in join order, and tied players share a rank ("1, 1, 3"), as on the big screen podium. No ★, Locked tag or ready marks in the rows: the winner line carries the ★. Names truncate with an ellipsis. The player's own row is highlighted with a surface tint, not a color from the §10 meaning table, and says "you" after the name, as the waiting roster does. The rank is the shared one on a tie, a plain ordinal ("1st", never "=1st"): the winner line and the standings already say who tied. Portrait stacks everything; landscape and computer put the rank, the winner line and Play again in a left column and the standings on the right. With 8 players, one per preset color, the screen keeps no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer. On a shorter screen the list scrolls inside itself, never the page.
 
-Stimulus: `card-selection` (selection, tray, count, auto-submit), `countdown` (every ring and seconds display) and `invite` (shares or copies the invite link, opens the QR sheet), its attributes listed in §7.
+Stimulus: `card-selection` (picks sent to the server, tray, count), `countdown` (every ring and seconds display) and `invite` (shares or copies the invite link, opens the QR sheet), its attributes listed in §7.
 
 ---
 
@@ -479,7 +479,11 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 
 ## 11. Selection submission UX (decision)
 
-After the third tap on the player screen, **auto-submit with a 250ms delay** so a player can deselect a misclick before commit. The card grid dims to 50% during the delay. Each tap also copies the card into the portrait tray's next free slot and updates the n/3 count.
+A claim is judged only when its 15 seconds run out: there is no submit. Every tap on the board picks or unpicks a card, up to three, and sends the current picks to the server at once (`PATCH /games/:code/claims/:id`, §5): one request at a time, each carrying the whole selection, so a quick sequence of taps arrives in order. The server stores them on the pending claim (`Claim#card_ids`) and broadcasts nothing: the picks are private to the claiming player. `ExpireClaimJob` judges the picks it finds (§2, Round flow): three that form a Set score as a correct Set, three that do not as a wrong Set, fewer than three as time's up. The picks on the server when the job runs decide; a tap still in flight is lost. Client timers stay display-only (§6).
+
+On the player screen each tap also copies the card into the portrait tray's next free slot and updates the n/3 count. The board never dims and three picks stay changeable until the time runs out; the countdown ring is the only sign of when the claim is judged. The picks are server state, so a redraw of the player screen mid-claim (a room update, §7) renders the picked cards picked and the controller continues from them, refilling the tray and the count. The pick request is a `fetch` carrying the page's CSRF token, not a form submit, so it does not depend on `form.requestSubmit`.
+
+History: v1 auto-submitted 250 ms after the third tap, the grid dimmed during the delay. Dropped (ticket 19): the third tap was seen not to submit on a phone, and judging only at the timeout removes the submit step and its race with a mid-claim redraw.
 
 ---
 
@@ -715,7 +719,7 @@ without callbacks.
 - **Color presets for player choice** (8 distinct hex values that don't collide with the card palette).
 - **Squiggle SVG path** — the canonical Set squiggle is a specific bezier; pick one and commit to it.
 - **Striped pattern density** — visually tune in browser; aim for clearly distinguishable from solid at TV viewing distance.
-- **Auto-submit timing** — 250ms feels right; tune with real users.
+- **Auto-submit timing** — resolved: no auto-submit, the picks are judged when the time runs out (§11).
 - **Cold-start mitigation** — consider a "Wake the server" splash on the landing page that does a low-cost ping while the user reads instructions.
 
 ---
