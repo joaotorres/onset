@@ -1,6 +1,6 @@
 # 23: Keep the latest picks across a player screen redraw during a claim
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
