@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Claim do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:game) {
     Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
   }
@@ -85,9 +87,12 @@ RSpec.describe Claim do
       expect(player.reload.score).to eq(0)
     end
 
-    it "locks the player out for 5 seconds" do
-      judge(find_non_set_on_board)
+    it "locks the player out for the claim time" do
+      freeze_time
+      expect { judge(find_non_set_on_board) }.to have_enqueued_job(UnlockBroadcastJob)
+        .with(player).at(Game::CLAIM_TIMEOUT.seconds.from_now)
       expect(player.reload).to be_locked
+      expect(player.locked_until).to eq(Game::CLAIM_TIMEOUT.seconds.from_now)
     end
 
     it "does not change the board" do
@@ -119,9 +124,13 @@ RSpec.describe Claim do
       expect(player.reload.score).to eq(0)
     end
 
-    it "locks the player out for 5 seconds" do
-      claim.expire!
+    it "locks the player out for the claim time" do
+      claim
+      freeze_time
+      expect { claim.expire! }.to have_enqueued_job(UnlockBroadcastJob)
+        .with(player).at(Game::CLAIM_TIMEOUT.seconds.from_now)
       expect(player.reload).to be_locked
+      expect(player.locked_until).to eq(Game::CLAIM_TIMEOUT.seconds.from_now)
     end
 
     it "releases the claim lock on the game" do
@@ -236,7 +245,7 @@ RSpec.describe Claim do
     it "sets the flash and schedules the unlock broadcast on a wrong Set" do
       expect { judge(find_non_set_on_board) }.to have_enqueued_job(UnlockBroadcastJob)
       expect(game.reload.flash_claim_id).to eq(claim.id)
-      expect(player.reload.locked_until).to be_within(1.second).of(5.seconds.from_now)
+      expect(player.reload.locked_until).to be_within(1.second).of(Game::CLAIM_TIMEOUT.seconds.from_now)
     end
 
     it "keeps fewer than three picks on an expired claim" do

@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  build 20: done, wrong and time's up lockouts now last Game::CLAIM_TIMEOUT (15 s) in the model, the locked-out countdown, the announcement and How to play, full suite green. Next: build 21.
 - 2026-10-13  build 19: done, picks stored on every tap by fetch and judged by ExpireClaimJob when the time runs out, picks survive a redraw, full suite green. Next: build 20.
 - 2026-10-13  triage 22: ready, the user meant the deck line and the Room CODE footer under the board on the computer player screen, SPEC §8 now centres the footer on the board there, Kind behavioural, four Decided lines. Next: build.
 - 2026-10-13  triage 21: design gap settled, SPEC now has the refusal of a No Set call (cancels it, blocks No Set 15 s, once per board, no penalty, two Game columns, a refuse route) and the screens it shows, seven Decided lines. Next: design brief, then triage.

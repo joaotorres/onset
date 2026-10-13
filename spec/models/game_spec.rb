@@ -133,8 +133,13 @@ RSpec.describe Game do
     end
 
     it "returns nil when the player is locked out" do
-      player.update!(locked_until: 5.seconds.from_now)
+      player.update!(locked_until: 1.second.from_now)
       expect(game.try_claim!(player)).to be_nil
+    end
+
+    it "claims once the lockout has passed" do
+      player.update!(locked_until: 1.second.ago)
+      expect(game.try_claim!(player)).to be_present
     end
 
     it "cancels an active No-Set when a claim is acquired" do

@@ -77,10 +77,10 @@ class Claim < ApplicationRecord
   end
 
   def lock_out!
-    player.update!(score: [player.score - 1, 0].max, locked_until: 5.seconds.from_now)
+    player.update!(score: [player.score - 1, 0].max, locked_until: Game::CLAIM_TIMEOUT.seconds.from_now)
     game.update!(claim_player_id: nil, claim_started_at: nil, flash_claim_id: id)
     ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
-    UnlockBroadcastJob.set(wait: 5.seconds).perform_later(player)
+    UnlockBroadcastJob.set(wait: Game::CLAIM_TIMEOUT.seconds).perform_later(player)
   end
 
   # At most 3 picks while pending or expired, exactly 3 once judged (§4).

@@ -18,10 +18,10 @@
         <div class="min-w-0">
           <% if flash_claim.expired? %>
             <p class="font-display text-6xl font-bold"><span class="text-red-400"><%= flash_claim.player.name %></span> · Time's up!</p>
-            <p class="mt-1 text-2xl text-gray-300">The <%= Game::CLAIM_TIMEOUT %> seconds ran out · locked out for 5 seconds</p>
+            <p class="mt-1 text-2xl text-gray-300">The <%= Game::CLAIM_TIMEOUT %> seconds ran out · locked out for <%= Game::CLAIM_TIMEOUT %> seconds</p>
           <% else %>
             <p class="font-display text-6xl font-bold"><span class="text-red-400"><%= flash_claim.player.name %></span> · Wrong!</p>
-            <p class="mt-1 text-2xl text-gray-300">Not a Set · locked out for 5 seconds</p>
+            <p class="mt-1 text-2xl text-gray-300">Not a Set · locked out for <%= Game::CLAIM_TIMEOUT %> seconds</p>
           <% end %>
         </div>
         <% if flash_claim.penalized? %>

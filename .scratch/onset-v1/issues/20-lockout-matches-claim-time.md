@@ -1,6 +1,6 @@
 # 20: Wrong claim lockout as long as the claim time
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by: 19
 Model:

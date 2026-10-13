@@ -58,6 +58,11 @@ RSpec.describe "Lobbies", type: :request do
   end
 
   describe "GET /how-to-play" do
+    it "says the lockout lasts the claim time" do
+      get how_to_play_path
+      expect(response.parsed_body.text.squish).to include("you're locked out for #{Game::CLAIM_TIMEOUT} seconds")
+    end
+
     it "returns 200 and renders the four sections" do
       get how_to_play_path
       expect(response).to have_http_status(:ok)

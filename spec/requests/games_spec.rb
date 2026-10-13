@@ -130,6 +130,25 @@ RSpec.describe "Games" do
         expect(response.body).to include("Agree on your screen, or find one first")
         expect(response.body).not_to include("on your phone")
       end
+
+      context "after a wrong claim or a time's up" do
+        let(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+
+        def flash(result, card_ids)
+          claim = game.claims.create!(player: alice, result: result, card_ids: card_ids, started_at: Time.current, resolved_at: Time.current)
+          game.update!(flash_claim_id: claim.id)
+          get game_path(game.code)
+          Nokogiri::HTML(response.body).at_css("#announcement").text.squish
+        end
+
+        it "names the lockout length from the claim time on a wrong claim" do
+          expect(flash(:wrong, [0, 1, 2])).to include("Not a Set · locked out for #{Game::CLAIM_TIMEOUT} seconds")
+        end
+
+        it "names the lockout length from the claim time on a time's up" do
+          expect(flash(:expired, [0])).to include("ran out · locked out for #{Game::CLAIM_TIMEOUT} seconds")
+        end
+      end
     end
   end
 
@@ -669,6 +688,15 @@ RSpec.describe "Games" do
       panel = status.at_css("[data-status-slot] > *")
       expect(panel.text.strip).to eq("Wrong! −1")
       expect(panel["class"]).to include("bg-red-950", "border-red-600", "animate-shake")
+    end
+
+    it "counts SET! down from the claim time while locked out" do
+      locked_until = Game::CLAIM_TIMEOUT.seconds.from_now.change(usec: 0)
+      alice.update!(locked_until: locked_until)
+      slot = status.at_css("[data-set-slot]")
+      expect(slot["data-countdown-duration-value"]).to eq(Game::CLAIM_TIMEOUT.to_s)
+      expect(slot["data-countdown-started-at-value"]).to eq((locked_until - Game::CLAIM_TIMEOUT.seconds).iso8601)
+      expect(slot.at_css("[data-countdown-target=display]").text.strip).to eq(Game::CLAIM_TIMEOUT.to_s)
     end
 
     it "shows the found-set banner with the finder and +1" do
