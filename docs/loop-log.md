@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  request 21: filed, visual, any player may refuse a No Set call once per board, blocking No Set for 15s. Next: triage, then the design pass.
 - 2026-10-13  request 20: filed, behavioural, lockout after a wrong claim to match the claim time. Next: triage.
 - 2026-10-13  request 19: filed, behavioural, the third card tap does not auto-submit the claim, only the timeout does. Next: triage.
 - 2026-10-12  deploy deploy-20261012-2206: 18 deployed. Next: new requests.
