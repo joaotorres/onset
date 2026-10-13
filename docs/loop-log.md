@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  design-brief 21: spec gap, six questions on refusing a No Set call. Next: triage settles the gap, then the brief.
 - 2026-10-13  request 22: filed, visual, align the cards and room code left, screen to settle in triage. Next: triage, then the design pass.
 - 2026-10-13  request 21: filed, visual, any player may refuse a No Set call once per board, blocking No Set for 15s. Next: triage, then the design pass.
 - 2026-10-13  request 20: filed, behavioural, lockout after a wrong claim to match the claim time. Next: triage.
