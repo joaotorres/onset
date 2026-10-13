@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  context cap: 102k, over 100k with the review next. 23 built; 21 waits on its design pass. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-13  build 23: done, the current claim's picks and one-at-a-time sending live in module state keyed by the claim URL, so a redraw with a pick on its way keeps the latest picks, full suite green. Next: build or review.
 - 2026-10-13  triage 23: ready, SPEC §11 and §8 now keep the latest picks of a claim in page memory across a redraw with a pick on its way, three Decided lines. Next: build.
 - 2026-10-13  request 23: keep the latest picks across a player screen redraw during a claim, from the review. Next: triage.
