@@ -86,7 +86,7 @@
   <% elsif my_claim %>
     <%# Claiming (mine): pick 3 cards. Portrait: the claim bar in the status slot, the tray in place of SET! and its pill.
         Landscape and computer: one yellow block in place of the status panel and SET!, the pill slot empty. %>
-    <div data-controller="card-selection" class="<%= body %>">
+    <div data-controller="card-selection" data-card-selection-url-value="<%= game_claim_path(game.code, my_claim.id) %>" class="<%= body %>">
       <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game, mode: :select, claim: my_claim %>
       <div data-action-column class="<%= column %>">

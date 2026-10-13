@@ -54,6 +54,27 @@ RSpec.describe "Stimulus polish", type: :system do
     expect(cards[1][:class]).to include("ring-4")
   end
 
+  it "shows the picks again after a redraw mid-claim in a portrait window" do
+    page.driver.browser.manage.window.resize_to(420, 900)
+    player = setup_claim_state
+    game = player.game
+    claim = game.claims.find_by!(player: player, result: :pending)
+    ids = game.board.first(2)
+
+    ids.each { |id| find("[data-card-id='#{id}']").click }
+    deadline = Time.current + Capybara.default_max_wait_time
+    sleep 0.05 until claim.reload.card_ids == ids || Time.current > deadline
+    expect(claim.card_ids).to eq(ids)
+
+    page.execute_script("document.getElementById('controller_status').dataset.beforeRedraw = 'yes'")
+    game.update!(flash_claim_id: nil)
+    expect(page).to have_no_css("#controller_status[data-before-redraw]")
+
+    ids.each { |id| expect(page).to have_css("[data-card-id='#{id}'][aria-pressed='true'].ring-4") }
+    expect(page).to have_css("[data-card-selection-target='count']", text: "2")
+    ids.each { |id| expect(page).to have_css("[data-slot-card-id='#{id}'] svg") }
+  end
+
   it "countdown ring is present in the DOM with correct data attributes" do
     setup_claim_state
 

@@ -37,6 +37,21 @@ RSpec.describe "Tapping a card calls SET!", type: :system do
 
   def count_text = all("[data-card-selection-target='count']", visible: :all).map { |el| el.text(:all) }
 
+  def alice_claim = game.claims.find_by!(player: alice, result: :pending)
+
+  # The picks reach the server by fetch, so poll until they land (§11).
+  def expect_server_picks(ids)
+    deadline = Time.current + Capybara.default_max_wait_time
+    sleep 0.05 until alice_claim.card_ids == ids || Time.current > deadline
+    expect(alice_claim.card_ids).to eq(ids)
+  end
+
+  def expect_picked(*ids)
+    ids.each do |id|
+      expect(page).to have_css("[data-card-id='#{id}'][aria-pressed='true'].ring-4")
+    end
+  end
+
   it "takes the claim and opens it with the tapped card selected" do
     card(4).click
 
@@ -45,6 +60,36 @@ RSpec.describe "Tapping a card calls SET!", type: :system do
     expect(card(4)["aria-pressed"]).to eq("true")
     expect(count_text).to all(eq("1"))
     expect(game.claims.where(player: alice, result: :pending).count).to eq(1)
+    expect_server_picks([4])
+  end
+
+  it "keeps three picks pending on the server, the board undimmed, until the time runs out" do
+    card(0).click
+    expect(page).to have_content("Your SET!")
+    card(1).click
+    card(2).click
+
+    expect_picked(0, 1, 2)
+    expect(count_text).to all(eq("3"))
+    expect_server_picks([0, 1, 2])
+    expect(alice_claim).to be_pending
+    expect(page).to have_no_css("[data-board] .opacity-50")
+    expect(page).to have_content("Your SET!")
+
+    card(1).click
+    expect(card(1)["aria-pressed"]).to eq("false")
+    expect_server_picks([0, 2])
+  end
+
+  it "sends the picks without form.requestSubmit" do
+    page.execute_script("delete HTMLFormElement.prototype.requestSubmit")
+    card(0).click
+    expect(page).to have_content("Your SET!")
+    page.execute_script("delete HTMLFormElement.prototype.requestSubmit")
+    card(1).click
+    card(2).click
+
+    expect_server_picks([0, 1, 2])
   end
 
   it "scores a correct Set made from the tapped card and two more taps" do
@@ -52,7 +97,10 @@ RSpec.describe "Tapping a card calls SET!", type: :system do
     expect(page).to have_content("Your SET!")
     card(1).click
     card(2).click
+    expect_server_picks([0, 1, 2])
+    expect(page).to have_content("Your SET!")
 
+    ExpireClaimJob.perform_now(alice_claim)
     expect(page).to have_no_content("Your SET!")
     expect(game.claims.find_by!(player: alice).reload).to be_correct
     expect(alice.reload.score).to eq(1)
@@ -63,7 +111,10 @@ RSpec.describe "Tapping a card calls SET!", type: :system do
     expect(page).to have_content("Your SET!")
     card(1).click
     card(3).click
+    expect_server_picks([0, 1, 3])
+    expect(page).to have_content("Your SET!")
 
+    ExpireClaimJob.perform_now(alice_claim)
     # Score never goes below 0 (Claim#resolve_wrong!), so check the result and the lockout.
     expect(page).to have_no_content("Your SET!")
     expect(game.claims.find_by!(player: alice).reload).to be_wrong

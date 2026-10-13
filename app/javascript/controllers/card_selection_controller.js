@@ -4,26 +4,35 @@ import { takePendingCardTap } from "controllers/card_tap_controller"
 const SELECTED = ["ring-4", "ring-blue-400", "scale-95"]
 const EMPTY_SLOT = ["border-2", "border-dashed", "border-gray-700"]
 
+// Claiming (mine): a tap picks or unpicks a card, up to three, and sends the
+// whole selection to the server. Nothing is judged until the time runs out (§11).
 export default class extends Controller {
-  static targets = ["card", "input", "form", "slot", "count"]
+  static targets = ["card", "slot", "count"]
+  static values = { url: String }
 
   connect() {
-    this.selected = []
-    this.submitTimer = null
+    this.inFlight = false
+    this.dirty = false
 
-    // A claim started by tapping an idle card opens with that card selected.
+    // The picks are server state: a redraw renders them aria-pressed, so
+    // the tray and the count are refilled from the board.
+    this.selected = []
+    this.cardTargets
+      .filter(card => card.getAttribute("aria-pressed") === "true")
+      .forEach(card => {
+        const id = parseInt(card.dataset.cardId)
+        this.selected.push(id)
+        this.fillSlot(id, card)
+      })
+    this.updateCount()
+
+    // A claim started by tapping an idle card opens with that card picked.
     const tapped = takePendingCardTap()
     const card = this.cardTargets.find(c => parseInt(c.dataset.cardId) === tapped)
-    if (card) this.toggleCard(card)
-  }
-
-  disconnect() {
-    clearTimeout(this.submitTimer)
+    if (card && !this.selected.includes(tapped)) this.toggleCard(card)
   }
 
   toggle(event) {
-    if (this.submitTimer) return // grace window in progress, ignore taps
-
     this.toggleCard(event.currentTarget)
   }
 
@@ -40,17 +49,46 @@ export default class extends Controller {
       card.classList.add(...SELECTED)
       card.setAttribute("aria-pressed", "true")
       this.fillSlot(id, card)
-
-      if (this.selected.length === 3) {
-        this.formTarget.classList.add("opacity-50", "pointer-events-none")
-        const snapshot = [...this.selected]
-        this.submitTimer = setTimeout(() => {
-          this.inputTarget.value = JSON.stringify(snapshot)
-          this.formTarget.requestSubmit()
-        }, 250)
-      }
+    } else {
+      return
     }
 
+    this.updateCount()
+    this.send()
+  }
+
+  // One request at a time, each carrying the whole selection, so the picks
+  // arrive in order; the latest selection goes when the previous returns.
+  async send() {
+    if (this.inFlight) {
+      this.dirty = true
+      return
+    }
+
+    this.inFlight = true
+    try {
+      await fetch(this.urlValue, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "text/vnd.turbo-stream.html, text/html",
+          "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
+        },
+        body: JSON.stringify({ card_ids: this.selected }),
+        credentials: "same-origin"
+      })
+    } catch (_error) {
+      // A lost request: the next tap sends the whole selection again.
+    } finally {
+      this.inFlight = false
+      if (this.dirty) {
+        this.dirty = false
+        this.send()
+      }
+    }
+  }
+
+  updateCount() {
     this.countTargets.forEach(el => { el.textContent = this.selected.length })
   }
 

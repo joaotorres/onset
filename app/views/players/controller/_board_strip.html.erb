@@ -18,22 +18,20 @@
         <% end %>
       <% end %>
     <% elsif mode == :select %>
-      <%= form_with url: game_claim_path(game.code, claim.id), method: :patch,
-            class: "h-full transition-opacity", data: {"card-selection-target": "form"} do |f| %>
-        <%= f.hidden_field :card_ids, value: "[]", data: {"card-selection-target": "input"} %>
-        <div class="<%= grid %>">
-          <% game.board_cards.each do |card| %>
-            <button type="button"
-                    class="<%= size %> <%= arrive.call(card) %> transition"
-                    aria-pressed="false"
-                    data-card-selection-target="card"
-                    data-card-id="<%= card.id %>"
-                    data-action="click->card-selection#toggle">
-              <%= render "cards/card", card: card %>
-            </button>
-          <% end %>
-        </div>
-      <% end %>
+      <%# The picks are server state (§11): a picked card renders picked, and card-selection sends each change. %>
+      <% picked = claim.card_ids || [] %>
+      <div class="<%= grid %>">
+        <% game.board_cards.each do |card| %>
+          <button type="button"
+                  class="<%= size %> <%= arrive.call(card) %> transition <%= "ring-4 ring-blue-400 scale-95" if picked.include?(card.id) %>"
+                  aria-pressed="<%= picked.include?(card.id) %>"
+                  data-card-selection-target="card"
+                  data-card-id="<%= card.id %>"
+                  data-action="click->card-selection#toggle">
+            <%= render "cards/card", card: card %>
+          </button>
+        <% end %>
+      </div>
     <% else %>
       <div class="<%= grid %>">
         <% game.board_cards.each do |card| %>

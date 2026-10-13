@@ -15,21 +15,22 @@ class ClaimsController < ApplicationController
       head :forbidden and return
     end
 
-    raw = params[:card_ids]
-    submitted_ids = if raw.is_a?(String)
-      begin
-        JSON.parse(raw).map(&:to_i)
-      rescue
-        []
-      end
-    else
-      Array(raw).map(&:to_i)
-    end
-    claim.submit!(submitted_ids)
+    # Stores the picks; nothing is judged until the time runs out (§11).
+    claim.pick!(picked_ids)
     head :no_content
   end
 
   private
+
+  # The player screen sends a JSON array; a JSON string is accepted too.
+  # Anything else becomes an invalid selection, which pick! ignores.
+  def picked_ids
+    raw = params[:card_ids]
+    raw = JSON.parse(raw) if raw.is_a?(String)
+    Array(raw).map { |id| Integer(id) }
+  rescue JSON::ParserError, ArgumentError, TypeError
+    nil
+  end
 
   def set_game
     @game = Game.find_by!(code: params[:game_code])

@@ -1,6 +1,6 @@
 # 19: Picking the third card does not auto-submit the claim
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:

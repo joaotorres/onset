@@ -48,7 +48,7 @@ ERB partials, no component library.
 - `players/controller/_qr_sheet` (v2): overlay `gray-950` at 85%. Portrait: a bottom sheet. Landscape: a centered card, QR on the left, code and Done on the right. Computer: a centered 352px modal. QR on a white tile, 288px in portrait and computer, 300px in landscape, the code under it, Done in `blue-600`
 - `players/controller/_standings` (v2): game over rows, each rank, dot, truncated name, "you" for the player, score. Own row `gray-800` with a `gray-600` border, other rows transparent. Rows 32px portrait, 34px landscape, 44px computer (computer list in a `gray-900` panel)
 - Landing mode toggle (v2): two radios styled as a segmented control inside the Start a game form, on a `gray-950` (desktop) or `gray-900` (phone) track with a `gray-700` border. Selected Standard `gray-700`, selected First to 5 `violet-600`, unselected `gray-400` text on transparent
-- Stimulus: `card-selection` (selection, tray, count, auto-submit), `countdown` (rings and seconds)
+- Stimulus: `card-selection` (picks sent to the server, tray, count), `countdown` (rings and seconds)
 
 ## Screens
 

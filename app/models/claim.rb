@@ -7,33 +7,34 @@ class Claim < ApplicationRecord
   validates :started_at, presence: true
   validate :card_ids_valid, if: -> { card_ids.present? }
 
+  # The time ran out (§2, §11): judge the picks the claim holds. The caller
+  # (ExpireClaimJob) holds the game lock and has checked the claim is pending.
   def expire!
-    update!(result: :expired, resolved_at: Time.current, penalized: player.score.positive?)
-    player.update!(score: [player.score - 1, 0].max, locked_until: 5.seconds.from_now)
-    game.update!(claim_player_id: nil, claim_started_at: nil, flash_claim_id: id)
-    ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
-    UnlockBroadcastJob.set(wait: 5.seconds).perform_later(player)
+    picks = card_ids || []
+
+    if picks.size < 3
+      resolve_expired!
+    elsif Card.valid_set?(*picks.map { |id| Card.new(id) })
+      resolve_correct!(picks)
+    else
+      resolve_wrong!(picks)
+    end
   end
 
-  def submit!(submitted_ids)
+  # Replaces the picks of a pending claim; an invalid selection is ignored.
+  def pick!(ids)
     game.with_lock do
-      return unless pending?
-      return unless valid_selection?(submitted_ids)
+      return unless reload.pending?
+      return unless valid_selection?(ids)
 
-      cards = submitted_ids.map { |id| Card.new(id) }
-
-      if Card.valid_set?(*cards)
-        resolve_correct!(submitted_ids)
-      else
-        resolve_wrong!(submitted_ids)
-      end
+      update!(card_ids: ids)
     end
   end
 
   private
 
   def valid_selection?(ids)
-    return false unless ids.is_a?(Array) && ids.size == 3
+    return false unless ids.is_a?(Array) && ids.size <= 3
     return false unless ids == ids.uniq
     return false unless ids.all? { |id| id.is_a?(Integer) && (0..80).cover?(id) }
 
@@ -65,19 +66,30 @@ class Claim < ApplicationRecord
     ClearLastDealtJob.set(wait: 3.seconds).perform_later(game, drawn) if drawn.any?
   end
 
+  def resolve_expired!
+    update!(result: :expired, resolved_at: Time.current, penalized: player.score.positive?)
+    lock_out!
+  end
+
   def resolve_wrong!(submitted_ids)
     update!(result: :wrong, card_ids: submitted_ids, resolved_at: Time.current, penalized: player.score.positive?)
+    lock_out!
+  end
+
+  def lock_out!
     player.update!(score: [player.score - 1, 0].max, locked_until: 5.seconds.from_now)
     game.update!(claim_player_id: nil, claim_started_at: nil, flash_claim_id: id)
     ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
     UnlockBroadcastJob.set(wait: 5.seconds).perform_later(player)
   end
 
+  # At most 3 picks while pending or expired, exactly 3 once judged (§4).
   def card_ids_valid
-    unless card_ids.is_a?(Array) && card_ids.size == 3 &&
+    sizes = (correct? || wrong?) ? [3] : (0..3)
+    unless card_ids.is_a?(Array) && sizes.include?(card_ids.size) &&
         card_ids == card_ids.uniq &&
         card_ids.all? { |id| id.is_a?(Integer) && (0..80).cover?(id) }
-      errors.add(:card_ids, "must be exactly 3 distinct integers in 0..80")
+      errors.add(:card_ids, "must be distinct integers in 0..80: at most 3 while pending or expired, exactly 3 once judged")
     end
   end
 end
