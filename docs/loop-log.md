@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  design-brief 21: brief for the refusal pills, the blocked No Set idle state and the big screen Refused panel, against design-system v2. Next: the design pass.
 - 2026-10-13  context cap: 121k, over 100k with the brief for 21 and the review next. Next: /clear, then /skills-loop:auto.
 - 2026-10-13  build 22: done, the computer Room CODE footer now centres on the board under the deck line during play, full suite green. Next: build or review.
 - 2026-10-13  build 20: done, wrong and time's up lockouts now last Game::CLAIM_TIMEOUT (15 s) in the model, the locked-out countdown, the announcement and How to play, full suite green. Next: build 21.

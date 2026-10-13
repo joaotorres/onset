@@ -29,3 +29,5 @@ Decided: the refusal is two nullable columns on Game, `no_set_refuser_id` and `n
 Decided: the refusal is `POST /games/:code/no_set/refuse`, because the no_set resource already groups the call's actions and its unused PATCH would not say what it does. Instead of: PATCH /games/:code/no_set.
 
 Decided: the pill reads "There's a Set" beside I agree, no Set; the big screen band shows a purple Refused panel with the block's ring, "Alex says there's a Set" and "No Set is back when the ring runs out"; player screens return to idle with No Set disabled and counting down ("No Set in 12 s") and "Alex says there's a Set" in the status slot, because every player should see why No Set is off and for how long; how the two pills share the slot is the design pass's. Instead of: a silently disabled pill.
+
+Decided: the brief leaves every play board as it is and adds the refusal states beside the No Set and idle boards, plus a first big screen board, because tickets 19 (claim picks, no dimming) and 22 (computer footer under the deck line) changed only parts the refusal does not touch. Instead of: redrawing the play boards from the code, which are marked exploring.
