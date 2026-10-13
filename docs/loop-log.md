@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  review: 20261013-031948, one pending decision (a pick lost from the screen across a redraw), 8 standards judgement calls. Next: settle the pending decision, design pass for 21.
 - 2026-10-13  copy pass: 0 fixed, 0 flagged, four lockout-length lines from build 20, all accurate. Next: review.
 - 2026-10-13  context cap: 121k, over 100k with the review next. 21 waits on its design pass (no changelog entry), though the board misses it since build 19 touched the design system. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-13  design-brief 21: brief for the refusal pills, the blocked No Set idle state and the big screen Refused panel, against design-system v2. Next: the design pass.
