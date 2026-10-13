@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  triage 23: ready, SPEC §11 and §8 now keep the latest picks of a claim in page memory across a redraw with a pick on its way, three Decided lines. Next: build.
 - 2026-10-13  request 23: keep the latest picks across a player screen redraw during a claim, from the review. Next: triage.
 - 2026-10-13  review: 20261013-031948, one pending decision (a pick lost from the screen across a redraw), 8 standards judgement calls. Next: settle the pending decision, design pass for 21.
 - 2026-10-13  copy pass: 0 fixed, 0 flagged, four lockout-length lines from build 20, all accurate. Next: review.
