@@ -1,7 +1,8 @@
 <%= turbo_stream_from "game:#{@game.code}" %>
 <%= turbo_stream_from "player:#{@player.id}" %>
 
-<main class="h-dvh overflow-hidden bg-gray-950 text-white border-t-4 p-4 flex flex-col" style="border-color: <%= @player.color %>;">
+<main class="group/main h-dvh overflow-hidden bg-gray-950 text-white border-t-4 p-4 flex flex-col" style="border-color: <%= @player.color %>;">
   <%= render "players/controller_status", player: @player, flash_claim: @game.flash_claim %>
-  <p class="mt-2 text-center text-xs text-gray-500">Room <span class="tracking-widest"><%= @game.code %></span></p>
+  <%# During play on a computer the footer centres on the board, not the screen: it skips the 248px side column and the 32px gap (§8, Deck). %>
+  <p class="mt-2 text-center text-xs text-gray-500 lg:group-has-[[data-board]]/main:mr-[280px]">Room <span class="tracking-widest"><%= @game.code %></span></p>
 </main>

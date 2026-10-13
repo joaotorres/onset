@@ -175,4 +175,63 @@ RSpec.describe "Player screen during play, computer", type: :system do
       expect(overflow).to eq([0, 0, 0])
     end
   end
+
+  # The "Room CODE" footer centres on the board, directly under the deck line, during play (§8, Deck).
+  def centre(selector)
+    r = rect(selector)
+    r["left"] + r["width"] / 2
+  end
+
+  def expect_footer_on_board
+    footer = rect("main > p")
+    deck = rect("[data-board] + p")
+    expect(centre("main > p")).to be_within(1).of(centre("[data-board] + p"))
+    expect(centre("main > p")).to be_within(1).of(centre("[data-board]"))
+    expect(footer["top"] - deck["bottom"]).to be_between(0, 8)
+  end
+
+  context "with the Room CODE footer" do
+    before { start_with(["Bartholomew Ashworth", "Alexandria Pemberton", "Samuel Wainwright"], cards: 18) }
+
+    [[1024, 640], [1280, 800]].each do |width, height|
+      ["idle", "claiming (mine)", "No Set countdown", "deck empty"].each do |name|
+        it "centres the footer on the board at #{width}x#{height} while #{name}" do
+          resize(width, height)
+          instance_exec(nil, &states[name])
+          visit game_controller_path(game.code)
+          expect(page).to have_css("[data-card-id]", count: 18)
+          expect_footer_on_board
+          expect(overflow).to eq([0, 0, 0])
+        end
+      end
+    end
+
+    it "keeps the footer on the board after a Turbo update" do
+      resize(1024, 640)
+      visit game_controller_path(game.code)
+      expect(page).to have_css("turbo-cable-stream-source[connected]", count: 2, visible: :all)
+      game.try_claim!(other)
+      expect(page).to have_css("[aria-label=\"SET! unavailable, #{other.name} is claiming\"]")
+      expect_footer_on_board
+    end
+
+    it "keeps the footer centred on the screen at 375x667 and 667x375" do
+      [[375, 667], [667, 375]].each do |width, height|
+        resize(width, height)
+        visit game_controller_path(game.code)
+        expect(page).to have_css("[data-card-id]", count: 18)
+        expect(centre("main > p")).to be_within(1).of(page.evaluate_script("window.innerWidth") / 2.0)
+      end
+    end
+  end
+
+  it "keeps the footer centred on the screen while waiting" do
+    visit join_game_players_path(game.code)
+    fill_in "player[name]", with: "Ada"
+    all("label.cursor-pointer").first.click
+    click_button "Join"
+    resize(1024, 640)
+    expect(page).to have_text("You're in")
+    expect(centre("main > p")).to be_within(1).of(512)
+  end
 end

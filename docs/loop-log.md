@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  build 22: done, the computer Room CODE footer now centres on the board under the deck line during play, full suite green. Next: build or review.
 - 2026-10-13  build 20: done, wrong and time's up lockouts now last Game::CLAIM_TIMEOUT (15 s) in the model, the locked-out countdown, the announcement and How to play, full suite green. Next: build 21.
 - 2026-10-13  build 19: done, picks stored on every tap by fetch and judged by ExpireClaimJob when the time runs out, picks survive a redraw, full suite green. Next: build 20.
 - 2026-10-13  triage 22: ready, the user meant the deck line and the Room CODE footer under the board on the computer player screen, SPEC §8 now centres the footer on the board there, Kind behavioural, four Decided lines. Next: build.

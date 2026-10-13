@@ -1,6 +1,6 @@
 # 22: Align the cards and room code left
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
@@ -59,3 +59,5 @@ Decided: the "Room CODE" footer centres on the board directly under the deck lin
 Decided: landscape keeps its footer centred on the screen, because the user named the computer layout and the same offset there is a one-line follow-up if wanted. Instead of: moving the landscape footer in this ticket.
 
 Decided: the footer stays centred on the screen while waiting and at game over, because those states show no board to centre on. Instead of: the play offset in every state, which would leave the footer off-centre under the waiting and game over layouts.
+
+Decided: the footer stays in `main` and a CSS `:has([data-board])` group variant gives it a 280px right margin on `lg:` during play, because it follows every Turbo update of `#controller_status` with no markup moved or duplicated. Instead of: moving the footer inside `#controller_status` into each playing state.
