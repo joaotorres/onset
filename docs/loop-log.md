@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  triage 21: design gap settled, SPEC now has the refusal of a No Set call (cancels it, blocks No Set 15 s, once per board, no penalty, two Game columns, a refuse route) and the screens it shows, seven Decided lines. Next: design brief, then triage.
 - 2026-10-13  triage 20: ready, SPEC ties the wrong-claim lockout to Game::CLAIM_TIMEOUT (15 s), blocked by 19, three Decided lines. Next: build, after 19.
 - 2026-10-13  triage 19: ready, the user chose to drop auto-submit, SPEC §11 now judges the picks when the 15 s run out and picks survive a redraw, six Decided lines. Next: build.
 - 2026-10-13  design-brief 22: spec gap, which screen and what aligns left. Next: triage settles the gap, then the brief.

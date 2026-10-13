@@ -39,6 +39,10 @@ _Avoid_: Penalty, cooldown
 A countdown any player starts when they believe the board holds no Set; when every active player agrees, or it runs out, three more cards are dealt.
 _Avoid_: Pass, skip
 
+**Refusal**:
+A player's answer to a No Set call that there is a Set to find ("There's a Set"): it cancels the call and blocks No Set for everyone for 15 seconds. One per board, no penalty.
+_Avoid_: Veto, reject, objection
+
 **Ready vote**:
 The vote every player casts to start a room, or to play again once it has ended.
 

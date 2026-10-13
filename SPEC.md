@@ -44,17 +44,18 @@ Three cards form a Set if, for **each** of the four attributes, the three values
    - **Correct Set** (3 picks that form a Set): +1 point, those 3 cards are removed, 3 new cards are dealt from the deck. Board unfreezes.
    - **Wrong Set** (3 picks that do not): −1 point, claiming player is locked out (cannot claim again) for **15 seconds**, as long as the claim window. The lockout reads `Game::CLAIM_TIMEOUT`, the same constant, so the two never drift. Board unfreezes. History: 5 seconds until ticket 20; that barely outlasted the announcement, so a wrong claim cost little more than the point.
    - **Time's up** (fewer than 3 picks): same penalty as a wrong Set: −1 point and the same lockout. Board unfreezes.
-5. **No Set on the board**: any player can tap **"No Set"**. A 15-second countdown begins, visible on the big screen and every player screen. Resolution:
+5. **No Set on the board**: any player can tap **"No Set"**. A 15-second countdown (`Game::NO_SET_TIMEOUT`) begins, visible on the big screen and every player screen. Resolution:
    - If **all currently active players** join the call before the countdown ends, it resolves immediately.
    - Otherwise, the countdown expires.
    - On resolution: deal 3 additional cards from the deck (board grows to 15, then 18 if called again). Hard cap at **18 cards**.
    - If anyone calls **"SET!"** during the countdown, the No-Set call is **cancelled** and the claim flow begins.
+   - **Refusal**: any other active player who has not agreed can tap **"There's a Set"** to refuse the call. The call is cancelled at once and nobody, the refuser included, can call No Set for **15 seconds** (`Game::NO_SET_TIMEOUT`, the countdown's own length, so the two never drift): time to find the Set the refuser says is there. SET! stays open throughout. Refusing costs nothing. One refusal per board: the next No Set call on the same board cannot be refused, and the refusal comes back once the board changes (a Set removed or cards dealt).
 6. **Game end**: when the deck is empty and **no valid Set exists** on the remaining board cards. Once the deck is empty, players can also end early: every active player taps **"End game"**. In quick mode the game ends when a player reaches 5 points (`Game::QUICK_WIN_SCORE`). The big screen shows the podium and a "Play again" button that restarts the room at once. Each player screen shows **Play again** as a ready vote: the room restarts once every active player has voted (§8, Player screen, Game over).
 
 ### Edge cases
 
 - A player can call No Set even if they were never going to find one — that's the point.
-- Wrong-claim lockout (15s, `Game::CLAIM_TIMEOUT`) only prevents that player from calling SET; they can still observe, call No Set and join No-Set votes.
+- Wrong-claim lockout (15s, `Game::CLAIM_TIMEOUT`) only prevents that player from calling SET; they can still observe, call No Set, join No-Set votes and refuse a call.
 - If the board grows beyond 12 (after No-Set draws), it stays oversized until a Set is found and removed; replacement cards only re-fill up to 12. Concretely: if board has 15 and a Set is found, board shrinks to 12 (no replacements).
 - If the deck runs out mid-game, the board is not refilled. Game continues until no Sets remain on the board.
 
@@ -101,6 +102,8 @@ The room.
 | `no_set_started_at` | datetime | nullable; for 15s No-Set countdown |
 | `no_set_caller_id` | bigint | nullable; the player who called No Set |
 | `no_set_voters` | json | Array of player ids who joined the call (default `[]`) |
+| `no_set_refuser_id` | bigint | nullable; the player who refused the No Set call on this board |
+| `no_set_refused_at` | datetime | nullable; when they refused. No Set is blocked for `NO_SET_TIMEOUT` from it, and no second refusal is accepted while it is set. Both cleared when the board changes (a Set removed or cards dealt) |
 | `mode` | enum | `standard`, `quick` (first to `QUICK_WIN_SCORE` points) |
 | `start_voters` | json | Player ids who tapped "I'm ready" while waiting, or "Play again" once ended (default `[]`) |
 | `end_game_voters` | json | Player ids who voted to end once the deck is empty (default `[]`) |
@@ -111,7 +114,7 @@ The room.
 
 **Validations**: `code` present, unique, matches `/\A[A-Z2-9]{6}\z/` (no `0/O/1/I` to avoid confusion).
 
-**Methods**: `claim_active?`, `no_set_active?`, `can_call_set?(player)`, `valid_set_on_board?`, `dealable?` (deck non-empty AND board < 12).
+**Methods**: `claim_active?`, `no_set_active?`, `no_set_blocked?` (refused less than `NO_SET_TIMEOUT` ago), `can_refuse_no_set?(player)` (a call is active, `no_set_refused_at` is nil, the player is active, not the caller and has not agreed), `can_call_set?(player)`, `valid_set_on_board?`, `dealable?` (deck non-empty AND board < 12).
 
 ### `Player`
 
@@ -200,7 +203,9 @@ Rails.application.routes.draw do
     end
     resource :controller, only: [:show], controller: "controllers"
     resources :claims, only: [:create, :update]
-    resource :no_set, only: [:create, :update, :destroy]
+    resource :no_set, only: [:create, :update, :destroy] do
+      post :refuse
+    end
     resource :end_game, only: [:create]
   end
 
@@ -227,6 +232,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | PATCH | `/games/:code/claims/:id` | Replace the picks (`card_ids`, 0 to 3 board cards) of a held claim; nothing is judged until the time runs out (§11) |
 | POST | `/games/:code/no_set` | Initiate No-Set countdown OR join existing call |
 | DELETE | `/games/:code/no_set` | Withdraw your vote (rare; no UI button v1) |
+| POST | `/games/:code/no_set/refuse` | Refuse the running call: cancel it and block No Set for `NO_SET_TIMEOUT` (§2). Once per board; refused by the caller, a player who agreed, or when this board's refusal is used |
 | POST | `/games/:code/end_game` | Vote to end once the deck is empty; ends when every active player has voted |
 
 ---
@@ -253,6 +259,9 @@ A round is the period between deals. Transitions are owned by the `Game` model a
    │                 │
    ├─── no_set_called ──→ no_set_pending
    │                              │
+   │                              ├─ refused (once per board) → cancel,
+   │                              │     No Set blocked 15s (back to idle)
+   │                              │
    │                              │ all_active_voted | 15s elapsed
    │                              ↓
    │                       deal 3 more (cap 18)
@@ -266,12 +275,13 @@ A round is the period between deals. Transitions are owned by the `Game` model a
 
 - At most one of `claim_player_id` and `no_set_caller_id` is non-null at any time.
 - A claim cannot be acquired while `no_set_started_at` is active. (Calling SET cancels the No-Set countdown atomically.)
-- A No-Set call cannot be initiated while a claim is active.
+- A No-Set call cannot be initiated while a claim is active, nor while the refusal block runs (`no_set_refused_at` less than `NO_SET_TIMEOUT` ago).
+- A refusal is accepted only while a call is active and `no_set_refused_at` is nil; `no_set_refuser_id` and `no_set_refused_at` are cleared whenever the board changes.
 - Lockout (`Player#locked_until`) is checked **inside** the claim acquisition transaction.
 
 ### Server-side timers
 
-Use Solid Queue jobs scheduled with `set(wait: ...)` to enforce timeouts: `ExpireClaimJob` after `Game::CLAIM_TIMEOUT`, `ExpireNoSetJob` after 15s, `UnlockBroadcastJob` after the lockout (`Game::CLAIM_TIMEOUT`), `ClearClaimFlashJob` and `ClearLastDealtJob` after 3s. The job re-checks state inside a transaction (claim could have been resolved already) and only acts if still applicable. Do not rely on client-side timers for correctness: they are display-only.
+Use Solid Queue jobs scheduled with `set(wait: ...)` to enforce timeouts: `ExpireClaimJob` after `Game::CLAIM_TIMEOUT`, `ExpireNoSetJob` after `Game::NO_SET_TIMEOUT`, `UnlockBroadcastJob` after the lockout (`Game::CLAIM_TIMEOUT`), `UnblockNoSetJob` after a refusal's block (`Game::NO_SET_TIMEOUT`, broadcasting so No Set comes back on every screen), `ClearClaimFlashJob` and `ClearLastDealtJob` after 3s. The job re-checks state inside a transaction (claim could have been resolved already) and only acts if still applicable. Do not rely on client-side timers for correctness: they are display-only.
 
 ---
 
@@ -355,6 +365,7 @@ Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wid
 - **Announcement band**: always 9rem tall so the grid never jumps. Empty while playing: "Spot a Set? Hit SET! on your screen." Otherwise one tinted panel:
   - Claiming (yellow): countdown ring, "Alex is calling SET!".
   - No Set (purple): ring, "Alex called No Set", "Agree on your screen, or find one first", and "n/m agreed".
+  - Refused (purple): ring counting the block down, "Alex says there's a Set", "No Set is back when the ring runs out". Shown for the `NO_SET_TIMEOUT` block after a refusal (§2), then the empty-band text returns.
   - Correct (green): the three cards, "Alex found a Set", "+1". Fades after 3s.
   - Wrong / Time's up (red): the cards for a wrong claim, the reason with the lockout length, "−1".
 - **Ended**: "Game over", then "Alex wins" or "It's a tie". Podium in 2-1-3 order; bars carry the real rank, so a tie reads #1 #1, and only a sole winner gets the ★. **Play again**, which restarts the room at once whatever the player screens have voted.
@@ -379,7 +390,7 @@ Shared by all three during play:
 - Other players' wrong claims and time's ups show only on the scoreboard (their Locked tag and score), with no banner.
 - With 8 players and 18 cards there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer, in every state: the cards shrink to fit.
 
-SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**.
+SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**, with **There's a Set** (the refusal) beside it while the player may refuse.
 
 1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more". Alone in the room, a player cannot vote: "Waiting for more players to join…" takes the place of I'm ready, so the voted line never reads "waiting for 0 more".
 
@@ -390,10 +401,10 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
    - **Show on a big screen →**: a text link that opens the room's big screen `/games/:code` in a new tab, as **Join from this computer →** does, so the player screen stays open.
 
    With 8 players and the invite there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640. The exact layout comes from the design pass.
-2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
+2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. During the block after a refusal (§2), No Set is disabled and shows the seconds left ("No Set in 12 s"), the status slot reads "Alex says there's a Set" and SET! stays as it is; the pill comes back on its own when the block ends. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
 3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait puts the bar in the status slot above SET! and a tray of three slots, which fill as cards are tapped, in place of SET! and its pill. Landscape and computer show the bar as one block in place of the panel and SET!, the pill slot left empty. No Set is not offered during the player's own claim. A claim started by tapping a card opens with that card picked (1/3) if it is still on the board. Tap a card to pick it, tap again to unpick, up to three, until the time runs out: the picks are judged then, per §11, and three picks stay changeable until then. A redraw of the screen during the claim (any room update, §7) shows the picks again, tray and count included.
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
-5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed in every layout) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
+5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed in every layout) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. A player who may refuse (§4 `can_refuse_no_set?`: not the caller, has not agreed, and no refusal used on this board) also gets **There's a Set**, the refusal, in the pill slot; how the two pills share it comes from the design pass. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled; the refusal stays available. A refusal returns every screen to idle with No Set blocked (state 2).
 6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the lockout countdown with "Locked": `Game::CLAIM_TIMEOUT` seconds, the same length as the claim ring. The pill slot keeps the idle secondary action, **No Set** or the **End game** vote, enabled: lockout only blocks SET! (§2 Edge cases).
 7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
 8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9", "★ You win with 9" when the player is the sole winner, or "★ Tied for first at 9"), the standings, then a green **Play again** button, the ready vote (§5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more", n being the active players who have not voted. The room restarts with the same mode, fresh deck and zero scores once every active player has voted, straight into play. Accepted risk: active means seen in the last 30s and only a player's own requests refresh it, so after 30s on this screen the first tap may restart the room alone.
@@ -491,7 +502,8 @@ History: v1 auto-submitted 250 ms after the third tap, the grid dimmed during th
 
 - **`CleanupIdleGamesJob`** — runs hourly via `recurring.yml`. Deletes Games with `updated_at < 24.hours.ago` (every gameplay action goes through `Game#update!`). Cascades to Players and Claims.
 - **`ExpireClaimJob`** — enqueued with `wait: 5.seconds` when a claim is acquired. If the claim is still `pending`, mark it `expired`, clear the lock, broadcast.
-- **`ExpireNoSetJob`** — enqueued with `wait: 15.seconds` when a No-Set is called. If still active, draw 3 cards (or end game), clear the call, broadcast.
+- **`ExpireNoSetJob`** — enqueued with `wait: Game::NO_SET_TIMEOUT` when a No-Set is called. If still active, draw 3 cards (or end game), clear the call, broadcast.
+- **`UnblockNoSetJob`** — enqueued with `wait: Game::NO_SET_TIMEOUT` when a call is refused. Broadcasts so the No Set pill and the big screen band return to idle; the block itself is enforced by `no_set_refused_at` at call time.
 - **`ExpirePlayerLockoutJob`** — optional; the lockout is enforced by checking `locked_until` at claim time, but a job that broadcasts UI updates when the lockout expires is nice-to-have.
 
 All jobs are idempotent: they re-check the relevant state inside a transaction and no-op if no longer applicable.
