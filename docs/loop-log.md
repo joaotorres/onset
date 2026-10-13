@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-13  request 19: filed, behavioural, the third card tap does not auto-submit the claim, only the timeout does. Next: triage.
 - 2026-10-12  deploy deploy-20261012-2206: 18 deployed. Next: new requests.
 - 2026-10-12  review: 20261012-220205, no hard violations, one pending decision (tablets get the phone landing). Next: settle it, then bin/deploy.
 - 2026-10-12  build 18: done, landing stacks below 1024px and the cards and wordmark shrink with the brand column up to 1280px, 18 examples green, two Decided lines. Next: review.
