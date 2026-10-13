@@ -42,8 +42,8 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 3. A player taps **"SET!"** on their player screen, or a card on the board their player screen shows (§8, Player screen), which also selects that card. Server timestamps the request and atomically locks the claim to the first arrival.
 4. The claiming player has **15 seconds** (`Game::CLAIM_TIMEOUT`) to pick 3 cards on their player screen. A tap picks a card, a second tap unpicks it, and the server keeps the current picks (§11). Nothing is judged before the 15 seconds run out; then the server judges the picks it holds:
    - **Correct Set** (3 picks that form a Set): +1 point, those 3 cards are removed, 3 new cards are dealt from the deck. Board unfreezes.
-   - **Wrong Set** (3 picks that do not): −1 point, claiming player is locked out for 5 seconds (cannot claim again). Board unfreezes.
-   - **Time's up** (fewer than 3 picks): same penalty as a wrong Set: −1 point and a 5-second lockout. Board unfreezes.
+   - **Wrong Set** (3 picks that do not): −1 point, claiming player is locked out (cannot claim again) for **15 seconds**, as long as the claim window. The lockout reads `Game::CLAIM_TIMEOUT`, the same constant, so the two never drift. Board unfreezes. History: 5 seconds until ticket 20; that barely outlasted the announcement, so a wrong claim cost little more than the point.
+   - **Time's up** (fewer than 3 picks): same penalty as a wrong Set: −1 point and the same lockout. Board unfreezes.
 5. **No Set on the board**: any player can tap **"No Set"**. A 15-second countdown begins, visible on the big screen and every player screen. Resolution:
    - If **all currently active players** join the call before the countdown ends, it resolves immediately.
    - Otherwise, the countdown expires.
@@ -54,7 +54,7 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 ### Edge cases
 
 - A player can call No Set even if they were never going to find one — that's the point.
-- Wrong-claim lockout (5s) only prevents that player from calling SET; they can still observe, call No Set and join No-Set votes.
+- Wrong-claim lockout (15s, `Game::CLAIM_TIMEOUT`) only prevents that player from calling SET; they can still observe, call No Set and join No-Set votes.
 - If the board grows beyond 12 (after No-Set draws), it stays oversized until a Set is found and removed; replacement cards only re-fill up to 12. Concretely: if board has 15 and a Set is found, board shrinks to 12 (no replacements).
 - If the deck runs out mid-game, the board is not refilled. Game continues until no Sets remain on the board.
 
@@ -125,7 +125,7 @@ A participant in a Game.
 | `name` | string | 1–20 chars, displayed |
 | `color` | string | Hex code, chosen at join. UI offers 8 distinct presets. |
 | `score` | integer | default 0 |
-| `locked_until` | datetime | nullable; the timestamp until which the player cannot call SET (5s lockout) |
+| `locked_until` | datetime | nullable; the timestamp until which the player cannot call SET (the `Game::CLAIM_TIMEOUT` lockout) |
 | `last_seen_at` | datetime | updated on every player screen request via `Player#seen!`, which skips callbacks so it never broadcasts |
 | `left_at` | datetime | nullable; for graceful disconnect |
 
@@ -271,7 +271,7 @@ A round is the period between deals. Transitions are owned by the `Game` model a
 
 ### Server-side timers
 
-Use Solid Queue jobs scheduled with `set(wait: ...)` to enforce timeouts: `ExpireClaimJob` after `Game::CLAIM_TIMEOUT`, `ExpireNoSetJob` after 15s, `UnlockBroadcastJob` after the 5s lockout, `ClearClaimFlashJob` and `ClearLastDealtJob` after 3s. The job re-checks state inside a transaction (claim could have been resolved already) and only acts if still applicable. Do not rely on client-side timers for correctness: they are display-only.
+Use Solid Queue jobs scheduled with `set(wait: ...)` to enforce timeouts: `ExpireClaimJob` after `Game::CLAIM_TIMEOUT`, `ExpireNoSetJob` after 15s, `UnlockBroadcastJob` after the lockout (`Game::CLAIM_TIMEOUT`), `ClearClaimFlashJob` and `ClearLastDealtJob` after 3s. The job re-checks state inside a transaction (claim could have been resolved already) and only acts if still applicable. Do not rely on client-side timers for correctness: they are display-only.
 
 ---
 
@@ -356,7 +356,7 @@ Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wid
   - Claiming (yellow): countdown ring, "Alex is calling SET!".
   - No Set (purple): ring, "Alex called No Set", "Agree on your screen, or find one first", and "n/m agreed".
   - Correct (green): the three cards, "Alex found a Set", "+1". Fades after 3s.
-  - Wrong / Time's up (red): the cards for a wrong claim, the reason with the 5-second lockout, "−1".
+  - Wrong / Time's up (red): the cards for a wrong claim, the reason with the lockout length, "−1".
 - **Ended**: "Game over", then "Alex wins" or "It's a tie". Podium in 2-1-3 order; bars carry the real rank, so a tie reads #1 #1, and only a sole winner gets the ★. **Play again**, which restarts the room at once whatever the player screens have voted.
 
 ### Join page (`/games/:code/players/join`)
@@ -394,7 +394,7 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
 3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", "Tap 3 cards" and an n/3 count. Portrait puts the bar in the status slot above SET! and a tray of three slots, which fill as cards are tapped, in place of SET! and its pill. Landscape and computer show the bar as one block in place of the panel and SET!, the pill slot left empty. No Set is not offered during the player's own claim. A claim started by tapping a card opens with that card picked (1/3) if it is still on the board. Tap a card to pick it, tap again to unpick, up to three, until the time runs out: the picks are judged then, per §11, and three picks stay changeable until then. A redraw of the screen during the claim (any room update, §7) shows the picks again, tray and count included.
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
 5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed in every layout) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, SET! shows disabled.
-6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the 5-second countdown with "Locked". The pill slot keeps the idle secondary action, **No Set** or the **End game** vote, enabled: lockout only blocks SET! (§2 Edge cases).
+6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the lockout countdown with "Locked": `Game::CLAIM_TIMEOUT` seconds, the same length as the claim ring. The pill slot keeps the idle secondary action, **No Set** or the **End game** vote, enabled: lockout only blocks SET! (§2 Edge cases).
 7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
 8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9", "★ You win with 9" when the player is the sole winner, or "★ Tied for first at 9"), the standings, then a green **Play again** button, the ready vote (§5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more", n being the active players who have not voted. The room restarts with the same mode, fresh deck and zero scores once every active player has voted, straight into play. Accepted risk: active means seen in the last 30s and only a player's own requests refresh it, so after 30s on this screen the first tap may restart the room alone.
 
