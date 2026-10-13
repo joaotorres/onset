@@ -385,7 +385,7 @@ Full height, no page scroll. A strip of the player's color across the top, "Room
 Shared by all three during play:
 
 - **Scoreboard**: every player in score order, ties in join order, each a dot, the name (truncated) and the score. The claiming player's entry turns solid yellow and a locked-out player's is greyed with a red **Locked** tag, as on the big screen. The player's own entry has a surface tint, as in the game over standings. Portrait fits 8 players in at most two rows.
-- **Deck**: "N cards left in the deck" with the board, or an orange "Deck is empty" pill once it runs out.
+- **Deck**: "N cards left in the deck" under the board, centred on it, or an orange "Deck is empty" pill once it runs out. In the computer layout the "Room CODE" footer sits directly under that line, centred on the board as well, so the two lines share one centre and nothing sits under the side column. Portrait and landscape keep the footer centred on the screen, and so do waiting and game over in every layout, since they show no board.
 - **Board**: cards dealt by the last replace get the green outline that fades over 3s (§10 `animate-arrive`), in every state that shows the board. The board is read-only in every state but idle and claiming (mine).
 - Other players' wrong claims and time's ups show only on the scoreboard (their Locked tag and score), with no banner.
 - With 8 players and 18 cards there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer, in every state: the cards shrink to fit.
