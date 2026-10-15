@@ -1,6 +1,6 @@
 # 23: Keep the latest picks across a player screen redraw during a claim
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

@@ -1,6 +1,6 @@
 # 19: Picking the third card does not auto-submit the claim
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

@@ -1,6 +1,6 @@
 # 22: Align the cards and room code left
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

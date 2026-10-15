@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  deploy deploy-20261016-0106: 19, 20, 22, 23, 24 deployed. Next: new requests.
 - 2026-10-16  review: 20261016-010057, one pending decision (stale SPEC and glossary text), nothing blocks. Next: settle it, then bin/deploy.
 - 2026-10-16  copy pass: byline footer text only, 0 fixed, 0 flagged. Next: review.
 - 2026-10-16  context cap: 111k, over 100k with the review next. 24 built; 21 waits on its design pass. Next: /clear, then /skills-loop:auto for the review.

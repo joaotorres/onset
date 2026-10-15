@@ -1,6 +1,6 @@
 # 24: Add a "by joaotorr.es" byline footer
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Model:
