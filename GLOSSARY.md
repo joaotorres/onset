@@ -32,7 +32,7 @@ A player's call of SET!, which gives them the sole right to pick three cards bef
 _Avoid_: Call, turn
 
 **Lockout**:
-The five seconds after a wrong or timed-out claim during which that player cannot claim again.
+The 15 seconds after a wrong or timed-out claim during which that player cannot claim again.
 _Avoid_: Penalty, cooldown
 
 **No Set call**:

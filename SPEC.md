@@ -232,7 +232,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | PATCH | `/games/:code/claims/:id` | Replace the picks (`card_ids`, 0 to 3 board cards) of a held claim; nothing is judged until the time runs out (§11) |
 | POST | `/games/:code/no_set` | Initiate No-Set countdown OR join existing call |
 | DELETE | `/games/:code/no_set` | Withdraw your vote (rare; no UI button v1) |
-| POST | `/games/:code/no_set/refuse` | Refuse the running call: cancel it and block No Set for `NO_SET_TIMEOUT` (§2). Once per board; refused by the caller, a player who agreed, or when this board's refusal is used |
+| POST | `/games/:code/no_set/refuse` | Refuse the running call: cancel it and block No Set for `NO_SET_TIMEOUT` (§2). Once per board. Ignored from the caller, from a player who agreed, and once this board's refusal is used (`can_refuse_no_set?`, §4) |
 | POST | `/games/:code/end_game` | Vote to end once the deck is empty; ends when every active player has voted |
 
 ---
@@ -511,7 +511,7 @@ History: v1 auto-submitted 250 ms after the third tap, the grid dimmed during th
 ## 12. Background Jobs
 
 - **`CleanupIdleGamesJob`** — runs hourly via `recurring.yml`. Deletes Games with `updated_at < 24.hours.ago` (every gameplay action goes through `Game#update!`). Cascades to Players and Claims.
-- **`ExpireClaimJob`** — enqueued with `wait: 5.seconds` when a claim is acquired. If the claim is still `pending`, mark it `expired`, clear the lock, broadcast.
+- **`ExpireClaimJob`** — enqueued with `wait: Game::CLAIM_TIMEOUT` when a claim is acquired. If the claim is still `pending`, judge the picks it holds (§11): `correct`, `wrong`, or `expired` with fewer than three. Clear the lock, broadcast.
 - **`ExpireNoSetJob`** — enqueued with `wait: Game::NO_SET_TIMEOUT` when a No-Set is called. If still active, draw 3 cards (or end game), clear the call, broadcast.
 - **`UnblockNoSetJob`** — enqueued with `wait: Game::NO_SET_TIMEOUT` when a call is refused. Broadcasts so the No Set pill and the big screen band return to idle; the block itself is enforced by `no_set_refused_at` at call time.
 - **`ExpirePlayerLockoutJob`** — optional; the lockout is enforced by checking `locked_until` at claim time, but a job that broadcasts UI updates when the lockout expires is nice-to-have.
@@ -663,21 +663,21 @@ broadcast a stale controller state that the `async` adapter could deliver after 
 now answer `204 No Content` and rely on the broadcast, and `Player#seen!` records `last_seen_at`
 without callbacks.
 
-### Step 10 — Claim timeout (5s)
+### Step 10 — Claim timeout (15s)
 **Goal:** a held claim that doesn't submit auto-expires server-side.
 
-- `ExpireClaimJob` enqueued on claim creation (`set(wait: 5.seconds)`). Idempotent: re-checks state on run.
+- `ExpireClaimJob` enqueued on claim creation (`set(wait: Game::CLAIM_TIMEOUT.seconds)`). Idempotent: re-checks state on run.
 - Countdown ring on phone (CSS animation driven by `data-claim-started-at`).
 - Phone state from §8: claim-active-others ("Alex is calling SET! 4… 3…").
 - **Acceptance:** call SET, ignore the timer, watch it auto-expire and unfreeze the board within 1s of the deadline.
 
 ### Step 11 — Wrong-claim lockout
-**Goal:** a wrong submission penalizes the player and bars them for 5s.
+**Goal:** a wrong submission penalizes the player and bars them for 15s.
 
-- On wrong claim, set `Player#locked_until = 5.seconds.from_now` inside the same transaction.
+- On wrong claim, set `Player#locked_until = Game::CLAIM_TIMEOUT.seconds.from_now` inside the same transaction.
 - Server rejects further claims from a locked player.
 - Phone state: locked-out (SET button greyed out with countdown ring).
-- **Acceptance:** deliberately submit a wrong Set, see your SET button disabled for 5s while others remain free.
+- **Acceptance:** deliberately submit a wrong Set, see your SET button disabled for 15s while others remain free.
 
 ### Step 12 — No-Set mechanic
 **Goal:** the table can collectively decide there is no Set, draw 3 more cards.
