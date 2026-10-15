@@ -31,3 +31,13 @@ Decided: the refusal is `POST /games/:code/no_set/refuse`, because the no_set re
 Decided: the pill reads "There's a Set" beside I agree, no Set; the big screen band shows a purple Refused panel with the block's ring, "Alex says there's a Set" and "No Set is back when the ring runs out"; player screens return to idle with No Set disabled and counting down ("No Set in 12 s") and "Alex says there's a Set" in the status slot, because every player should see why No Set is off and for how long; how the two pills share the slot is the design pass's. Instead of: a silently disabled pill.
 
 Decided: the brief leaves every play board as it is and adds the refusal states beside the No Set and idle boards, plus a first big screen board, because tickets 19 (claim picks, no dimming) and 22 (computer footer under the deck line) changed only parts the refusal does not touch. Instead of: redrawing the play boards from the code, which are marked exploring.
+
+Design proposes: the refuser's own screen reads "You say there's a Set" in the status slot, with their own dot, as "You agreed" and "You called No Set" do. SPEC §8 Player screen > 2. Idle names only "Alex says there's a Set".
+
+Design question: a 20-character name at 1280px wide pushes the big screen's Refused headline to three lines and out of the 9rem band, as it would the No Set and claiming headlines. The design tool recommends truncating the name with an ellipsis so the headline stays within two lines.
+
+Design question: the canvas's Locked out boards still draw the 5-second ring, though lockout is 15 s since ticket 20. The design tool recommends redrawing them in the next brief that touches lockout; no code change.
+
+Decided: design-system v4 takes the lockout ring on SET! during a No Set countdown (seconds and "Locked", as in Locked out) where the code shows a plain disabled SET!, because the brief asked for SET! "disabled as the lockout countdown" there. Instead of: keeping the plain disabled SET!.
+
+Decided: design-system v4 adds variants and changes no existing rule: the refusal pair and blocked No Set in `_secondary_action`, the refused `_status_panel`, the Refused `_announcement` panel; in portrait the pill slot widens to the status slot's width while the pair shows. Instead of: stacking the two pills, which would move SET!.

@@ -1,6 +1,6 @@
-# Onset design system, version 3
+# Onset design system, version 4
 
-The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
+The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, and the No Set refusal drawn for ticket 21. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
 
 Boards for every screen and state are on the canvas named in `docs/design-handoff.md`. Where this file and a board differ, this file wins; tell the design tool in the next brief.
 
@@ -31,18 +31,21 @@ ERB partials, no component library.
 - `games/_ring`: big screen countdown ring, size-24, seconds inside
 - `games/_scoreboard`: big screen score rows, sorted by score
 - `games/_start_button`: Start game with "n of m ready", or disabled with the reason
-- `games/_announcement`: the 9rem announcement band and its tinted panels
+- `games/_announcement`: the 9rem announcement band and its tinted panels. Refused (v4): the No Set panel's tint, ring and type; the ring counts the block down (`purple-400` progress, `purple-300` seconds), "Alex says there's a Set" in 48px display bold with the name in `purple-400`, "No Set is back when the ring runs out" in 24px `gray-300`, nothing on the right. At 1280px wide the headline wraps onto two balanced lines inside the band, as "Alex called No Set" does
 - `players/controller/_header`: header with dot, name and score, on Waiting and Game over
 - `players/controller/_board_strip`: the play card grid with the deck line, sized by the card size rule in portrait and landscape
 - `players/controller/_button_ring`: thin ring around the round SET! button
 - `players/controller/_small_ring`: countdown ring with seconds, any size
-- `players/controller/_secondary_action`: the pill under SET!: No Set, the End game vote, or during a No Set countdown I agree, no Set (filled purple) or the waiting text (outlined purple)
+- `players/controller/_secondary_action`: the pill under SET!: No Set, the End game vote, or during a No Set countdown I agree, no Set (filled purple) or the waiting text (outlined purple). v4 variants:
+  - refusal pair, while the player may refuse: two equal pills side by side, There's a Set on the left (outlined, 2px `purple-400` border, no fill, white bold text), I agree, no Set on the right (filled `purple-700`, white text). The pair fills its column: portrait the status slot's width (351px at 375, 8px gap, 16px labels), landscape the 9rem column (two 69×44 pills, 6px gap, 13px labels on two lines), computer 248×46 (two 120px pills, 8px gap, 15px labels). SET! does not move. Once this board's refusal is used, the lone I agree, no Set sits as before (220×44 in portrait, centered)
+  - blocked No Set, after a refusal: the No Set pill at its usual size (portrait 220×44, landscape 144×44, computer 248×46), disabled, `purple-700` at 35% with `purple-200` text, "No Set in 12 s" with the seconds in display type. The block's seconds show only here, not in the status panel
 - `players/controller/_scoreboard` (v2): the play scoreboard, every player in score order. Portrait: chips, 4 per row, at most 2 rows, the Locked tag a red badge on the chip's top-right corner. Landscape and computer: one row per player, the Locked tag inline before the score. Own entry `gray-800` with a `gray-500` border; claiming entry solid `yellow-400` with `gray-950` text; locked entry content at 45% opacity
 - `players/controller/_status_panel` (v2): one fixed slot above SET!, portrait 64px tall, landscape 144×104, computer 248×76. Variants:
   - claim bar: `yellow-400`, ring, "Your SET!", "Tap 3 cards", n/3
   - someone else claiming: `gray-900` with a `yellow-400` border, "Alex is calling SET!"
   - No Set: `purple-950` with a `purple-500` border, ring, "No Set called by Alex", "n/m agreed"
   - locked out: `red-950` with a `red-600` border, "Wrong! −1" or "Time's up! −1", `animate-shake`
+  - refused (v4): `gray-900` with a `purple-500` border, laid out as someone else claiming in each layout: the refuser's dot, the name bold and "says there's a Set" in `gray-300`. No ring. `gray-900`, not `purple-950`, so it does not read as a call still running
   - idle: empty, the slot keeps its size
 - `players/controller/_found_banner` (v2): `green-950` panel with a `green-500` border, the 3 cards small, the caller's dot, "Alex found a Set" and "+1" in `green-400`. Absolutely positioned over the top of the board area, over the scoreboard in portrait. `pointer-events: none`, `.found-set-flash`
 - `players/controller/_roster` (v2): the Waiting roster, two columns, each a dot, the name, "you" for the player and a `green-400` ✓ once ready
@@ -88,6 +91,8 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Claiming (mine): portrait, the claim bar takes the status slot and the 3-slot tray replaces SET! and its pill. Landscape and computer: one yellow block replaces the panel and SET!, and the pill slot is empty
 - Someone else claiming: the disabled SET! shows the seconds large with a small "SET!" label under them, inside the yellow ring
 - Read-only boards (someone else claiming, No Set, locked out) are not dimmed
+- No Set countdown, may refuse (v4): the No Set status panel, SET!, and the refusal pair in the pill slot. Locked out at the same time: the No Set panel keeps the status slot, since the call is the news; SET! shows the lockout ring with the seconds and "Locked", as in Locked out, and the chip shows the Locked tag
+- No Set blocked after a refusal (v4): idle with the refused status panel and the blocked No Set pill; SET! stays round blue and enabled
 - Found-set banner: in portrait it covers the scoreboard for its 3s; the board under it shows the replaced cards with the arrive outline
 
 ### Player screen, Game over (ticket 07)
@@ -185,12 +190,15 @@ None
 
 ## Open questions
 
+- The Locked out boards (`-wrong`, `-timeup`) still draw the 5-second ring, though lockout is 15 s since ticket 20. Redraw them in the next brief that touches lockout
+- A 20-character name at 1280px wide pushes a big screen headline (Refused, No Set, claiming) to three lines and out of the 9rem band. The design tool recommends truncating the name with an ellipsis so the headline stays within two lines
 - Answered by triage 07 in SPEC §8 Player screen > 8. Game over: a tied rank stays a plain "1st", and the winner line reads "★ You win with 7" when the viewer wins, as the code already does. Redraw the -win boards to match in the next brief that touches game over
 
 ---
 
 ## Changelog
 
+- v4, 2026-10-16: ticket 21, refusing a No Set call: the refusal pill pair and the blocked No Set pill in `_secondary_action`, the refused `_status_panel` variant, the Refused `_announcement` panel, the lockout ring on SET! during a No Set countdown, and the first big screen board.
 - v3, 2026-10-16: ticket 24, the byline footer `_byline_footer` and the `--wm-*` logo colours, taken from the cross-app byline brief as built in d7f1cc8, not from a design pass.
 - v2, 2026-10-12: ticket 07, game over standings on the player screen in portrait, landscape and computer: `_standings`, own row `gray-800`, Play again on `green-700`.
 - v2, 2026-10-12: ticket 08, devices-first landing (mode toggle, one Start a game, phone order) and the join page with the creator's big screen link, field and base errors, and taken swatches blended over `gray-950`.
