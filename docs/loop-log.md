@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  request 25: stale claim and refusal text in SPEC and the glossary, behavioural. Next: triage.
 - 2026-10-16  context cap: 135k, over 100k with the review next. 21 built. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-16  build 21: done, refusing a No Set call with the 15 s block on both screens, bundle exec rspec green (442 examples), one Decided line. Next: review.
 - 2026-10-16  triage 21: ready, the v4 entry accepted, SPEC §8 settles the refuser's own line, the truncated Refused headline and the lockout ring under a No Set call, seven Decided lines. Next: build.
