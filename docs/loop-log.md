@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  triage 21: ready, the v4 entry accepted, SPEC §8 settles the refuser's own line, the truncated Refused headline and the lockout ring under a No Set call, seven Decided lines. Next: build.
 - 2026-10-16  design-entry 21: design-system v4, 9 new boards, one Design proposes and two Design questions. Next: triage 21.
 - 2026-10-16  deploy deploy-20261016-0106: 19, 20, 22, 23, 24 deployed. Next: new requests.
 - 2026-10-16  review: 20261016-010057, one pending decision (stale SPEC and glossary text), nothing blocks. Next: settle it, then bin/deploy.

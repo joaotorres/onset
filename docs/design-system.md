@@ -191,7 +191,7 @@ None
 ## Open questions
 
 - The Locked out boards (`-wrong`, `-timeup`) still draw the 5-second ring, though lockout is 15 s since ticket 20. Redraw them in the next brief that touches lockout
-- A 20-character name at 1280px wide pushes a big screen headline (Refused, No Set, claiming) to three lines and out of the 9rem band. The design tool recommends truncating the name with an ellipsis so the headline stays within two lines
+- A 20-character name at 1280px wide pushes a big screen headline (No Set, claiming) to three lines and out of the 9rem band. The design tool recommends truncating the name with an ellipsis so the headline stays within two lines. Triage 21 took it for the Refused headline in SPEC §8; the No Set and claiming headlines wait for a request of their own
 - Answered by triage 07 in SPEC §8 Player screen > 8. Game over: a tied rank stays a plain "1st", and the winner line reads "★ You win with 7" when the viewer wins, as the code already does. Redraw the -win boards to match in the next brief that touches game over
 
 ---
