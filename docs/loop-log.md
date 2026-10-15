@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  request 26: byline footer makes the landing, How to play and join pages scroll; filed behavioural. Next: triage.
 - 2026-10-16  review 20261016-014459: docs only, spec passes, two Oxford commas in SPEC, no pending decisions. Next: bin/deploy.
 - 2026-10-16  context cap: 141k, over 100k with the review next. 25 done in triage. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-16  triage 25: done in triage, docs only: §5 refuse row, §12 ExpireClaimJob, §15 Steps 10 and 11 and the glossary Lockout now say 15 s and judged picks, two Decided lines. Next: review.
