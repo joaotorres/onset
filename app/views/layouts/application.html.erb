@@ -28,5 +28,6 @@
 
   <body>
     <%= yield %>
+    <%= render "layouts/byline_footer" unless content_for?(:hide_byline) %>
   </body>
 </html>

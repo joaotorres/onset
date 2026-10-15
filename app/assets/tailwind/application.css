@@ -24,3 +24,72 @@
 .found-set-flash {
   animation: found-set-fade-out 3s ease-in-out forwards;
 }
+
+/* Byline footer: the joaotorr.es logo colours. The app is always dark, so the footer takes the dark values */
+:root {
+  --wm-green: #009C3B;
+  --wm-blue: #002776;
+  --wm-red: #C60B1E;
+  --wm-gold: #E08A00;
+}
+.byline-footer {
+  --wm-green: #22C35E;
+  --wm-blue: #5B8CFF;
+  --wm-red: #FF4F5E;
+  --wm-gold: #FFD21F;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.byline {
+  --byline-font: var(--font-sans);
+  --byline-text: var(--color-gray-400);
+  --byline-focus: var(--color-blue-500);
+  display: inline-block;
+  padding: 0.75rem 0.5rem;
+  border-radius: 0.5rem;
+  font-family: var(--byline-font);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  color: var(--byline-text);
+  white-space: nowrap;
+  text-decoration: none;
+}
+.byline:focus-visible { outline: 2px solid var(--byline-focus); outline-offset: 2px; }
+
+/* One continuous 1px red line under the whole phrase. Not text-decoration: skip-ink breaks it at "j" and "y", and the hopping dot would carry its piece of underline with it */
+.byline-line {
+  background: linear-gradient(var(--wm-red), var(--wm-red)) 0 100% / 100% 1px no-repeat;
+  padding-bottom: 1px;
+}
+
+/* Plain text and the coloured logo stacked in the same spot. The coloured copy is invisible at rest, so no logo colour leaks around the grey letters */
+.wm-layer { display: inline-grid; }
+.wm-layer > * { grid-area: 1 / 1; }
+.wm-plain, .wm-color { transition: opacity 0.37s cubic-bezier(0.3, 0.7, 0.4, 1) 999999s; }
+.wm-color { opacity: 0; color: transparent; -webkit-background-clip: text; background-clip: text; }
+.wm-br { background-image: linear-gradient(90deg, var(--wm-green) 10%, var(--wm-blue) 90%); }
+.wm-es { background-image: linear-gradient(180deg, var(--wm-red) 51%, var(--wm-gold) 51% 64%, var(--wm-red) 64%); }
+.wm-dot { position: relative; top: 0; transition: color 0.37s cubic-bezier(0.3, 0.7, 0.4, 1) 999999s; }
+
+/* Hover or keyboard focus: the dot hops and lands, the colours fade in from 370ms to 740ms */
+@media (hover: hover) {
+  .byline:hover .wm-color { opacity: 1; transition-delay: 0.37s; }
+  .byline:hover .wm-plain { opacity: 0; transition-delay: 0.37s; }
+  .byline:hover .wm-dot { color: var(--wm-gold); transition-delay: 0.37s; animation: wm-hop 1s cubic-bezier(0.3, 0.7, 0.4, 1); }
+}
+.byline:focus-visible .wm-color { opacity: 1; transition-delay: 0.37s; }
+.byline:focus-visible .wm-plain { opacity: 0; transition-delay: 0.37s; }
+.byline:focus-visible .wm-dot { color: var(--wm-gold); transition-delay: 0.37s; animation: wm-hop 1s cubic-bezier(0.3, 0.7, 0.4, 1); }
+
+@keyframes wm-hop {
+  0% { top: 0; }
+  18%, 37% { top: -0.9em; }
+  74% { top: 0; }
+  89% { top: -0.14em; }
+  100% { top: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wm-dot { animation: none !important; }
+}

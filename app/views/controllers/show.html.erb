@@ -1,6 +1,9 @@
 <%= turbo_stream_from "game:#{@game.code}" %>
 <%= turbo_stream_from "player:#{@player.id}" %>
 
+<%# Full-screen game view: no byline footer, it would make the page scroll. %>
+<% content_for :hide_byline, "true" %>
+
 <main class="group/main h-dvh overflow-hidden bg-gray-950 text-white border-t-4 p-4 flex flex-col" style="border-color: <%= @player.color %>;">
   <%= render "players/controller_status", player: @player, flash_claim: @game.flash_claim %>
   <%# During play on a computer the footer centres on the board, not the screen: it skips the 248px side column and the 32px gap (§8, Deck). %>
