@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  context cap: 111k, over 100k with the review next. 24 built; 21 waits on its design pass. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-16  build 24: done, the footer from d7f1cc8 now covered by a request spec, full suite green. Next: review.
 - 2026-10-16  triage 24: ready, SPEC §8 Byline footer and design-system v3 written from the cross-app brief, three Decided lines. Next: build.
 - 2026-10-16  request 24: filed after the build, the byline footer from d7f1cc8, for the spec. Next: triage.
