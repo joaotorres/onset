@@ -1,6 +1,6 @@
 # 24: Add a "by joaotorr.es" byline footer
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Model:
@@ -44,3 +44,5 @@ Decided: design entry v3 written from the cross-app byline brief, because its lo
 Decided: the footer follows the content instead of pinning to the bottom of a short window, because pinning moves the landing's centred content and the join page's Join button. Instead of: a min-height flex body with `main` set to flex 1.
 
 Decided: no footer on the big screen and player screen, because they are full-screen `h-dvh` views and a footer would make them scroll. Instead of: the footer on every page of the layout.
+
+Decided: the code came first (d7f1cc8), so the spec was red only with the footer removed from the layout, 4 of 6 failing. Instead of: rebuilding it after the tests.

@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  build 24: done, the footer from d7f1cc8 now covered by a request spec, full suite green. Next: review.
 - 2026-10-16  triage 24: ready, SPEC §8 Byline footer and design-system v3 written from the cross-app brief, three Decided lines. Next: build.
 - 2026-10-16  request 24: filed after the build, the byline footer from d7f1cc8, for the spec. Next: triage.
 - 2026-10-16  review: 20261016-003656, no pending decisions, 23 closes the last review's gap, three stale or ambiguous doc lines and seven smells. Next: bin/deploy; 21 waits on its design pass.
