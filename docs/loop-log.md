@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  triage 26: ready, spec says the footer fits inside the first screen, two Decided lines. Next: build.
 - 2026-10-16  request 26: byline footer makes the landing, How to play and join pages scroll; filed behavioural. Next: triage.
 - 2026-10-16  review 20261016-014459: docs only, spec passes, two Oxford commas in SPEC, no pending decisions. Next: bin/deploy.
 - 2026-10-16  context cap: 141k, over 100k with the review next. 25 done in triage. Next: /clear, then /skills-loop:auto for the review.
