@@ -2,11 +2,15 @@ class Game < ApplicationRecord
   CODE_ALPHABET = (("A".."Z").to_a - %w[I O]) + %w[2 3 4 5 6 7 8 9]
   CODE_FORMAT = /\A[A-HJ-NP-Z2-9]{6}\z/
   CLAIM_TIMEOUT = 15
+  NO_SET_TIMEOUT = 15
 
   enum :status, {waiting: 0, playing: 1, ended: 2}, default: :waiting
   enum :mode, {standard: 0, quick: 1}, default: :standard
 
   QUICK_WIN_SCORE = 5
+
+  # The board changed (a Set removed or cards dealt): this board's No Set refusal is free again (§2).
+  CLEAR_REFUSAL = {no_set_refuser_id: nil, no_set_refused_at: nil}.freeze
 
   # Claims first: they reference players, so destroying players first trips the foreign key.
   has_many :claims, dependent: :destroy
@@ -14,6 +18,7 @@ class Game < ApplicationRecord
   belongs_to :host_player, class_name: "Player", optional: true
   belongs_to :claiming_player, class_name: "Player", foreign_key: :claim_player_id, optional: true
   belongs_to :no_set_caller, class_name: "Player", foreign_key: :no_set_caller_id, optional: true
+  belongs_to :no_set_refuser, class_name: "Player", optional: true
   belongs_to :flash_claim, class_name: "Claim", optional: true
 
   validates :code, presence: true, uniqueness: true, format: {with: CODE_FORMAT}
@@ -23,7 +28,7 @@ class Game < ApplicationRecord
 
   def start!
     shuffled = (0..80).to_a.shuffle
-    update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [], start_voters: [], last_dealt: [])
+    update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [], start_voters: [], last_dealt: [], **CLEAR_REFUSAL)
   end
 
   def restart!
@@ -42,7 +47,8 @@ class Game < ApplicationRecord
         no_set_voters: [],
         end_game_voters: [],
         start_voters: [],
-        last_dealt: []
+        last_dealt: [],
+        **CLEAR_REFUSAL
       )
     end
   end
@@ -120,6 +126,16 @@ class Game < ApplicationRecord
     no_set_started_at.present?
   end
 
+  # A refusal blocks No Set for everyone for NO_SET_TIMEOUT (§2).
+  def no_set_blocked?
+    no_set_refused_at.present? && no_set_refused_at > NO_SET_TIMEOUT.seconds.ago
+  end
+
+  def can_refuse_no_set?(player)
+    no_set_active? && no_set_refused_at.nil? && player.active? &&
+      player.id != no_set_caller_id && !no_set_voters.include?(player.id)
+  end
+
   def try_claim!(player)
     with_lock do
       return nil unless playing?
@@ -144,9 +160,22 @@ class Game < ApplicationRecord
       return nil unless playing?
       return nil if claim_active?
       return nil if no_set_active?
+      return nil if no_set_blocked?
 
       update!(no_set_caller_id: player.id, no_set_started_at: Time.current, no_set_voters: [player.id])
-      ExpireNoSetJob.set(wait: 15.seconds).perform_later(self)
+      ExpireNoSetJob.set(wait: NO_SET_TIMEOUT.seconds).perform_later(self)
+      self
+    end
+  end
+
+  # "There's a Set": cancels the running call and blocks No Set for NO_SET_TIMEOUT. Once per board.
+  def refuse_no_set!(player)
+    with_lock do
+      return nil unless can_refuse_no_set?(player)
+
+      update!(no_set_caller_id: nil, no_set_started_at: nil, no_set_voters: [],
+        no_set_refuser_id: player.id, no_set_refused_at: Time.current)
+      UnblockNoSetJob.set(wait: NO_SET_TIMEOUT.seconds).perform_later(self)
       self
     end
   end
@@ -196,20 +225,14 @@ class Game < ApplicationRecord
       no_set_started_at: nil,
       no_set_voters: [],
       last_dealt: drawn,
-      status: game_ended ? :ended : :playing
+      status: game_ended ? :ended : :playing,
+      **CLEAR_REFUSAL
     )
     ClearLastDealtJob.set(wait: 3.seconds).perform_later(self, drawn) if drawn.any?
   end
 
   def just_dealt?(card_id)
     last_dealt.include?(card_id)
-  end
-
-  private
-
-  def all_active_players_voted?
-    active_ids = players.select(&:active?).map(&:id)
-    active_ids.any? && (active_ids - no_set_voters).empty?
   end
 
   def broadcast_game_state
@@ -240,6 +263,13 @@ class Game < ApplicationRecord
         partial: "players/controller_status",
         locals: {player: player, game: self, flash_claim: flash}
     end
+  end
+
+  private
+
+  def all_active_players_voted?
+    active_ids = players.select(&:active?).map(&:id)
+    active_ids.any? && (active_ids - no_set_voters).empty?
   end
 
   def generate_code

@@ -1,6 +1,6 @@
 # 21: Refuse a No Set call once per board
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Model:
@@ -121,3 +121,5 @@ Decided: locked out during the block, the status slot shows the refused panel an
 Decided: the build introduces `Game::NO_SET_TIMEOUT = 15` and replaces the literal 15 s for the No Set countdown in the model, the big screen ring and the player screen panel, because SPEC §2, §6 and §12 name the constant and the block must equal the countdown. Instead of: a literal 15 for the block as well.
 
 Decided: one ticket, no split, because the refusal is one vertical slice (two columns, one action, one job, one panel per screen) in partials that already carry each layout's variants, smaller than ticket 14. Instead of: splitting by screen or layout.
+
+Decided: on the refuser's own screen the refused panel bolds "You" where others see the bold name, then "say there's a Set", because it keeps the panel's layout identical for everyone. Instead of: one unbolded line.

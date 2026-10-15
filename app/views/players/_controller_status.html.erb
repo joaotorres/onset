@@ -10,9 +10,11 @@
   body = "flex-1 min-h-0 flex portrait:max-lg:flex-col landscape:max-lg:gap-2.5 lg:grid lg:grid-cols-[minmax(0,1fr)_248px] lg:grid-rows-[auto_minmax(0,1fr)] lg:gap-x-8 lg:gap-y-3.5 lg:px-2"
   column = "flex w-36 shrink-0 flex-col items-center justify-center gap-2.5 portrait:max-lg:contents lg:col-start-2 lg:row-start-2 lg:w-full lg:justify-start lg:gap-3"
   slot = "relative grid size-32 shrink-0 place-items-center self-center"
-  pill_slot = "flex h-11 max-w-full shrink-0 items-center justify-center self-center portrait:max-lg:mt-1 landscape:max-lg:w-full lg:h-[46px] lg:w-full"
+  pill_slot = "flex h-11 max-w-full shrink-0 items-center justify-center self-center portrait:max-lg:mt-1 portrait:max-lg:w-full landscape:max-lg:w-full lg:h-[46px] lg:w-full"
   set_idle = "size-[104px] rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 transition font-display text-[30px] font-extrabold tracking-widest shadow-[0_0_36px_rgba(37,99,235,0.55)] ring-8 ring-blue-600/25 lg:size-[108px] lg:text-[32px]"
   set_ring = "relative flex size-[100px] flex-col items-center justify-center rounded-full bg-gray-800 cursor-not-allowed"
+  # During the block after a refusal the refused panel takes the status slot (§8, Player screen 2 and 6).
+  blocked = game.playing? && game.no_set_blocked?
 %>
 <div id="controller_status" class="relative flex-1 min-h-0 flex flex-col">
   <% if flash_claim&.correct? && flash_claim.card_ids.present? %>
@@ -131,52 +133,44 @@
     </div>
 
   <% elsif game.no_set_active? %>
-    <%# No Set countdown: the status panel, then SET! in its idle slot, then the agree pill. %>
+    <%# No Set countdown: the status panel, then SET! in its idle slot (the lockout countdown while locked out), then the agree pill. %>
     <div class="<%= body %>">
       <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game %>
       <div data-action-column class="<%= column %>">
         <%= render "players/controller/status_panel", game: game, player: player, variant: :no_set %>
-        <div data-set-slot class="<%= slot %>">
-          <% if locked %>
-            <button type="button" disabled class="size-[104px] lg:size-[108px] lg:text-[32px] rounded-full cursor-not-allowed bg-gray-800 font-display text-[30px] font-extrabold tracking-widest text-gray-500">SET!</button>
-          <% else %>
+        <% if locked %>
+          <%= render "players/controller/locked_set", player: player, slot: slot, set_ring: set_ring %>
+        <% else %>
+          <div data-set-slot class="<%= slot %>">
             <%= button_to "SET!", game_claims_path(game.code), method: :post,
                   form_class: "contents", data: {turbo_submits_with: "…"}, class: set_idle %>
-          <% end %>
-        </div>
+          </div>
+        <% end %>
         <div data-pill-slot class="<%= pill_slot %>"><%= render "players/controller/secondary_action", game: game, player: player %></div>
       </div>
     </div>
 
   <% elsif game.playing? && locked %>
-    <%# Locked out after a wrong or expired claim: the status panel shakes red, SET! becomes the countdown. %>
+    <%# Locked out after a wrong or expired claim: the status panel shakes red, SET! becomes the countdown.
+        During the block after a refusal the refused panel takes the status slot instead. %>
     <div class="<%= body %>">
       <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game %>
       <div data-action-column class="<%= column %>">
-        <%= render "players/controller/status_panel", game: game, player: player, variant: :locked %>
-        <div data-set-slot class="<%= slot %>"
-             data-controller="countdown"
-             data-countdown-started-at-value="<%= (player.locked_until - Game::CLAIM_TIMEOUT.seconds).iso8601 %>"
-             data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
-          <%= render "players/controller/button_ring", stroke: "stroke-red-500" %>
-          <button type="button" disabled aria-label="SET! locked" class="<%= set_ring %> gap-0.5 text-gray-200">
-            <span data-countdown-target="display" class="font-display text-[38px] font-extrabold leading-none tabular-nums"><%= Game::CLAIM_TIMEOUT %></span>
-            <span class="text-xs font-bold text-red-300">Locked</span>
-          </button>
-        </div>
+        <%= render "players/controller/status_panel", game: game, player: player, variant: blocked ? :refused : :locked %>
+        <%= render "players/controller/locked_set", player: player, slot: slot, set_ring: set_ring %>
         <div data-pill-slot class="<%= pill_slot %>"><%= render "players/controller/secondary_action", game: game, player: player %></div>
       </div>
     </div>
 
   <% elsif game.playing? %>
-    <%# Idle: a card tap calls SET! (§8); the status slot stays empty. %>
+    <%# Idle: a card tap calls SET! (§8); the status slot stays empty, or holds the refused panel during the block. %>
     <div class="<%= body %>">
       <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game, mode: :tap %>
       <div data-action-column class="<%= column %>">
-        <%= render "players/controller/status_panel", game: game, player: player %>
+        <%= render "players/controller/status_panel", game: game, player: player, variant: (:refused if blocked) %>
         <div data-set-slot class="<%= slot %>">
           <%= button_to "SET!", game_claims_path(game.code), method: :post,
                 form_class: "contents", data: {turbo_submits_with: "…"}, class: set_idle %>

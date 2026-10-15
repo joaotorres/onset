@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Game do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe "code generation" do
     it "generates a code on create" do
       game = Game.create!
@@ -421,6 +423,172 @@ RSpec.describe Game do
 
     it "gives tied players the same rank and skips the next" do
       expect([alice, bob, caio].map { game.rank_of(it) }).to eq([1, 1, 3])
+    end
+  end
+
+  describe "Game::NO_SET_TIMEOUT" do
+    it "is 15 seconds" do
+      expect(Game::NO_SET_TIMEOUT).to eq(15)
+    end
+
+    it "is the wait call_no_set! schedules ExpireNoSetJob with, not a literal" do
+      game = Game.create!.tap(&:start!)
+      player = game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current)
+      stub_const("Game::NO_SET_TIMEOUT", 20)
+      freeze_time do
+        expect { game.call_no_set!(player) }
+          .to have_enqueued_job(ExpireNoSetJob).with(game).at(Game::NO_SET_TIMEOUT.seconds.from_now)
+      end
+    end
+  end
+
+  describe "refusing a No Set call" do
+    let(:game) { Game.create!.tap(&:start!) }
+    let!(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current, score: 2) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current, score: 1) }
+    let!(:charlie) { game.players.create!(name: "Charlie", color: "#DC267F", last_seen_at: Time.current) }
+
+    describe "#refuse_no_set!" do
+      before { game.call_no_set!(alice) }
+
+      it "cancels the call, records the refuser and returns the game" do
+        freeze_time do
+          result = game.refuse_no_set!(bob)
+          game.reload
+          expect(result).to eq(game)
+          expect(game.no_set_caller_id).to be_nil
+          expect(game.no_set_started_at).to be_nil
+          expect(game.no_set_voters).to be_empty
+          expect(game.no_set_refuser_id).to eq(bob.id)
+          expect(game.no_set_refuser).to eq(bob)
+          expect(game.no_set_refused_at).to eq(Time.current)
+        end
+      end
+
+      it "enqueues UnblockNoSetJob after NO_SET_TIMEOUT" do
+        freeze_time do
+          expect { game.refuse_no_set!(bob) }
+            .to have_enqueued_job(UnblockNoSetJob).with(game).at(Game::NO_SET_TIMEOUT.seconds.from_now)
+        end
+      end
+
+      it "leaves every score as it was" do
+        expect { game.refuse_no_set!(bob) }.not_to(change { game.players.order(:id).pluck(:score) })
+      end
+
+      it "accepts a refusal from a locked-out player" do
+        bob.update!(locked_until: 10.seconds.from_now)
+        expect(game.refuse_no_set!(bob)).to eq(game)
+        expect(game.reload.no_set_refuser_id).to eq(bob.id)
+      end
+
+      it "returns nil and changes nothing for the caller" do
+        expect(game.can_refuse_no_set?(alice)).to be false
+        expect(game.refuse_no_set!(alice)).to be_nil
+        expect(game.reload.no_set_active?).to be true
+        expect(game.no_set_refused_at).to be_nil
+      end
+
+      it "returns nil and changes nothing for a player who agreed" do
+        game.join_no_set!(bob)
+        expect(game.can_refuse_no_set?(bob)).to be false
+        expect(game.refuse_no_set!(bob)).to be_nil
+        expect(game.reload.no_set_voters).to include(bob.id)
+        expect(game.no_set_refused_at).to be_nil
+      end
+
+      it "returns nil and enqueues nothing when the player is not allowed" do
+        expect { game.refuse_no_set!(alice) }.not_to have_enqueued_job(UnblockNoSetJob)
+      end
+
+      it "returns nil for an inactive player" do
+        charlie.update_column(:last_seen_at, 1.minute.ago)
+        expect(game.can_refuse_no_set?(charlie)).to be false
+        expect(game.refuse_no_set!(charlie)).to be_nil
+      end
+
+      it "answers can_refuse_no_set? true for an allowed player" do
+        expect(game.can_refuse_no_set?(bob)).to be true
+      end
+    end
+
+    it "returns nil when no call is active" do
+      expect(game.can_refuse_no_set?(bob)).to be false
+      expect(game.refuse_no_set!(bob)).to be_nil
+      expect(game.reload.no_set_refused_at).to be_nil
+    end
+
+    it "accepts no second refusal on the same board" do
+      game.call_no_set!(alice)
+      game.refuse_no_set!(bob)
+      travel_to((Game::NO_SET_TIMEOUT + 1).seconds.from_now) do
+        expect(game.reload.call_no_set!(alice)).to eq(game)
+        expect(game.can_refuse_no_set?(charlie)).to be false
+        expect(game.refuse_no_set!(charlie)).to be_nil
+        game.reload
+        expect(game.no_set_active?).to be true
+        expect(game.no_set_refuser_id).to eq(bob.id)
+      end
+    end
+
+    describe "the block" do
+      before do
+        game.call_no_set!(alice)
+        game.refuse_no_set!(bob)
+        game.reload
+      end
+
+      it "blocks call_no_set! for everyone, the refuser included" do
+        expect(game.no_set_blocked?).to be true
+        expect(game.call_no_set!(bob)).to be_nil
+        expect(game.call_no_set!(charlie)).to be_nil
+        expect(game.reload.no_set_active?).to be false
+      end
+
+      it "lifts once NO_SET_TIMEOUT has passed" do
+        travel_to(game.no_set_refused_at + (Game::NO_SET_TIMEOUT + 1).seconds) do
+          expect(game.no_set_blocked?).to be false
+          expect(game.call_no_set!(charlie)).to eq(game)
+        end
+      end
+
+      it "keeps SET! open" do
+        expect(game.try_claim!(charlie)).to be_a(Claim)
+      end
+    end
+
+    describe "a board change" do
+      before do
+        game.call_no_set!(alice)
+        game.refuse_no_set!(bob)
+      end
+
+      def expect_cleared_and_refusable
+        game.reload
+        expect(game.no_set_refuser_id).to be_nil
+        expect(game.no_set_refused_at).to be_nil
+        game.call_no_set!(alice)
+        expect(game.refuse_no_set!(bob)).to eq(game)
+      end
+
+      it "clears the refusal when a No Set call resolves" do
+        travel_to((Game::NO_SET_TIMEOUT + 1).seconds.from_now) do
+          game.reload.call_no_set!(alice)
+          game.resolve_no_set!
+          expect_cleared_and_refusable
+        end
+      end
+
+      it "clears the refusal on start!" do
+        game.start!
+        expect_cleared_and_refusable
+      end
+
+      it "clears the refusal on restart!" do
+        game.update!(status: :ended)
+        game.restart!
+        expect_cleared_and_refusable
+      end
     end
   end
 end

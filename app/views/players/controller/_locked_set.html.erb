@@ -1,0 +1,11 @@
+<%# SET! as the lockout countdown: the red ring, the seconds and "Locked", from locked_until. %>
+<div data-set-slot class="<%= slot %>"
+     data-controller="countdown"
+     data-countdown-started-at-value="<%= (player.locked_until - Game::CLAIM_TIMEOUT.seconds).iso8601 %>"
+     data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
+  <%= render "players/controller/button_ring", stroke: "stroke-red-500" %>
+  <button type="button" disabled aria-label="SET! locked" class="<%= set_ring %> gap-0.5 text-gray-200">
+    <span data-countdown-target="display" class="font-display text-[38px] font-extrabold leading-none tabular-nums"><%= Game::CLAIM_TIMEOUT %></span>
+    <span class="text-xs font-bold text-red-300">Locked</span>
+  </button>
+</div>

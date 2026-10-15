@@ -1,5 +1,5 @@
 <% flash_claim = local_assigns[:flash_claim] %>
-<% empty = !flash_claim && !(game.playing? && (game.claim_active? || game.no_set_active?)) %>
+<% empty = !flash_claim && !(game.playing? && (game.claim_active? || game.no_set_active? || game.no_set_blocked?)) %>
 <div id="announcement" class="h-36 shrink-0 <%= "grid place-items-center" if empty %>">
   <% if flash_claim %>
     <% flash_cards = flash_claim.card_ids&.map { |cid| Card.new(cid) } || [] %>
@@ -39,7 +39,7 @@
 
   <% elsif game.playing? && game.no_set_active? %>
     <div class="h-full flex items-center gap-6 rounded-3xl bg-purple-500/10 px-8 ring-2 ring-inset ring-purple-500">
-      <%= render "games/ring", started_at: game.no_set_started_at, duration: 15,
+      <%= render "games/ring", started_at: game.no_set_started_at, duration: Game::NO_SET_TIMEOUT,
             stroke: "stroke-purple-400", digits: "text-purple-300" %>
       <div class="min-w-0 flex-1">
         <p class="font-display text-5xl font-bold"><span class="text-purple-400"><%= game.no_set_caller.name %></span> called No Set</p>
@@ -48,6 +48,17 @@
       <div class="shrink-0 text-right">
         <p class="font-display text-6xl font-bold leading-none tabular-nums"><%= game.no_set_voters.size %><span class="text-gray-500">/<%= game.players.select(&:active?).size %></span></p>
         <p class="mt-1 text-xl text-gray-400">agreed</p>
+      </div>
+    </div>
+
+  <% elsif game.playing? && game.no_set_blocked? %>
+    <%# Refused: the No Set panel's tint, the ring counting the block down, nothing on the right. %>
+    <div class="h-full flex items-center gap-6 rounded-3xl bg-purple-500/10 px-8 ring-2 ring-inset ring-purple-500">
+      <%= render "games/ring", started_at: game.no_set_refused_at, duration: Game::NO_SET_TIMEOUT,
+            stroke: "stroke-purple-400", digits: "text-purple-300" %>
+      <div class="min-w-0 flex-1">
+        <p class="font-display text-5xl font-bold text-balance"><span class="inline-block max-w-full truncate align-bottom text-purple-400"><%= game.no_set_refuser.name %></span> says there's a Set</p>
+        <p class="mt-2 text-2xl text-gray-300">No Set is back when the ring runs out</p>
       </div>
     </div>
 

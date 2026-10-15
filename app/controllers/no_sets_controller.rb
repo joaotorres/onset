@@ -11,6 +11,12 @@ class NoSetsController < ApplicationController
     head :no_content
   end
 
+  # Once per board, and not by the caller or a player who agreed (§2); anything else is ignored.
+  def refuse
+    @game.refuse_no_set!(@player)
+    head :no_content
+  end
+
   def destroy
     head :no_content
   end

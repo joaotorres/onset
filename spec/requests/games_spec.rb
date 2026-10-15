@@ -131,6 +131,53 @@ RSpec.describe "Games" do
         expect(response.body).not_to include("on your phone")
       end
 
+      it "reads the No Set ring's duration from NO_SET_TIMEOUT" do
+        stub_const("Game::NO_SET_TIMEOUT", 20)
+        alice = game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current)
+        game.update!(no_set_caller_id: alice.id, no_set_started_at: Time.current, no_set_voters: [alice.id])
+        get game_path(game.code)
+        ring = Nokogiri::HTML(response.body).at_css("#announcement [data-controller=countdown]")
+        expect(ring["data-countdown-duration-value"]).to eq("20")
+      end
+
+      context "during the block after a refusal" do
+        include ActiveSupport::Testing::TimeHelpers
+
+        let(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current) }
+        let(:band) { Nokogiri::HTML(response.body).at_css("#announcement") }
+
+        before { game.update!(no_set_refuser_id: bob.id, no_set_refused_at: 3.seconds.ago) }
+
+        it "shows one purple Refused panel with the block's ring and the refuser" do
+          get game_path(game.code)
+          ring = band.at_css("[data-controller=countdown]")
+          expect(ring["data-countdown-started-at-value"]).to eq(game.reload.no_set_refused_at.iso8601)
+          expect(ring["data-countdown-duration-value"]).to eq(Game::NO_SET_TIMEOUT.to_s)
+          expect(ring.at_css(".stroke-purple-400")).to be_present
+          expect(ring.at_css("[data-countdown-target=display]")["class"]).to include("text-purple-300")
+          expect(band.text.squish).to include("Bob says there's a Set", "No Set is back when the ring runs out")
+          name = band.css("span.text-purple-400").find { |n| n.text.strip == "Bob" }
+          expect(name).to be_present
+          expect(name["class"]).to include("truncate")
+          expect(band.text).not_to include("agreed")
+          expect(band.text).not_to include("Spot a Set?")
+        end
+
+        it "shows the Claiming panel while a claim runs" do
+          game.try_claim!(bob)
+          get game_path(game.code)
+          expect(band.text).to include("is calling SET!")
+          expect(band.text).not_to include("says there's a Set")
+        end
+
+        it "shows the idle text once the block is over" do
+          game.update!(no_set_refused_at: (Game::NO_SET_TIMEOUT + 1).seconds.ago)
+          get game_path(game.code)
+          expect(band.text.squish).to include("Spot a Set? Hit SET! on your screen.")
+          expect(band.text).not_to include("says there's a Set")
+        end
+      end
+
       context "after a wrong claim or a time's up" do
         let(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
 

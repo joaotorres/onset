@@ -14,7 +14,9 @@ Rails.application.routes.draw do
     end
     resource :controller, only: [:show], controller: "controllers"
     resources :claims, only: [:create, :update]
-    resource :no_set, only: [:create, :update, :destroy]
+    resource :no_set, only: [:create, :update, :destroy] do
+      post :refuse
+    end
     resource :end_game, only: [:create]
   end
 

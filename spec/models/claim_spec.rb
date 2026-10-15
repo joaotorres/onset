@@ -67,6 +67,14 @@ RSpec.describe Claim do
       judge(find_set_on_board)
       expect(game.reload.claim_player_id).to be_nil
     end
+
+    it "clears this board's No Set refusal" do
+      game.update!(no_set_refuser_id: player.id, no_set_refused_at: Time.current)
+      judge(find_set_on_board)
+      game.reload
+      expect(game.no_set_refuser_id).to be_nil
+      expect(game.no_set_refused_at).to be_nil
+    end
   end
 
   describe "#expire! on three picks that do not form a Set" do

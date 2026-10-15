@@ -1,4 +1,5 @@
-<%# The pill under SET!: No Set, the agree vote during a No Set countdown, or the End game vote once the deck is empty.
+<%# The pill under SET!: No Set, the agree vote during a No Set countdown (beside There's a Set while the player may refuse),
+    No Set blocked after a refusal, or the End game vote once the deck is empty.
     Filled purple pills are purple-700 with white text in every layout. %>
 <% size = "h-11 rounded-full portrait:max-lg:w-[220px] landscape:max-lg:w-full landscape:max-lg:px-2 lg:h-[46px] lg:w-full lg:text-base" %>
 <% pill = "#{size} font-bold text-white" %>
@@ -11,6 +12,17 @@
     <p class="<%= outlined %> border-purple-500 text-purple-200">You called No Set · waiting for <%= waiting_for %> more</p>
   <% elsif game.no_set_voters.include?(player.id) %>
     <p class="<%= outlined %> border-purple-500 text-purple-200">You agreed · waiting for <%= waiting_for %> more</p>
+  <% elsif game.can_refuse_no_set?(player) %>
+    <%# The refusal pair fills the slot: portrait the status slot's width, landscape the 9rem column with labels on two lines, computer 248px. %>
+    <% half = "h-11 min-w-0 flex-1 rounded-full px-1 text-base font-bold leading-tight text-white landscape:max-lg:text-[13px] lg:h-[46px] lg:text-[15px]" %>
+    <div class="flex w-full gap-2 landscape:max-lg:gap-1.5">
+      <%= button_to "There's a Set", refuse_game_no_set_path(game.code), method: :post,
+            form_class: "contents", data: {turbo_submits_with: "…"},
+            class: "#{half} border-2 border-purple-400 hover:bg-purple-400/10 active:scale-95 transition" %>
+      <%= button_to "I agree, no Set", game_no_set_path(game.code), method: :post,
+            form_class: "contents", data: {turbo_submits_with: "…"},
+            class: "#{half} bg-purple-700 hover:bg-purple-600 active:scale-95 transition" %>
+    </div>
   <% else %>
     <%= button_to "I agree, no Set", game_no_set_path(game.code), method: :post,
           form_class: "contents", data: {turbo_submits_with: "…"},
@@ -28,6 +40,12 @@
       <span class="text-[11px] font-medium text-orange-50"><%= count %></span>
     <% end %>
   <% end %>
+<% elsif game.no_set_blocked? %>
+  <% left = [(game.no_set_refused_at + Game::NO_SET_TIMEOUT.seconds - Time.current).ceil, 0].max %>
+  <button type="button" disabled class="<%= size %> cursor-not-allowed bg-purple-700 font-bold text-purple-200 opacity-35"
+          data-controller="countdown"
+          data-countdown-started-at-value="<%= game.no_set_refused_at.iso8601 %>"
+          data-countdown-duration-value="<%= Game::NO_SET_TIMEOUT %>">No Set in <span data-countdown-target="display" class="font-display tabular-nums"><%= left %></span> s</button>
 <% else %>
   <%= button_to "No Set", game_no_set_path(game.code), method: :post,
         form_class: "contents", data: {turbo_submits_with: "…"},

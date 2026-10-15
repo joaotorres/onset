@@ -66,6 +66,14 @@ RSpec.describe "Player screen during play, portrait", type: :system do
       game.call_no_set!(other)
       game.join_no_set!(me)
     },
+    "No Set countdown, locked out" => ->(_) {
+      me.update!(locked_until: 5.seconds.from_now)
+      game.call_no_set!(other)
+    },
+    "No Set blocked" => ->(_) {
+      game.call_no_set!(other)
+      game.refuse_no_set!(game.players.order(:id).third)
+    },
     "locked out, wrong" => ->(_) { resolve(me, :wrong) },
     "locked out, time's up" => ->(_) { resolve(me, :expired) },
     "found-set banner" => ->(_) {

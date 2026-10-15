@@ -60,7 +60,8 @@ class Claim < ApplicationRecord
       claim_started_at: nil,
       flash_claim_id: id,
       last_dealt: drawn,
-      status: (game_ended || quick_ended) ? :ended : :playing
+      status: (game_ended || quick_ended) ? :ended : :playing,
+      **Game::CLEAR_REFUSAL
     )
     ClearClaimFlashJob.set(wait: 3.seconds).perform_later(self)
     ClearLastDealtJob.set(wait: 3.seconds).perform_later(game, drawn) if drawn.any?

@@ -27,12 +27,23 @@
     <div role="status" class="<%= panel %> grid grid-cols-[auto_minmax(0,1fr)] content-center items-center gap-x-3 border-2 border-purple-500 bg-purple-950 px-3.5 landscape:max-lg:gap-x-2 landscape:max-lg:gap-y-1.5 landscape:max-lg:px-2.5"
          data-controller="countdown"
          data-countdown-started-at-value="<%= game.no_set_started_at.iso8601 %>"
-         data-countdown-duration-value="15">
+         data-countdown-duration-value="<%= Game::NO_SET_TIMEOUT %>">
       <div class="row-span-2 landscape:max-lg:row-span-1">
-        <%= render "players/controller/small_ring", size: "size-11 landscape:max-lg:size-9 lg:size-12", track: "stroke-white/15", stroke: "stroke-purple-400", digits: "text-[17px] landscape:max-lg:text-sm", duration: 15 %>
+        <%= render "players/controller/small_ring", size: "size-11 landscape:max-lg:size-9 lg:size-12", track: "stroke-white/15", stroke: "stroke-purple-400", digits: "text-[17px] landscape:max-lg:text-sm", duration: Game::NO_SET_TIMEOUT %>
       </div>
       <p class="col-start-2 row-start-1 truncate font-bold landscape:max-lg:col-span-2 landscape:max-lg:col-start-1 landscape:max-lg:row-start-2 landscape:max-lg:whitespace-normal landscape:max-lg:text-[13px] landscape:max-lg:leading-tight lg:text-[15px]">No Set called by <%= game.no_set_caller.name %></p>
       <p class="col-start-2 row-start-2 text-[13px] text-purple-200 landscape:max-lg:row-start-1"><%= game.no_set_voters.size %>/<%= game.players.select(&:active?).size %> agreed</p>
+    </div>
+  <% when :refused %>
+    <%# Laid out as someone else claiming, gray-900 with a purple border and no ring: the call is over, No Set is blocked. %>
+    <% refuser = game.no_set_refuser %>
+    <% mine = refuser == player %>
+    <div role="status" class="<%= panel %> items-center justify-center gap-2.5 border-2 border-purple-500 bg-gray-900 px-4 landscape:max-lg:flex-col landscape:max-lg:gap-1 landscape:max-lg:px-2 landscape:max-lg:text-center">
+      <p class="flex min-w-0 items-center gap-2.5 landscape:max-lg:gap-[7px]">
+        <span class="size-3 shrink-0 rounded-full landscape:max-lg:size-2.5" style="background-color: <%= refuser.color %>;"></span>
+        <span class="min-w-0 truncate text-lg font-bold landscape:max-lg:text-[17px]"><%= mine ? "You" : refuser.name %></span>
+      </p>
+      <p class="shrink-0 text-gray-300 landscape:max-lg:text-[13px]"><%= mine ? "say there's a Set" : "says there's a Set" %></p>
     </div>
   <% when :locked %>
     <p role="status" class="<%= panel %> animate-shake items-center justify-center border-2 border-red-600 bg-red-950 px-2 text-center font-display text-[28px] font-extrabold leading-tight text-red-200 landscape:max-lg:text-[21px]"><%= (player.lockout_reason == "expired") ? "Time's up! −1" : "Wrong! −1" %></p>
