@@ -1,6 +1,6 @@
 # 21: Refuse a No Set call once per board
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Model:

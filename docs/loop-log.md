@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  deploy deploy-20261016-0139: 21 deployed. Next: new requests.
 - 2026-10-16  request 25: stale claim and refusal text in SPEC and the glossary, behavioural. Next: triage.
 - 2026-10-16  context cap: 135k, over 100k with the review next. 21 built. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-16  build 21: done, refusing a No Set call with the 15 s block on both screens, bundle exec rspec green (442 examples), one Decided line. Next: review.
