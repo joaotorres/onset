@@ -413,6 +413,16 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
 
 Stimulus: `card-selection` (picks sent to the server, tray, count), `countdown` (every ring and seconds display) and `invite` (shares or copies the invite link, opens the QR sheet), its attributes listed in §7.
 
+### Byline footer
+
+A small muted footer, the same across all of joaotorr.es's apps, so its look and behaviour follow that shared design rather than this spec's palette. It must stay quiet and never compete with the Onset wordmark.
+
+- **Where**: after `main` on the landing, How to play and the join page, centred in the How to play container (`max-w-5xl`, `px-5`, `md:px-10`), on `gray-950`. Nothing above it beyond `main`'s own bottom padding; below it 16px or the bottom safe area, whichever is bigger. It follows the content rather than pinning to the bottom of a short window, since pinning it would move the landing's centred content and the join page's Join button. The big screen and the player screen have none: they are full-screen views with no page scroll. Static error pages and emails have none.
+- **What**: "by joaotorr.es", one link to https://joaotorr.es that opens in a new tab, so the player keeps their place. A hidden "(Opens in a new tab)" completes the accessible name; the coloured copies of the domain are hidden from screen readers so it is read once. English only, like the rest of the app.
+- **At rest**: `gray-400`, 14px, weight 500, the body font, with one continuous 1px red underline under the whole phrase. The link is 44px tall for touch.
+- **Hover (devices with hover) or keyboard focus**: "by" and the underline stay as they are. Over 1s the dot hops up and lands with a small bounce, turning gold, while "joaotorr" fades to a green to blue gradient and "es" to a red, gold, red stripe. It stays coloured until the next page load; hovering again replays the hop. Reduced motion: no hop, the colours still fade in. Keyboard focus adds a 2px `blue-500` outline.
+- **Logo colours**: the dark values, since every Onset screen is dark: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`. The light values (`#009C3B`, `#002776`, `#C60B1E`, `#E08A00`) sit on `:root` for any light ground.
+
 ---
 
 ## 9. Action Cable channel (optional, only if Turbo Streams is insufficient)

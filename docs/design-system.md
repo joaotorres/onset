@@ -1,4 +1,4 @@
-# Onset design system, version 2
+# Onset design system, version 3
 
 The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
 
@@ -18,6 +18,8 @@ From `app/assets/tailwind/application.css` (`@theme`), on top of the Tailwind de
 Card palette (`app/views/cards/_card.html.erb`): blue `#648FFF`, orange `#FE6100`, magenta `#DC267F`.
 
 Player colors (`PlayersController::PRESET_COLORS`): `#E74C3C #2ECC71 #F1C40F #9B59B6 #1ABC9C #E91E63 #00BCD4 #8BC34A`.
+
+Byline logo colours (v3, `--wm-*`): light on `:root` green `#009C3B`, blue `#002776`, red `#C60B1E`, gold `#E08A00`; dark on `.byline-footer`, the values every Onset screen uses: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`.
 
 v2 adds no tokens: every new color is from the Tailwind default palette.
 
@@ -48,6 +50,7 @@ ERB partials, no component library.
 - `players/controller/_qr_sheet` (v2): overlay `gray-950` at 85%. Portrait: a bottom sheet. Landscape: a centered card, QR on the left, code and Done on the right. Computer: a centered 352px modal. QR on a white tile, 288px in portrait and computer, 300px in landscape, the code under it, Done in `blue-600`
 - `players/controller/_standings` (v2): game over rows, each rank, dot, truncated name, "you" for the player, score. Own row `gray-800` with a `gray-600` border, other rows transparent. Rows 32px portrait, 34px landscape, 44px computer (computer list in a `gray-900` panel)
 - Landing mode toggle (v2): two radios styled as a segmented control inside the Start a game form, on a `gray-950` (desktop) or `gray-900` (phone) track with a `gray-700` border. Selected Standard `gray-700`, selected First to 5 `violet-600`, unselected `gray-400` text on transparent
+- `layouts/_byline_footer` (v3): "by joaotorr.es" after `main` on the landing, How to play and the join page, never on the big screen or player screen. `gray-400` 14px weight 500 with a 1px red underline; on hover or keyboard focus the dot hops and the domain fades into the logo colours (`--wm-*`), held until the next page load. Styles in `app/assets/tailwind/application.css` (`.byline`, `.wm-*`), fixed across joaotorr.es apps
 - Stimulus: `card-selection` (picks sent to the server, tray, count), `countdown` (rings and seconds)
 
 ## Screens
@@ -188,6 +191,7 @@ None
 
 ## Changelog
 
+- v3, 2026-10-16: ticket 24, the byline footer `_byline_footer` and the `--wm-*` logo colours, taken from the cross-app byline brief as built in d7f1cc8, not from a design pass.
 - v2, 2026-10-12: ticket 07, game over standings on the player screen in portrait, landscape and computer: `_standings`, own row `gray-800`, Play again on `green-700`.
 - v2, 2026-10-12: ticket 08, devices-first landing (mode toggle, one Start a game, phone order) and the join page with the creator's big screen link, field and base errors, and taken swatches blended over `gray-950`.
 - v2, 2026-10-12: ticket 09, the player screen during play stands alone in portrait, landscape and a new computer layout: `_scoreboard`, `_status_panel`, `_found_banner`, the card size rule with no landscape sideways scroll, the 128px SET! slot, filled purple pills on `purple-700`.
