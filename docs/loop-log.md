@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  context cap: over 100k with the review next. 26 built, 27 done in triage. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-16  deploy deploy-20261016-0229: 25, 26 deployed. Next: new requests.
 - 2026-10-16  triage 27: done in triage, docs only: §5 refuse row and §12 ExpireClaimJob lose their Oxford commas, §8 byline says nothing sits between the footer and main, two Decided lines. Next: review.
 - 2026-10-16  request 27: SPEC wording fixes from the last two reviews, docs only; filed behavioural. Next: triage.
