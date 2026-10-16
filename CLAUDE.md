@@ -5,23 +5,11 @@ The full design lives in `SPEC.md`. Read it before starting any non-trivial task
 ## Workflow
 
 Work moves from request to deploy through the skills-loop plugin. Config in
-`docs/agents/skills-loop.conf`, documentation in the plugin's
-`docs/workflow.md`.
-
-```
-bin/mode                    the model mode: chosen from Fable usage, or set (global)
-/request "one-liner"        a needs-triage ticket per line, then the chain carries on
-/design-brief NN            visual tickets: a brief for the design tool
-(paste the design reply)    the design entry, then the chain carries on
-/skills-loop:auto           carry the chain on, after a /clear at the context cap
-                            (each ticket's triage and build runs in a fresh subagent)
-bin/auto                    triage, build and review in one session with you
-                            (--headless, --unattended, --max N, --skip-gaps)
-bin/next-ticket             the next ticket and its launch command; --all is the board
-bin/deploy                  deploy, mark tickets deployed, tag, push
-```
-
-`docs/loop-log.md` records each step, newest first.
+`docs/agents/skills-loop.conf`. The commands and what each does are in the
+plugin's `README.md`, the contract in its `docs/workflow.md`
+(`${SKILLS_LOOP:-~/Projects/skills-loop}`); neither is copied here, so a
+plugin change never leaves this file stale. `docs/loop-log.md` records each
+step, newest first.
 
 When triaging, splitting, implementing, reviewing or designing a ticket,
 call the Skill tool with `loop-rules`: the gates, the implement loop, the
