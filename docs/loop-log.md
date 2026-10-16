@@ -3,6 +3,7 @@
 What the skills-loop steps did, newest first.
 
 - 2026-10-16  deploy deploy-20261016-0229: 25, 26 deployed. Next: new requests.
+- 2026-10-16  triage 27: done in triage, docs only: §5 refuse row and §12 ExpireClaimJob lose their Oxford commas, §8 byline says nothing sits between the footer and main, two Decided lines. Next: review.
 - 2026-10-16  request 27: SPEC wording fixes from the last two reviews, docs only; filed behavioural. Next: triage.
 - 2026-10-16  review 20261016-020150: footer fit passes spec, no pending decisions, two low spec-wording and test-tidiness findings. Next: bin/deploy.
 - 2026-10-16  build 26: done, body is a viewport-tall flex column with main growing and the footer last; fit spec and full suite pass. Next: review.

@@ -232,7 +232,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | PATCH | `/games/:code/claims/:id` | Replace the picks (`card_ids`, 0 to 3 board cards) of a held claim; nothing is judged until the time runs out (§11) |
 | POST | `/games/:code/no_set` | Initiate No-Set countdown OR join existing call |
 | DELETE | `/games/:code/no_set` | Withdraw your vote (rare; no UI button v1) |
-| POST | `/games/:code/no_set/refuse` | Refuse the running call: cancel it and block No Set for `NO_SET_TIMEOUT` (§2). Once per board. Ignored from the caller, from a player who agreed, and once this board's refusal is used (`can_refuse_no_set?`, §4) |
+| POST | `/games/:code/no_set/refuse` | Refuse the running call: cancel it and block No Set for `NO_SET_TIMEOUT` (§2). Once per board. Ignored from the caller, from a player who agreed and once this board's refusal is used (`can_refuse_no_set?`, §4) |
 | POST | `/games/:code/end_game` | Vote to end once the deck is empty; ends when every active player has voted |
 
 ---
@@ -417,7 +417,7 @@ Stimulus: `card-selection` (picks sent to the server, tray, count), `countdown` 
 
 A small muted footer, the same across all of joaotorr.es's apps, so its look and behaviour follow that shared design rather than this spec's palette. It must stay quiet and never compete with the Onset wordmark.
 
-- **Where**: after `main` on the landing, How to play and the join page, centred in the How to play container (`max-w-5xl`, `px-5`, `md:px-10`), on `gray-950`. Nothing above it beyond `main`'s own bottom padding; below it 16px or the bottom safe area, whichever is bigger. It fits inside the first screen: the page is a viewport-tall column in which `main` grows and the footer comes last, so when the content fits the screen the footer sits at the bottom edge and the page does not scroll, and when the content is taller the footer follows it. The footer never overlaps content. The landing's centred content and the join page's Join button therefore sit above the footer, not at the bottom of the window. The big screen and the player screen have none: they are full-screen views with no page scroll. Static error pages and emails have none.
+- **Where**: after `main` on the landing, How to play and the join page, centred in the How to play container (`max-w-5xl`, `px-5`, `md:px-10`), on `gray-950`. Nothing between it and `main`; below it 16px or the bottom safe area, whichever is bigger. It fits inside the first screen: the page is a viewport-tall column in which `main` grows and the footer comes last, so when the content fits the screen the footer sits at the bottom edge and the page does not scroll, and when the content is taller the footer follows it. The footer never overlaps content. The landing's centred content and the join page's Join button therefore sit above the footer, not at the bottom of the window. The big screen and the player screen have none: they are full-screen views with no page scroll. Static error pages and emails have none.
 - **What**: "by joaotorr.es", one link to https://joaotorr.es that opens in a new tab, so the player keeps their place. A hidden "(Opens in a new tab)" completes the accessible name; the coloured copies of the domain are hidden from screen readers so it is read once. English only, like the rest of the app.
 - **At rest**: `gray-400`, 14px, weight 500, the body font, with one continuous 1px red underline under the whole phrase. The link is 44px tall for touch.
 - **Hover (devices with hover) or keyboard focus**: "by" and the underline stay as they are. Over 1s the dot hops up and lands with a small bounce, turning gold, while "joaotorr" fades to a green to blue gradient and "es" to a red, gold, red stripe. It stays coloured until the next page load; hovering again replays the hop. Reduced motion: no hop, the colours still fade in. Keyboard focus adds a 2px `blue-500` outline.
@@ -511,7 +511,7 @@ History: v1 auto-submitted 250 ms after the third tap, the grid dimmed during th
 ## 12. Background Jobs
 
 - **`CleanupIdleGamesJob`** — runs hourly via `recurring.yml`. Deletes Games with `updated_at < 24.hours.ago` (every gameplay action goes through `Game#update!`). Cascades to Players and Claims.
-- **`ExpireClaimJob`** — enqueued with `wait: Game::CLAIM_TIMEOUT` when a claim is acquired. If the claim is still `pending`, judge the picks it holds (§11): `correct`, `wrong`, or `expired` with fewer than three. Clear the lock, broadcast.
+- **`ExpireClaimJob`** — enqueued with `wait: Game::CLAIM_TIMEOUT` when a claim is acquired. If the claim is still `pending`, judge the picks it holds (§11): `correct`, `wrong` or `expired` with fewer than three. Clear the lock, broadcast.
 - **`ExpireNoSetJob`** — enqueued with `wait: Game::NO_SET_TIMEOUT` when a No-Set is called. If still active, draw 3 cards (or end game), clear the call, broadcast.
 - **`UnblockNoSetJob`** — enqueued with `wait: Game::NO_SET_TIMEOUT` when a call is refused. Broadcasts so the No Set pill and the big screen band return to idle; the block itself is enforced by `no_set_refused_at` at call time.
 - **`ExpirePlayerLockoutJob`** — optional; the lockout is enforced by checking `locked_until` at claim time, but a job that broadcasts UI updates when the lockout expires is nice-to-have.
