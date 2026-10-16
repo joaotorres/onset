@@ -1,6 +1,6 @@
 # 25: Fix stale claim and refusal text in SPEC and the glossary
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

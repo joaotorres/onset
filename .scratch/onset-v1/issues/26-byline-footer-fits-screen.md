@@ -1,6 +1,6 @@
 # 26: Byline footer fits the screen
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:
