@@ -3,6 +3,7 @@
 What the skills-loop steps did, newest first.
 
 - 2026-10-17  triage 28: done in triage, §5 gains the how-to-play route and a row for its Back link, three Decided lines. Next: review, then bin/deploy.
+- 2026-10-17  review 20261017-005226: ticket 28 passes spec, no pending decisions, the triage 27 log line still out of order. Next: bin/deploy.
 - 2026-10-17  request 28: SPEC row for the How to play Back link, filed from the review's pending decision. Next: triage.
 - 2026-10-17  review 20261017-004042: one pending decision (spec line for the How to play Back link), ticket 27 Changelog added, the triage 27 log line still out of order. Next: settle the pending decision, then bin/deploy.
 - 2026-10-17  context cap: 101k, over 100k with the review next. Nothing to triage or build; the How to play Back link fix, bin/ci and the CLAUDE.md workflow block came after the last review. Next: /clear, then /skills-loop:auto for the review.
