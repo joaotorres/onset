@@ -1,6 +1,6 @@
 # 28: SPEC: How to play Back link takes a room code
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

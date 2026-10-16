@@ -1,6 +1,6 @@
 # 27: SPEC wording fixes from the last two reviews
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:
