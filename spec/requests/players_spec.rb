@@ -182,6 +182,12 @@ RSpec.describe "Players" do
       expect(response.body).to include("Alice")
     end
 
+    it "links How to play back to this game by its code" do
+      post game_players_path(game.code), params: {player: {name: "Alice", color: "#E74C3C"}}
+      get game_controller_path(game.code)
+      expect(response.body).to include(%(href="#{how_to_play_path(game: game.code)}"))
+    end
+
     it "returns 404 with no valid cookie" do
       get game_controller_path(game.code)
       expect(response).to have_http_status(:not_found)

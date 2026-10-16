@@ -10,9 +10,9 @@ class LobbiesController < ApplicationController
   end
 
   def how_to_play
-    return_to = params[:return_to].to_s
-    # only same-site paths, never a full URL or protocol-relative //host
-    @return_to = return_to if return_to.start_with?("/") && !return_to.start_with?("//")
+    # only a game code, so the Back link can never point off the site
+    code = params[:game].to_s
+    @return_to = game_controller_path(code) if code.match?(Game::CODE_FORMAT)
     @back_path = @return_to || root_path
   end
 end

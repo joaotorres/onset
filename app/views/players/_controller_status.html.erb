@@ -38,7 +38,7 @@
         </div>
         <h2 class="font-display text-[30px] font-extrabold leading-none landscape:max-lg:text-2xl lg:text-4xl">You're in</h2>
         <%= render "players/controller/roster", game: game, player: player %>
-        <%= link_to "New to Set? How to play →", how_to_play_path(return_to: game_controller_path(game.code)), class: "-my-1.5 inline-flex min-h-8 items-center self-start text-sm font-semibold text-blue-400 hover:text-blue-300" %>
+        <%= link_to "New to Set? How to play →", how_to_play_path(game: game.code), class: "-my-1.5 inline-flex min-h-8 items-center self-start text-sm font-semibold text-blue-400 hover:text-blue-300" %>
         <div class="portrait:order-last portrait:mt-auto landscape:mt-auto">
           <% if total < 2 %>
             <p class="<%= ready_box %> grid place-items-center border-2 border-gray-700 px-3 text-center font-semibold text-gray-400">Waiting for more players to join…</p>

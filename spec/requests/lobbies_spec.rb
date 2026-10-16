@@ -86,14 +86,14 @@ RSpec.describe "Lobbies", type: :request do
       end
     end
 
-    it "links back to the game when return_to is a same-site path" do
-      get how_to_play_path, params: {return_to: "/games/ABC123/controller"}
-      expect(response.body).to include(%(href="/games/ABC123/controller">Back to the game</a>))
+    it "links back to the game's player screen when given its code" do
+      get how_to_play_path, params: {game: "ABC234"}
+      expect(response.body).to include(%(href="/games/ABC234/controller">Back to the game</a>))
     end
 
-    ["https://example.com", "//example.com"].each do |url|
-      it "ignores return_to=#{url} and goes back to the root" do
-        get how_to_play_path, params: {return_to: url}
+    ["https://example.com", "//example.com", "/\\example.com", "example.com/ABC234"].each do |url|
+      it "ignores game=#{url} and goes back to the root" do
+        get how_to_play_path, params: {game: url}
         expect(response.body).to include(%(href="#{root_path}">← Back</a>))
         expect(response.body).not_to include("Back to the game")
         expect(response.body).not_to include("example.com")
