@@ -1,6 +1,6 @@
 # 26: Byline footer fits the screen
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
