@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: Behind the scenes: spec wording fixes, nothing changes for players.
 
 ## Request
 
