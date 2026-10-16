@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-16  review 20261016-020150: footer fit passes spec, no pending decisions, two low spec-wording and test-tidiness findings. Next: bin/deploy.
 - 2026-10-16  build 26: done, body is a viewport-tall flex column with main growing and the footer last; fit spec and full suite pass. Next: review.
 - 2026-10-16  triage 26: ready, spec says the footer fits inside the first screen, two Decided lines. Next: build.
 - 2026-10-16  request 26: byline footer makes the landing, How to play and join pages scroll; filed behavioural. Next: triage.
