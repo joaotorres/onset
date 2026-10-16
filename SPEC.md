@@ -191,6 +191,7 @@ The board and deck columns store integer ids; instantiate `Card` objects in the 
 Rails.application.routes.draw do
   root "lobbies#new"
   get "join" => "lobbies#join", :as => :join_by_code
+  get "how-to-play" => "lobbies#how_to_play", :as => :how_to_play
 
   resources :games, only: [:create, :show], param: :code do
     member do
@@ -220,6 +221,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | --- | --- | --- |
 | GET | `/` | Landing: start a game, standard or first to 5, or join by code |
 | GET | `/join?code=` | Find the room by code, redirect to its join page or back with "Room not found" |
+| GET | `/how-to-play?game=` | The rules page, linked from the landing and the player screen. With `?game=` holding a room code (`Game::CODE_FORMAT`), **← Back** and the closing **Back to the game** go to that room's player screen `/games/:code/controller`; with anything else, or no code, Back goes to `/` and the closing section offers **Start a game** and **Join with a room code** instead. Only a code is ever accepted, never a path or URL, so Back cannot leave the site |
 | POST | `/games` | Create room (`mode=quick` for first to 5), give this browser the `host_game` cookie, redirect to the creator's join page `/games/:code/players/join` |
 | GET | `/games/:code` | Big screen, optional: any room can open it at any time |
 | GET | `/games/:code/players/join` | Join page, after starting a game, the QR scan or a code: name + color form |
