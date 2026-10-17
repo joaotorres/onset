@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-17  context cap: 104k, over 100k with the review next. 30 triaged and built. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-17  build 30: @game_path renamed to @player_screen_path, Verification passed (16 examples, standardrb clean, grep empty). Next: review.
 - 2026-10-17  triage 30: ready, no spec change, one Decided line. Next: build.
 - 2026-10-17  request 30: rename @game_path to @player_screen_path on How to play, from review 20261017-132315. Next: triage.
