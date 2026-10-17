@@ -1,6 +1,6 @@
 # 29: How to play Back link: specs and a clearer name
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

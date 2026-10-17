@@ -2,6 +2,11 @@
 
 What each deploy shipped, newest first, from the tickets' Changelog: lines.
 
+## 2026-10-17, deploy-20261017-1810
+
+- Behind the scenes: tests now cover where the How to play Back link goes, and a variable got a clearer name. (29)
+- Behind the scenes: the How to play page names its player screen link more clearly in the code. (30)
+
 ## 2026-10-17, deploy-20261017-0058
 
 - Behind the scenes: spec wording fixes, nothing changes for players. (27)

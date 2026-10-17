@@ -1,6 +1,6 @@
 # 30: How to play: rename @game_path to @player_screen_path
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:
