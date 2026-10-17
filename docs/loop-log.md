@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-17  request 29: specs for the How to play Back link and a clearer name for @return_to, from review 20261017-005226. Next: triage.
 - 2026-10-17  changelog: backfilled 5 deploys, 25 tickets. Next: new requests.
 - 2026-10-17  deploy deploy-20261017-0058: 27, 28 deployed. Next: new requests.
 - 2026-10-17  review 20261017-005226: ticket 28 passes spec, no pending decisions, the triage 27 log line still out of order. Next: bin/deploy.
