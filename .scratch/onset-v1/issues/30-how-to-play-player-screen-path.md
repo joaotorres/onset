@@ -1,11 +1,11 @@
 # 30: How to play: rename @game_path to @player_screen_path
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the How to play page names its player screen link more clearly in the code.
 
 ## Request
 

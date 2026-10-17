@@ -12,7 +12,7 @@ class LobbiesController < ApplicationController
   def how_to_play
     # only a game code, so the Back link can never point off the site
     code = params[:game].to_s
-    @game_path = game_controller_path(code) if code.match?(Game::CODE_FORMAT)
-    @back_path = @game_path || root_path
+    @player_screen_path = game_controller_path(code) if code.match?(Game::CODE_FORMAT)
+    @back_path = @player_screen_path || root_path
   end
 end
