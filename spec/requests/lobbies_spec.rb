@@ -91,6 +91,17 @@ RSpec.describe "Lobbies", type: :request do
       expect(response.body).to include(%(href="/games/ABC234/controller">Back to the game</a>))
     end
 
+    it "points ← Back at the game's player screen when given its code" do
+      get how_to_play_path, params: {game: "ABC234"}
+      expect(response.body).to include(%(href="#{game_controller_path("ABC234")}">← Back</a>))
+    end
+
+    it "points ← Back at the root with no game param" do
+      get how_to_play_path
+      expect(response.body).to include(%(href="#{root_path}">← Back</a>))
+      expect(response.body).not_to include("Back to the game")
+    end
+
     ["https://example.com", "//example.com", "/\\example.com", "example.com/ABC234"].each do |url|
       it "ignores game=#{url} and goes back to the root" do
         get how_to_play_path, params: {game: url}

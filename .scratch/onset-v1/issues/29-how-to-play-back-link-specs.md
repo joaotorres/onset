@@ -1,11 +1,11 @@
 # 29: How to play Back link: specs and a clearer name
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: tests now cover where the How to play Back link goes, and a variable got a clearer name.
 
 ## Request
 

@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-17  build 29: done, two Back link request specs and @return_to renamed to @game_path, verification passed. Next: review.
 - 2026-10-17  triage 29: ready, no spec change, three Decided lines. Next: build.
 - 2026-10-17  request 29: specs for the How to play Back link and a clearer name for @return_to, from review 20261017-005226. Next: triage.
 - 2026-10-17  changelog: backfilled 5 deploys, 25 tickets. Next: new requests.
