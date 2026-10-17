@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-17  copy pass: 0 fixed, 0 flagged, one Changelog line in range. Next: review.
 - 2026-10-17  context cap: 127k, over 100k with the review next. 29 built. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-17  build 29: done, two Back link request specs and @return_to renamed to @game_path, verification passed. Next: review.
 - 2026-10-17  triage 29: ready, no spec change, three Decided lines. Next: build.
