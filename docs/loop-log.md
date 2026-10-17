@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-17  review: 20261017-160534, tickets 29 and 30, no pending decisions, one Oxford comma in ticket 30's prose. Next: bin/deploy.
 - 2026-10-17  context cap: 104k, over 100k with the review next. 30 triaged and built. Next: /clear, then /skills-loop:auto for the review.
 - 2026-10-17  build 30: @game_path renamed to @player_screen_path, Verification passed (16 examples, standardrb clean, grep empty). Next: review.
 - 2026-10-17  triage 30: ready, no spec change, one Decided line. Next: build.
