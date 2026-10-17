@@ -5,6 +5,7 @@ Kind: visual
 Blocked by: 15
 Model:
 Effort:
+Changelog: On a computer, the player screen shows a board-sized layout, with the scores and SET! in a side column.
 
 ## Request
 

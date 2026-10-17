@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: Striped cards keep their stripes on a computer after you tap a card.
 
 ## Request
 

@@ -5,6 +5,7 @@ Kind: visual
 Blocked by: 14
 Model:
 Effort:
+Changelog: In landscape, the player screen shows the board, every player's score and SET! side by side, with no sideways scroll.
 
 ## Request
 

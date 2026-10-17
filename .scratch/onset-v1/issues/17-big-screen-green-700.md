@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: The big screen's Start game and Play again buttons are a darker green, so their white text is easier to read.
 
 ## Request
 

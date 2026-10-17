@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: Tapping a card on the player screen while nobody is claiming calls SET! and picks that card.
 
 ## Request
 

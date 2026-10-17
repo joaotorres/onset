@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: Play again on the player screen is a vote: the game restarts once every player has voted.
 
 ## Request
 

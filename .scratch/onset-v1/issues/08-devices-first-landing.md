@@ -5,6 +5,7 @@ Kind: visual
 Blocked by:
 Model:
 Effort:
+Changelog: The landing has one "Start a game" button with a standard or first-to-5 choice, and takes you to your own join form, with the option to use that screen as the big screen instead.
 
 ## Request
 

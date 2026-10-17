@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: On a narrow desktop window, the landing's example cards no longer cover the start game form.
 
 ## Request
 

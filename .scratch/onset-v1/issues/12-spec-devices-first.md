@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: Behind the scenes: the spec describes playing on your own devices, with the big screen optional.
 
 ## Request
 

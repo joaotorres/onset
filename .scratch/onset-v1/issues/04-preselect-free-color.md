@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: The join form picks the first free color for you.
 
 ## Request
 

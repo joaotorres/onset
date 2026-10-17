@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by: 16
 Model:
 Effort:
+Changelog: How to play explains that everyone plays on their own phone or computer, with the big screen optional.
 
 ## Request
 

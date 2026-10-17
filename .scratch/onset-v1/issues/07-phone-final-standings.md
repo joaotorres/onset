@@ -5,6 +5,7 @@ Kind: visual
 Blocked by:
 Model:
 Effort:
+Changelog: The player screen's game over shows the full standings, with your row highlighted.
 
 ## Request
 

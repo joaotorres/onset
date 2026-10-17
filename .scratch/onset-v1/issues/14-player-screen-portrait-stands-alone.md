@@ -5,6 +5,7 @@ Kind: visual
 Blocked by:
 Model:
 Effort:
+Changelog: In portrait, the player screen shows the whole game during play: every player's score, the board and the deck.
 
 ## Request
 

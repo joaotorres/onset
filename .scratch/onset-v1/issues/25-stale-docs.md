@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: Behind the scenes: the spec and glossary give the right claim and lockout times and say who can refuse a No Set call.
 
 ## Request
 

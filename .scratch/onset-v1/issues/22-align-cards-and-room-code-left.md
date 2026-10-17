@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: On a computer, the room code sits right under the cards, lined up with them.
 
 ## Request
 

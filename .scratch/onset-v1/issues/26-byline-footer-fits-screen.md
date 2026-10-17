@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: The byline no longer makes the landing, How to play and join pages scroll.
 
 ## Request
 

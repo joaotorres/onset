@@ -5,6 +5,7 @@ Kind: visual
 Blocked by:
 Model:
 Effort:
+Changelog: Any player can refuse a No Set call once per board, and after a refusal nobody can call No Set for 15 seconds.
 
 ## Request
 

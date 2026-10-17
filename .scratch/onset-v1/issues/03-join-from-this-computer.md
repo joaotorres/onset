@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by: 02
 Model:
 Effort:
+Changelog: The big screen has a "Join from this computer" link that opens the join page in a new tab.
 
 ## Request
 

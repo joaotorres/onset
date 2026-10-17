@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by: 19
 Model:
 Effort:
+Changelog: After a wrong or timed-out claim you are locked out for 15 seconds, as long as a claim lasts.
 
 ## Request
 

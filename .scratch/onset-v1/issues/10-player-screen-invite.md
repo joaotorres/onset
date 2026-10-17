@@ -5,6 +5,7 @@ Kind: visual
 Blocked by:
 Model:
 Effort:
+Changelog: The player screen's waiting room lets you invite others with the room code, a link to copy or share, a QR code and a "Show on a big screen" link.
 
 ## Request
 

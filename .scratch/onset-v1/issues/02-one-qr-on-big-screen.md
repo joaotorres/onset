@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: The big screen shows one QR code, only while waiting, and the room code fits on a laptop screen.
 
 ## Request
 

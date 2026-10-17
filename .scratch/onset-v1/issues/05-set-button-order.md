@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: SET! stays on top of the player screen in every state, the No Set countdown included.
 
 ## Request
 

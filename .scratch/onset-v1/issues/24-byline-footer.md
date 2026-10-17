@@ -5,6 +5,7 @@ Kind: visual
 Blocked by:
 Model:
 Effort:
+Changelog: The landing, How to play and join pages have a "by joaotorr.es" byline at the bottom.
 
 ## Request
 

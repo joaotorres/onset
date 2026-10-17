@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: Picking a third card no longer submits right away: you can change your picks until the claim time runs out, and they are judged then.
 
 ## Request
 

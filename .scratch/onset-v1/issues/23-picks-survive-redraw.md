@@ -5,6 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
+Changelog: Cards you pick during a claim stay picked when the screen redraws.
 
 ## Request
 

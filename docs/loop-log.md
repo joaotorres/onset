@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-17  changelog: backfilled 5 deploys, 25 tickets. Next: new requests.
 - 2026-10-17  deploy deploy-20261017-0058: 27, 28 deployed. Next: new requests.
 - 2026-10-17  triage 28: done in triage, §5 gains the how-to-play route and a row for its Back link, three Decided lines. Next: review, then bin/deploy.
 - 2026-10-17  review 20261017-005226: ticket 28 passes spec, no pending decisions, the triage 27 log line still out of order. Next: bin/deploy.
