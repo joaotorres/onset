@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-17  triage 30: ready, no spec change, one Decided line. Next: build.
 - 2026-10-17  request 30: rename @game_path to @player_screen_path on How to play, from review 20261017-132315. Next: triage.
 - 2026-10-17  review: 20261017-132315, 0 spec findings, 4 standards judgement calls, one pending decision (@game_path clashes with the big screen route helper). Next: user settles it, then bin/deploy.
 - 2026-10-17  copy pass: 0 fixed, 0 flagged, one Changelog line in range. Next: review.
