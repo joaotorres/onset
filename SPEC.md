@@ -336,6 +336,7 @@ Stimulus attributes stay on whatever element plays the role:
 - `card-selection`: `card` targets with `data-card-id`, `aria-pressed` (the server renders `true` for a picked card) and `click->card-selection#toggle`, plus `slot` and `count` targets, and the claim's PATCH URL in `data-card-selection-url-value`
 - Idle board, in every player screen layout: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle). `card-tap`: `data-controller="card-tap"` on the claim form around the cards, each card a submit button with `click->card-tap#tap`. It remembers the tapped card in memory, and `card-selection` selects it on connect
 - Waiting invite (§8, Player screen, Waiting): `data-controller="invite"` around the invite with `url` (the join page URL) and `code` values. The Copy link / Share link button is the `link` target with `click->invite#share`; the QR sheet is a `<dialog>`, the `sheet` target, inside `#controller_status`, opened by Show QR with `click->invite#open` and closed by Done with `click->invite#close`
+- Telemetry (§17): the hidden `game-events` element stays inside `#controller_status`, so every room update re-renders it, and the layout keeps `tracked_events_tag` at the top of `<body>`
 - `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
 
 ### Why this works
@@ -530,13 +531,13 @@ The app deploys with Kamal to the Hostinger VPS shared with the other joaotorr.e
 
 - One `web` server, the VPS. kamal-proxy, already on the host, terminates SSL with a Let's Encrypt certificate and routes by hostname. Rails runs with `assume_ssl` and `force_ssl`, `/up` excluded from the redirect for the proxy health check.
 - Image on GitHub Container Registry as `joaotorres/onset`, built for amd64.
-- Env: `RAILS_MASTER_KEY` (secret), `SOLID_QUEUE_IN_PUMA: true` (clear).
+- Env: `RAILS_MASTER_KEY` and `SENTRY_DSN` (secret), `APP_NAME: onset` and `SOLID_QUEUE_IN_PUMA: true` (clear). `APP_NAME` and `SENTRY_DSN` are for telemetry (§17).
 - Volume `onset_storage:/rails/storage` holds the four SQLite files.
 - No accessories.
 
 ### `.kamal/secrets`
 
-Reads the registry token from the macOS Keychain and `RAILS_MASTER_KEY` from `config/master.key`. Nothing is stored in the file.
+Reads the registry token and the Sentry DSN from the macOS Keychain (items `onset-registry-pat` and `onset-sentry-dsn`) and `RAILS_MASTER_KEY` from `config/master.key`. Nothing is stored in the file.
 
 ### Notes
 
@@ -745,6 +746,47 @@ without callbacks.
 - **Striped pattern density** — visually tune in browser; aim for clearly distinguishable from solid at TV viewing distance.
 - **Auto-submit timing** — resolved: no auto-submit, the picks are judged when the time runs out (§11).
 - **Cold-start mitigation** — consider a "Wake the server" splash on the landing page that does a low-cost ping while the user reads instructions.
+
+---
+
+## 17. Telemetry
+
+Analytics go to PostHog and errors to Sentry through the [`jt_telemetry`](https://github.com/joaotorres/jt_telemetry) gem, shared by the joaotorr.es apps. How it works, its settings and its defaults are in its [README](https://github.com/joaotorres/jt_telemetry#readme); this section covers only what Onset adds.
+
+### Setup
+
+- The layout calls `jt_telemetry_tags` in `<head>`, before the importmap tags. Telemetry is on in production only.
+- `APP_NAME` is `onset` (clear env, §13): the `app` property on every PostHog event and the `app` tag in Sentry.
+- `SENTRY_DSN` is a secret: `.kamal/secrets` reads it from the Keychain item `onset-sentry-dsn` (§13, `docs/deploy.md`).
+- The image build's `assets:precompile` needs no telemetry setting: the gem turns itself off under `SECRET_KEY_BASE_DUMMY`.
+
+### Custom events
+
+Every event goes through `window.jtTrack(name, props)`, which the gem defines in every environment, so app code calls it as `window.jtTrack?.(...)`. Names and properties are snake_case.
+
+| Event | Properties | Fires |
+|---|---|---|
+| `game_created` | `mode` (`standard` or `quick`) | `GamesController#create`, sent from the creator's join page |
+| `player_joined` | `player_count` (the room's players, the new one included), `is_creator` (this browser holds the room's `host_game` cookie), `mode` | `PlayersController#create`, sent from the new player's player screen |
+| `invite_shared` | `method`: `web_share` (the share sheet completed), `copy` (the link was copied) or `qr` (Show QR opened) | The waiting invite (`invite` controller, §8 Player screen) |
+| `game_started` | `mode`, `player_count` | Status `waiting` to `playing`: the host's Start game or the ready vote |
+| `game_restarted` | `mode`, `player_count` | Status `ended` to `playing`: the big screen's Play again or the ready vote |
+| `game_finished` | `mode`, `player_count`, `end_reason` (`quick_win`, `vote` or `deck_exhausted`), `is_tie` (no sole winner), `duration_seconds` when known | Status `playing` to `ended` |
+
+**Server actions ride the flash.** `game_created` and `player_joined` happen in an action that redirects, so no page is there to send them. `track_event` (`TracksEvents`, included in `ApplicationController`) appends the event to `flash[:tracked_events]`. The next page's layout renders it into a hidden `track` controller element, which sends each event once on connect and then empties its value, so a Turbo restoration visit to the cached page does not send it again. Nothing calls PostHog from the server.
+
+**Game state events come from one player screen.** The status reaches every screen by broadcast (§7), so no request marks a game starting, restarting or finishing. `#controller_status` carries a hidden `game-events` element (`TrackingHelper#game_events_tag`) with the room code, the status, the event properties and whether this player is the reporter. On each render the `game-events` controller compares the status with the last one this tab saw for the room; an event is a change it saw. Every player screen keeps track, and only the reporter sends: the player at the top of the standings (`Game#standings.first`, ties in join order), so each event is counted once. If the reporter's screen is not open at that moment, the event is not sent. The big screen sends no game events.
+
+**`duration_seconds` is measured on the screen.** Each player screen notes when it saw play start, and `game_finished` carries the seconds from then to the finish. A reporter screen opened fresh mid-game (a closed and reopened tab, another browser) did not see play start, so its `game_finished` leaves `duration_seconds` out. `Game` has no `started_at` column; adding one would make the duration exact, from the server, for every game.
+
+**Not tracked, on purpose.**
+
+- `start_method` on `game_started`: the screen sees only the change of status, so it cannot tell whether the host pressed Start game or everyone voted ready.
+- `set_found`: it fires many times per game.
+
+### Privacy
+
+PostHog runs with memory persistence: it sets no cookies and keeps nothing in browser storage, so there is no consent banner. Onset's own browser state is unchanged by telemetry, apart from one `sessionStorage` entry per room for the `game-events` controller (`onset.game.<code>`: the last status this tab saw and when it saw play start), which never leaves the browser.
 
 ---
 
