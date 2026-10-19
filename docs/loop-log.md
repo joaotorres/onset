@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-20  deploy deploy-20261020-0058: no ticket deployed. Next: new requests.
 - 2026-10-19  deploy deploy-20261019-2240: no ticket deployed. Next: new requests.
 - 2026-10-19  deploy deploy-20261019-2027: 31 deployed. Next: new requests.
 - 2026-10-19  triage 31: done in triage, docs only: new §17 Telemetry, §13 Env and secrets, §7 hook line, four Decided lines. Next: review.
