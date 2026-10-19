@@ -52,9 +52,7 @@ COPY . .
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-# Telemetry off: jt_telemetry fails a production boot without APP_NAME, which
-# only the running container gets (config/deploy.yml).
-RUN SECRET_KEY_BASE_DUMMY=1 TELEMETRY_ENABLED=false ./bin/rails assets:precompile
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
 
