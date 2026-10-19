@@ -426,6 +426,11 @@ A small muted footer, the same across all of joaotorr.es's apps, so its look and
 - **Hover (devices with hover) or keyboard focus**: "by" and the underline stay as they are. Over 1s the dot hops up and lands with a small bounce, turning gold, while "joaotorr" fades to a green to blue gradient and "es" to a red, gold, red stripe. It stays coloured until the next page load; hovering again replays the hop. Reduced motion: no hop, the colours still fade in. Keyboard focus adds a 2px `blue-500` outline.
 - **Logo colours**: the dark values, since every Onset screen is dark: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`. The light values (`#009C3B`, `#002776`, `#C60B1E`, `#E08A00`) sit on `:root` for any light ground.
 
+### Search engines
+
+- **Public**: the landing (`/`) and How to play (`/how-to-play`), the pages meant to be found in search. Each carries a canonical link to its production URL without a query, so `/how-to-play?game=` folds into `/how-to-play`. English only, so no hreflang. `/sitemap.xml` lists the two, and `/robots.txt` allows everything and points to it, because a crawler cannot see the noindex on a page robots.txt blocks.
+- **Everything else is noindex by default**, through an `X-Robots-Tag` header: the big screen, the join and player screens, `/join` and anything added later. A new public page has to opt out explicitly and be added to the sitemap.
+
 ---
 
 ## 9. Action Cable channel (optional, only if Turbo Streams is insufficient)

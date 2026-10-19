@@ -1,4 +1,7 @@
 class LobbiesController < ApplicationController
+  # The public pages (SPEC.md §8, Search engines). /join only redirects.
+  skip_before_action :keep_out_of_search_results, only: [:new, :how_to_play]
+
   def new
   end
 

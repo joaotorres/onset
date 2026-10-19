@@ -1,1 +1,9 @@
 # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+#
+# Private pages are kept out of search results with an X-Robots-Tag noindex
+# (ApplicationController), not here: a crawler never sees the noindex on a
+# page it is not allowed to fetch.
+User-agent: *
+Allow: /
+
+Sitemap: https://onset.joaotorr.es/sitemap.xml
