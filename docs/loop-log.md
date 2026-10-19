@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-19  request 31: SPEC: telemetry with jt_telemetry and the custom events, docs only. Next: triage.
 - 2026-10-17  deploy deploy-20261017-1810: 29, 30 deployed. Next: new requests.
 - 2026-10-17  review: 20261017-160534, tickets 29 and 30, no pending decisions, one Oxford comma in ticket 30's prose. Next: bin/deploy.
 - 2026-10-17  context cap: 104k, over 100k with the review next. 30 triaged and built. Next: /clear, then /skills-loop:auto for the review.
