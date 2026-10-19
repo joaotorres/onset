@@ -1,5 +1,5 @@
 GIT
-  remote: https://github.com/joaotorres/jt_telemetry.git
+  remote: https://github.com/joaotorres/jt-telemetry.git
   revision: a2123b9b51eab04c1f7774bf9d2e2df83eb18189
   branch: main
   specs:

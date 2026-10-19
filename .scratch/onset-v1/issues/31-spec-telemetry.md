@@ -11,7 +11,7 @@ Changelog: Behind the scenes: the spec now describes the telemetry and its custo
 
 SPEC: document the telemetry from 6ad66e4, e3a67b0 and 2539ceb: jt_telemetry (PostHog and Sentry, link its README, no gem internals), APP_NAME onset, Sentry DSN in Keychain item onset-sentry-dsn, the custom event catalog with properties and where each fires (flash-based for server actions), game_started/finished/restarted sent only by the player at the top of the standings, duration_seconds left out when that screen did not see play start (no started_at column; adding one would make it exact), start_method and set_found deliberately not tracked, PostHog memory persistence. Docs only
 
-From the user. The code is built and committed; this documents it, no code or test change. The gem is https://github.com/joaotorres/jt_telemetry: link its README for how it works rather than repeating it.
+From the user. The code is built and committed; this documents it, no code or test change. The gem is https://github.com/joaotorres/jt-telemetry: link its README for how it works rather than repeating it.
 
 game_started, game_finished and game_restarted arrive by broadcast, so only one screen sends them: the player at the top of the standings. duration_seconds on game_finished is left out when that player's screen was opened fresh mid-game, since there is no started_at column; adding one would make it exact.
 
@@ -39,7 +39,7 @@ SPEC.md only. No code, no tests: 6ad66e4, e3a67b0 and 2539ceb already do what §
 
 ## Verification
 
-`grep -q "^## 17. Telemetry" SPEC.md && grep -q "onset-sentry-dsn" SPEC.md && grep -q "github.com/joaotorres/jt_telemetry#readme" SPEC.md && for e in game_created player_joined invite_shared game_started game_restarted game_finished; do grep -qE "^\| \`$e\` \|" SPEC.md || exit 1; done && grep -q "memory persistence" SPEC.md && grep -q "started_at" SPEC.md && grep -q "set_found" SPEC.md && grep -q "start_method" SPEC.md && echo ok`
+`grep -q "^## 17. Telemetry" SPEC.md && grep -q "onset-sentry-dsn" SPEC.md && grep -q "github.com/joaotorres/jt-telemetry#readme" SPEC.md && for e in game_created player_joined invite_shared game_started game_restarted game_finished; do grep -qE "^\| \`$e\` \|" SPEC.md || exit 1; done && grep -q "memory persistence" SPEC.md && grep -q "started_at" SPEC.md && grep -q "set_found" SPEC.md && grep -q "start_method" SPEC.md && echo ok`
 
 Tests to write first: none, docs only.
 

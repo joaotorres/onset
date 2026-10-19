@@ -40,8 +40,8 @@ gem "kamal", require: false
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
-# Sentry and PostHog, configured from ENV [https://github.com/joaotorres/jt_telemetry]
-gem "jt_telemetry", github: "joaotorres/jt_telemetry", branch: "main"
+# Sentry and PostHog, configured from ENV [https://github.com/joaotorres/jt-telemetry]
+gem "jt_telemetry", github: "joaotorres/jt-telemetry", branch: "main"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

@@ -751,7 +751,7 @@ without callbacks.
 
 ## 17. Telemetry
 
-Analytics go to PostHog and errors to Sentry through the [`jt_telemetry`](https://github.com/joaotorres/jt_telemetry) gem, shared by the joaotorr.es apps. How it works, its settings and its defaults are in its [README](https://github.com/joaotorres/jt_telemetry#readme); this section covers only what Onset adds.
+Analytics go to PostHog and errors to Sentry through the [`jt_telemetry`](https://github.com/joaotorres/jt-telemetry) gem, shared by the joaotorr.es apps. How it works, its settings and its defaults are in its [README](https://github.com/joaotorres/jt-telemetry#readme); this section covers only what Onset adds.
 
 ### Setup
 
