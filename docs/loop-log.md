@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-19  deploy deploy-20261019-2027: 31 deployed. Next: new requests.
 - 2026-10-19  triage 31: done in triage, docs only: new §17 Telemetry, §13 Env and secrets, §7 hook line, four Decided lines. Next: review.
 - 2026-10-19  request 31: SPEC: telemetry with jt_telemetry and the custom events, docs only. Next: triage.
 - 2026-10-17  deploy deploy-20261017-1810: 29, 30 deployed. Next: new requests.

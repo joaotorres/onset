@@ -2,6 +2,10 @@
 
 What each deploy shipped, newest first, from the tickets' Changelog: lines.
 
+## 2026-10-19, deploy-20261019-2027
+
+- Behind the scenes: the spec now describes the telemetry and its custom events, nothing changes for players. (31)
+
 ## 2026-10-17, deploy-20261017-1810
 
 - Behind the scenes: tests now cover where the How to play Back link goes, and a variable got a clearer name. (29)

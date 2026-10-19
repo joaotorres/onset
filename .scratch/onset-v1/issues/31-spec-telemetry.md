@@ -1,6 +1,6 @@
 # 31: SPEC: telemetry with jt_telemetry and the custom events
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:
