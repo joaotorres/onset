@@ -19,6 +19,7 @@ export default class extends Controller {
     if (this.sharing) {
       try {
         await navigator.share({ url: this.urlValue, title: `Room ${this.codeValue}` })
+        window.jtTrack?.("invite_shared", { method: "web_share" })
         return
       } catch (error) {
         if (error.name === "AbortError") return
@@ -26,6 +27,7 @@ export default class extends Controller {
     }
     try {
       await navigator.clipboard.writeText(this.urlValue)
+      window.jtTrack?.("invite_shared", { method: "copy" })
       this.flash("Copied ✓")
     } catch {
       this.flash("Couldn't copy")
@@ -34,6 +36,7 @@ export default class extends Controller {
 
   open() {
     this.sheetTarget.showModal()
+    window.jtTrack?.("invite_shared", { method: "qr" })
   }
 
   close() {

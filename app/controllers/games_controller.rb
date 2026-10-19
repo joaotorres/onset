@@ -8,6 +8,7 @@ class GamesController < ApplicationController
   def create
     game = Game.create!(mode: (params[:mode] == "quick") ? :quick : :standard)
     cookies.encrypted[:host_game] = {value: game.code, httponly: true, same_site: :lax}
+    track_event("game_created", mode: game.mode)
     redirect_to join_game_players_path(game.code)
   end
 

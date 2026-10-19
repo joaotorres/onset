@@ -28,6 +28,7 @@
   </head>
 
   <body class="min-h-dvh flex flex-col">
+    <%= tracked_events_tag(flash[:tracked_events]) %>
     <%= yield %>
     <%= render "layouts/byline_footer" unless content_for?(:hide_byline) %>
   </body>

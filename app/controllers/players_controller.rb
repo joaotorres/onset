@@ -27,6 +27,7 @@ class PlayersController < ApplicationController
     @player = @game.players.build(player_params)
     if @player.save
       cookies.encrypted[:player_token] = {value: @player.session_token, httponly: true, same_site: :lax}
+      track_event("player_joined", player_count: @game.players.count, is_creator: creator?, mode: @game.mode)
       redirect_to game_controller_path(@game.code)
     else
       @player.color = color_for_rerender(@player.color)
