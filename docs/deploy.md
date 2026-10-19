@@ -20,18 +20,20 @@ and SPEC.md section 13.
    This app only registers its own host with the proxy, so nothing about the
    other apps changes.
 
-3. **Store the registry secret in the Keychain, once.** `.kamal/secrets`
-   reads it at deploy time with `security find-generic-password`, so nothing
-   is exported and nothing is written to disk. The command prompts for the
-   value.
+3. **Store the two secrets in the Keychain, once.** `.kamal/secrets`
+   reads them at deploy time with `security find-generic-password`, so
+   nothing is exported and nothing is written to disk. Each command prompts
+   for the value.
 
    ```
    security add-generic-password -a "$USER" -s onset-registry-pat -w
+   security add-generic-password -a "$USER" -s onset-sentry-dsn -w
    ```
 
-   The value is a GitHub personal access token (classic) with the
+   The registry secret is a GitHub personal access token (classic) with the
    `write:packages` scope, the same one done uses. The image goes to GitHub
-   Container Registry and the package is private by default.
+   Container Registry and the package is private by default. The Sentry DSN
+   is the onset project's, from Sentry (Settings > Client Keys).
 
    `RAILS_MASTER_KEY` needs nothing: `.kamal/secrets` reads
    `config/master.key` directly. The first deploy of a login session may

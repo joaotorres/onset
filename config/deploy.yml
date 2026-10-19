@@ -32,7 +32,11 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - SENTRY_DSN
   clear:
+    # jt_telemetry: the PostHog app property and the Sentry app tag.
+    APP_NAME: onset
+
     # Solid Queue runs inside Puma, so this one container is the whole app:
     # HTML, WebSockets and jobs (SPEC.md, Architecture).
     SOLID_QUEUE_IN_PUMA: true

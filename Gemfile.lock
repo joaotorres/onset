@@ -1,3 +1,13 @@
+GIT
+  remote: https://github.com/joaotorres/jt_telemetry.git
+  revision: 646edaf0bf5a7d9bfa226c2e26cee47c4d9cab0a
+  branch: main
+  specs:
+    jt_telemetry (0.1.0)
+      railties (>= 8.0)
+      sentry-rails (~> 7.1)
+      sentry-ruby (~> 7.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -315,6 +325,13 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
+    sentry-rails (7.1.0)
+      railties (>= 5.2.0)
+      sentry-ruby (~> 7.1.0)
+    sentry-ruby (7.1.0)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      logger
     solid_cable (4.1.0)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -418,6 +435,7 @@ DEPENDENCIES
   image_processing (~> 2.1)
   importmap-rails
   jbuilder
+  jt_telemetry!
   kamal
   propshaft
   puma (>= 5.0)
