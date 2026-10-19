@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/joaotorres/jt_telemetry.git
-  revision: 0a138b09a03335ed659649f9d935ae1de1dbb2e1
+  revision: a2123b9b51eab04c1f7774bf9d2e2df83eb18189
   branch: main
   specs:
-    jt_telemetry (0.2.0)
+    jt_telemetry (0.3.0)
       railties (>= 8.0)
       sentry-rails (~> 7.1)
       sentry-ruby (~> 7.1)
