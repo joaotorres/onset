@@ -21,5 +21,6 @@ Rails.application.routes.draw do
   end
 
   mount ActionCable.server => "/cable"
+  get "clock" => "clocks#show"
   get "up" => "rails/health#show", :as => :rails_health_check
 end

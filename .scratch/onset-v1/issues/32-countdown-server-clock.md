@@ -1,11 +1,11 @@
 # 32: Countdown rings follow the server's clock
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: Countdown rings show the same time left on every screen, even on a device whose clock is off.
 
 ## Request
 

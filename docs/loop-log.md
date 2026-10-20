@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-21  build 32: done, GET /clock and a server clock offset shared by every countdown, suite green. Next: build 33.
 - 2026-10-21  triage 33: ready, spec gains Lost races are logged under §6 and Claim fairness under §14, four Decided lines. Next: build.
 - 2026-10-21  triage 32: ready, spec gains GET /clock and the NTP-style offset under §6, three Decided lines. Next: build.
 - 2026-10-21  request 33: log SET! near-ties and a §14 note to evaluate them, filed. Next: triage.

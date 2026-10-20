@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { now } from "server_clock"
 
 const CIRCUMFERENCE = 2 * Math.PI * 45 // ≈ 282.7
 
@@ -21,7 +22,7 @@ export default class extends Controller {
   }
 
   update() {
-    const elapsed = (Date.now() - new Date(this.startedAtValue)) / 1000
+    const elapsed = (now() - new Date(this.startedAtValue)) / 1000
     const remaining = Math.max(0, this.durationValue - elapsed)
 
     if (this.hasDisplayTarget) {
