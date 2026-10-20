@@ -47,6 +47,35 @@ RSpec.describe "Claims" do
       expect { post game_claims_path(game.code) }.not_to change(Claim, :count)
       expect(response).to have_http_status(:no_content)
     end
+
+    def near_tie_lines
+      lines = []
+      allow(Rails.logger).to receive(:info) { |msg = nil, &blk| lines << (msg || blk&.call).to_s }
+      yield
+      lines.grep(/near_tie/)
+    end
+
+    it "logs a near-tie when the call loses to another player's running claim" do
+      other = game.players.create!(name: "Bob", color: "#2ECC71")
+      game.try_claim!(other)
+      player = sign_in
+      lines = near_tie_lines do
+        expect { post game_claims_path(game.code) }.not_to change(Claim, :count)
+      end
+      expect(response).to have_http_status(:no_content)
+      expect(lines.size).to eq(1)
+      expect(lines.first).to match(/\Anear_tie game=#{game.code} winner=#{other.id} loser=#{player.id} late_ms=-?\d+\z/)
+    end
+
+    it "logs no near-tie for a locked-out player while another claim runs" do
+      player = sign_in
+      player.update!(locked_until: 5.seconds.from_now)
+      other = game.players.create!(name: "Bob", color: "#2ECC71")
+      game.try_claim!(other)
+      lines = near_tie_lines { post game_claims_path(game.code) }
+      expect(response).to have_http_status(:no_content)
+      expect(lines).to be_empty
+    end
   end
 
   describe "PATCH /games/:code/claims/:id" do

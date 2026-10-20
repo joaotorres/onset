@@ -1,10 +1,11 @@
 class ClaimsController < ApplicationController
+  before_action :stamp_arrival, only: :create
   before_action :set_game
   before_action :set_player
 
   def create
     # A lost race is not an error: the broadcast shows who is claiming.
-    @game.try_claim!(@player)
+    @game.try_claim!(@player, arrived_at: @arrived_at)
     head :no_content
   end
 
@@ -21,6 +22,11 @@ class ClaimsController < ApplicationController
   end
 
   private
+
+  # Before the lookups and the lock, so a wait for them does not inflate the near-tie gap (§6).
+  def stamp_arrival
+    @arrived_at = Time.current
+  end
 
   # The player screen sends a JSON array; a JSON string is accepted too.
   # Anything else becomes an invalid selection, which pick! ignores.

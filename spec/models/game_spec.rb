@@ -149,6 +149,52 @@ RSpec.describe Game do
       game.try_claim!(player)
       expect(game.reload.no_set_active?).to be false
     end
+
+    describe "near-tie log" do
+      let(:bob) { game.players.create!(name: "Bob", color: "#2ECC71") }
+
+      def near_tie_lines
+        lines = []
+        allow(Rails.logger).to receive(:info) { |msg = nil, &blk| lines << (msg || blk&.call).to_s }
+        yield
+        lines.grep(/near_tie/)
+      end
+
+      it "logs how late a call lost to a running claim arrived" do
+        game.try_claim!(player)
+        game.reload
+        lines = near_tie_lines { expect(game.try_claim!(bob, arrived_at: game.claim_started_at + 0.183)).to be_nil }
+        expect(lines).to eq(["near_tie game=#{game.code} winner=#{player.id} loser=#{bob.id} late_ms=183"])
+      end
+
+      it "logs a negative gap when the call arrived before the claim was stamped" do
+        game.try_claim!(player)
+        game.reload
+        lines = near_tie_lines { game.try_claim!(bob, arrived_at: game.claim_started_at - 0.02) }
+        expect(lines).to eq(["near_tie game=#{game.code} winner=#{player.id} loser=#{bob.id} late_ms=-20"])
+      end
+
+      it "logs nothing when the call wins" do
+        expect(near_tie_lines { game.try_claim!(bob) }).to be_empty
+      end
+
+      it "logs nothing for a locked-out player while a claim runs" do
+        game.try_claim!(player)
+        bob.update!(locked_until: 1.second.from_now)
+        expect(near_tie_lines { expect(game.try_claim!(bob)).to be_nil }).to be_empty
+      end
+
+      it "logs nothing when the game is not playing" do
+        game.try_claim!(player)
+        game.update!(status: :waiting)
+        expect(near_tie_lines { expect(game.try_claim!(bob)).to be_nil }).to be_empty
+      end
+
+      it "logs nothing for a locked-out player with no claim running" do
+        bob.update!(locked_until: 1.second.from_now)
+        expect(near_tie_lines { expect(game.try_claim!(bob)).to be_nil }).to be_empty
+      end
+    end
   end
 
   describe "#call_no_set!" do

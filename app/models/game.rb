@@ -136,11 +136,12 @@ class Game < ApplicationRecord
       player.id != no_set_caller_id && !no_set_voters.include?(player.id)
   end
 
-  def try_claim!(player)
+  # arrived_at: when the call reached the app, for the near-tie log (§6 Lost races are logged).
+  def try_claim!(player, arrived_at: Time.current)
     with_lock do
       return nil unless playing?
-      return nil if claim_active?
       return nil if player.locked?
+      return log_near_tie(player, arrived_at) if claim_active?
 
       cancel_no_set! if no_set_active?
 
@@ -266,6 +267,13 @@ class Game < ApplicationRecord
   end
 
   private
+
+  # A call that lost on the running claim alone. Returns nil, like every refused call.
+  def log_near_tie(player, arrived_at)
+    late_ms = ((arrived_at - claim_started_at) * 1000).round
+    Rails.logger.info("near_tie game=#{code} winner=#{claim_player_id} loser=#{player.id} late_ms=#{late_ms}")
+    nil
+  end
 
   def all_active_players_voted?
     active_ids = players.select(&:active?).map(&:id)

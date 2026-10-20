@@ -1,11 +1,11 @@
 # 33: Log SET! near-ties
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the server logs how late a SET! call arrived when it loses the race to another player's claim.
 
 ## Request
 
