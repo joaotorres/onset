@@ -52,6 +52,22 @@ The spec is intentionally minimal. Do not add the following without flagging in 
 
 Re-read the relevant spec section. Do not invent details that drift from the spec.
 
+## Shared conventions
+
+Conventions shared across my apps (SEO, telemetry, verify after deploy, the
+new app checklist) live in `~/Projects/jt-playbook`. A change here to a shared
+convention updates jt-playbook in the same piece of work.
+
+- **New pages are private.** Every response is noindex unless its controller
+  skips `keep_out_of_search_results`. A page made public is added to
+  `public/sitemap.xml` with a canonical link. See §8, Search engines
+- **A new user-facing action gets a `jtTrack` event**, named `object_action`
+  in snake_case, and is added to the table in §17, Custom events. An event
+  fired right before the page navigates away passes `{ beacon: true }`
+- **A new URL that carries a secret is declared in `redact_paths`**
+  (`config/application.rb`). None does today. See the jt-telemetry README,
+  Secrets in paths
+
 ## Agent skills
 
 ### Issue tracker

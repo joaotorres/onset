@@ -3,7 +3,7 @@
 Kamal to the Hostinger VPS that already runs done (done.joaotorr.es) and
 linkpass. The app and kamal-proxy share the host. There is no database
 accessory: the four SQLite databases live on a Docker volume. Deploys are run
-by hand from this Mac. Why this shape: ~/Projects/TOOLCHAIN.md, Deployment,
+by hand from this Mac. Why this shape: ~/Projects/jt-playbook/TOOLCHAIN.md, Deployment,
 and SPEC.md section 13.
 
 ## First deploy
