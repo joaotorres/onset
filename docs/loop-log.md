@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-21  review 20261021-004236: tickets 32 and 33, suite green, no pending decisions, 3 Oxford commas and 6 judgement calls in findings. Next: bin/deploy.
 - 2026-10-21  build 33: done, lost SET! races logged as near_tie lines with late_ms, suite green. Next: review.
 - 2026-10-21  build 32: done, GET /clock and a server clock offset shared by every countdown, suite green. Next: build 33.
 - 2026-10-21  triage 33: ready, spec gains Lost races are logged under §6 and Claim fairness under §14, four Decided lines. Next: build.
