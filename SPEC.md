@@ -210,6 +210,8 @@ Rails.application.routes.draw do
     resource :end_game, only: [:create]
   end
 
+  get "clock" => "clocks#show"
+
   mount ActionCable.server => "/cable"
   get "up" => "rails/health#show", :as => :rails_health_check
 end
@@ -236,6 +238,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | DELETE | `/games/:code/no_set` | Withdraw your vote (rare; no UI button v1) |
 | POST | `/games/:code/no_set/refuse` | Refuse the running call: cancel it and block No Set for `NO_SET_TIMEOUT` (§2). Once per board. Ignored from the caller, from a player who agreed and once this board's refusal is used (`can_refuse_no_set?`, §4) |
 | POST | `/games/:code/end_game` | Vote to end once the deck is empty; ends when every active player has voted |
+| GET | `/clock` | The server's current time, JSON `{"now": <milliseconds since the epoch>}`, uncached. Screens measure their clock offset against it (§6 Server-side timers) |
 
 ---
 
@@ -284,6 +287,8 @@ A round is the period between deals. Transitions are owned by the `Game` model a
 ### Server-side timers
 
 Use Solid Queue jobs scheduled with `set(wait: ...)` to enforce timeouts: `ExpireClaimJob` after `Game::CLAIM_TIMEOUT`, `ExpireNoSetJob` after `Game::NO_SET_TIMEOUT`, `UnlockBroadcastJob` after the lockout (`Game::CLAIM_TIMEOUT`), `UnblockNoSetJob` after a refusal's block (`Game::NO_SET_TIMEOUT`, broadcasting so No Set comes back on every screen), `ClearClaimFlashJob` and `ClearLastDealtJob` after 3s. The job re-checks state inside a transaction (claim could have been resolved already) and only acts if still applicable. Do not rely on client-side timers for correctness: they are display-only.
+
+**Countdowns follow the server's clock.** Every ring and seconds display counts from a `started_at` the server stamped, so a device whose clock is n seconds off would show every countdown off by n seconds. To keep the rings on every screen in step, each page measures its offset from the server's clock once per page load, NTP-style: it fetches `GET /clock` a few times, keeps the sample with the shortest round trip and takes `offset = server_now - (sent + received) / 2`. Countdowns then read the time as `Date.now() + offset`. One offset per page, shared by every countdown on it and kept across the stream redraws that replace rings (§7). Until the first sample lands, countdowns use the device clock as is, and they correct on their own once it does. Tens of ms of residual error from an asymmetric network path are expected and fine: the rings are display only, the server still judges every deadline.
 
 ---
 
@@ -337,7 +342,7 @@ Stimulus attributes stay on whatever element plays the role:
 - Idle board, in every player screen layout: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle). `card-tap`: `data-controller="card-tap"` on the claim form around the cards, each card a submit button with `click->card-tap#tap`. It remembers the tapped card in memory, and `card-selection` selects it on connect
 - Waiting invite (§8, Player screen, Waiting): `data-controller="invite"` around the invite with `url` (the join page URL) and `code` values. The Copy link / Share link button is the `link` target with `click->invite#share`; the QR sheet is a `<dialog>`, the `sheet` target, inside `#controller_status`, opened by Show QR with `click->invite#open` and closed by Done with `click->invite#close`
 - Telemetry (§17): the hidden `game-events` element stays inside `#controller_status`, so every room update re-renders it, and the layout keeps `tracked_events_tag` at the top of `<body>`
-- `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`.
+- `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`. Elapsed time is measured on the server's clock, through the page's clock offset (§6 Server-side timers), which lives outside the controller instance so a redraw keeps it.
 
 ### Why this works
 

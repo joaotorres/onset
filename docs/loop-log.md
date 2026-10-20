@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-21  triage 32: ready, spec gains GET /clock and the NTP-style offset under §6, three Decided lines. Next: build.
 - 2026-10-21  request 33: log SET! near-ties and a §14 note to evaluate them, filed. Next: triage.
 - 2026-10-21  request 32: countdown rings follow the server's clock, filed. Next: triage.
 - 2026-10-20  deploy deploy-20261020-0058: no ticket deployed. Next: new requests.
