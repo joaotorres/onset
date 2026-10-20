@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-21  request 32: countdown rings follow the server's clock, filed. Next: triage.
 - 2026-10-20  deploy deploy-20261020-0058: no ticket deployed. Next: new requests.
 - 2026-10-19  deploy deploy-20261019-2240: no ticket deployed. Next: new requests.
 - 2026-10-19  deploy deploy-20261019-2027: 31 deployed. Next: new requests.
