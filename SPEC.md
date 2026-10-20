@@ -232,7 +232,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | POST | `/games/:code/ready` | A player votes to start; the game starts when every player (2+) has voted. Once ended, a player votes to play again; the room restarts when every active player has voted |
 | POST | `/games/:code/start` | The host (the browser holding `host_game`) starts the game from the big screen |
 | POST | `/games/:code/restart` | Play again from the big screen (host): reset deck, clear scores and votes, status `playing`, at once |
-| POST | `/games/:code/claims` | Try to take the claim lock; a lost race changes nothing |
+| POST | `/games/:code/claims` | Try to take the claim lock; a lost race changes nothing, and one lost to a running claim is logged (§6 Lost races are logged) |
 | PATCH | `/games/:code/claims/:id` | Replace the picks (`card_ids`, 0 to 3 board cards) of a held claim; nothing is judged until the time runs out (§11) |
 | POST | `/games/:code/no_set` | Initiate No-Set countdown OR join existing call |
 | DELETE | `/games/:code/no_set` | Withdraw your vote (rare; no UI button v1) |
@@ -283,6 +283,8 @@ A round is the period between deals. Transitions are owned by the `Game` model a
 - A No-Set call cannot be initiated while a claim is active, nor while the refusal block runs (`no_set_refused_at` less than `NO_SET_TIMEOUT` ago).
 - A refusal is accepted only while a call is active and `no_set_refused_at` is nil; `no_set_refuser_id` and `no_set_refused_at` are cleared whenever the board changes.
 - Lockout (`Player#locked_until`) is checked **inside** the claim acquisition transaction.
+
+**Lost races are logged.** A SET! call that arrives while another claim runs loses the race and changes nothing (§5), but the server logs how late it was: one `info` line, `near_tie game=<code> winner=<player id> loser=<player id> late_ms=<n>`, where `late_ms` is the losing call's arrival minus the running claim's `claim_started_at`, in whole ms. Arrival is stamped as soon as the request reaches the app, before the game and player are looked up and before the lock is taken, so a wait for the lock does not inflate the gap; a negative value means the call reached the app before the winner's claim was stamped and the lock order decided. Only a call that lost on the running claim alone is logged: a call from a locked-out player, or outside play, is refused for its own reason and logs nothing. The line carries ids, never names. Why: the server already judges claims in arrival order, so the unfairness, if any, comes before it (network differences between phones, `click` firing on finger release, an occasional cold connection), and the arrival gap is the signal for whether the order could have flipped. §14 Claim fairness says what the lines are for.
 
 ### Server-side timers
 
@@ -574,6 +576,16 @@ The Game logic does not change. `Player` continues to be the in-game identity; `
 ### AI opponent (v2)
 
 Brute-force solver runs in `Card.any_set_on?` already. A "bot player" is a `Player` row with no `session_token` and no User, animated by a background job that, after a configurable delay, attempts to claim a random valid Set. Difficulty = delay distribution.
+
+### Claim fairness
+
+Once enough games have been played, read the `near_tie` lines (§6 Lost races are logged; `bin/kamal logs`, `docs/deploy.md`) and decide from them whether the claim race needs changing. Today the rule is "first to reach the server", and a `late_ms` well above the spread of a phone's network path says the order could not have flipped. If the gaps are small and frequent, these are the options, with their trade-offs:
+
+- **Claim on pointerdown**: removes the release delay that varies per player, but fires on a scroll start or a brush (stray claims cost −1), loses slide-off-to-cancel, risks a card being picked twice when the click lands on the redrawn screen (§8 "only the first tap counts"), and needs `click` kept for the keyboard. If done, SET! button only.
+- **Claims over the WebSocket**: skips a possible handshake and HTTP overhead, but the gain is unmeasured, mobile browsers drop the socket on suspended tabs so HTTP stays as a fallback (two claim paths), and it needs the custom channel §9 says to avoid.
+- **Lag compensation** (tap timestamps plus a short collection window): the only option that cancels network differences, but every claim starts about 150 ms later, it trusts device-reported tap times (needs clock sync for correctness and a clamp against faked early stamps), still misses device input speed and is harder to test.
+
+Also worth weighing then: players see a new board at different moments, a head start none of these fix; and "first to reach the server" is a defensible rule for a casual party game.
 
 ### Other
 
