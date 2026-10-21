@@ -2,6 +2,11 @@
 
 What each deploy shipped, newest first, from the tickets' Changelog: lines.
 
+## 2026-10-21, deploy-20261021-2026
+
+- Countdown rings show the same time left on every screen, even on a device whose clock is off. (32)
+- Behind the scenes: the server logs how late a SET! call arrived when it loses the race to another player's claim. (33)
+
 ## 2026-10-19, deploy-20261019-2027
 
 - Behind the scenes: the spec now describes the telemetry and its custom events, nothing changes for players. (31)

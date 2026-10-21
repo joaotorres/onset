@@ -1,6 +1,6 @@
 # 33: Log SET! near-ties
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

@@ -1,6 +1,6 @@
 # 32: Countdown rings follow the server's clock
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:
