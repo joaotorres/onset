@@ -64,9 +64,10 @@ bin/kamal app exec 'bin/rails runner "puts SolidQueue::Process.count"'
 The first prints a 200 page. The second prints at least 1: the Solid Queue
 supervisor running inside Puma.
 
-Then open https://onset.joaotorr.es/, create a game and join it from a phone.
-Cards appearing on the board when the phone claims a Set confirms Action
-Cable works through the proxy.
+Then open https://onset.joaotorr.es/, create a game on one device and join it
+from a second, such as a phone. New cards appearing on the first device's
+screen when the second claims a Set confirm Action Cable works through the
+proxy.
 
 ## Redeploying
 

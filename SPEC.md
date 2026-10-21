@@ -108,7 +108,7 @@ The room.
 | `start_voters` | json | Player ids who tapped "I'm ready" while waiting, or "Play again" once ended (default `[]`) |
 | `end_game_voters` | json | Player ids who voted to end once the deck is empty (default `[]`) |
 | `flash_claim_id` | bigint | nullable; the just-resolved claim the screens announce for 3s |
-| `last_dealt` | json | Card ids dealt by the last replace, outlined on the big screen for 3s (default `[]`) |
+| `last_dealt` | json | Card ids dealt by the last replace, outlined on the big screen and every player screen for 3s (default `[]`) |
 | `last_activity_at` | datetime | unused; idle cleanup uses `updated_at` |
 | `ended_at` | datetime | nullable |
 
