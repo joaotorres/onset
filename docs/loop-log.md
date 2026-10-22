@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-22  triage 35: ready, no spec change, three Decided lines. Next: build.
 - 2026-10-22  request 36: filed, behavioural. Next: triage.
 - 2026-10-22  request 35: filed, behavioural. Next: triage.
 - 2026-10-22  review 20261022-163847: suite green, no hard violation, two pending decisions (join reorder on the waiting board, the seen! comment). Next: settle them, then bin/deploy.
