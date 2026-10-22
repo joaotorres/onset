@@ -1,11 +1,11 @@
 # 35: Player#seen! comment gives the spec's reason
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the comment on Player#seen! gives SPEC §7's reason for skipping callbacks, a heartbeat broadcast shows nothing new.
 
 ## Request
 

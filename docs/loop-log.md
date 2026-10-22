@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-22  build 35: done, Player#seen! comment gives §7's reason, model spec green. Next: build 36.
 - 2026-10-22  triage 36: ready, spec §7 stamps the waiting board, start button and controller status with the room players' version, five Decided lines. Next: build.
 - 2026-10-22  triage 35: ready, no spec change, three Decided lines. Next: build.
 - 2026-10-22  request 36: filed, behavioural. Next: triage.

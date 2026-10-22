@@ -14,8 +14,8 @@ class Player < ApplicationRecord
 
   def active? = last_seen_at.present? && last_seen_at > 30.seconds.ago
 
-  # Bookkeeping only: skips callbacks so it doesn't broadcast a stale
-  # controller_status that can land after the real update.
+  # Bookkeeping only: skips callbacks because a heartbeat broadcast would
+  # show nothing new (SPEC §7).
   def seen! = update_column(:last_seen_at, Time.current)
 
   def host? = game.host_player_id == id
