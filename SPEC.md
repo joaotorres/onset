@@ -329,11 +329,20 @@ The big screen subscribes to `game:CODE` only. The player screen subscribes to *
 
 Every POST from a player screen or the big screen (SET!, a card pick, No Set, agree, End game, ready, Start game, Play again) answers `204 No Content`. Turbo leaves the page alone, and the broadcast the action triggers updates every screen, including the one that acted.
 
-Do not redirect back to the same page. A redirect reloads it, which drops its stream subscriptions for about 500 ms, and any broadcast in that window is lost. Do not send per-player broadcasts for bookkeeping either (see `last_seen_at`): the `async` adapter can deliver two messages to the same stream out of order, and a stale one can win.
+Do not redirect back to the same page. A redirect reloads it, which drops its stream subscriptions for about 500 ms, and any broadcast in that window is lost. Do not send per-player broadcasts for bookkeeping either (see `last_seen_at`): a broadcast per heartbeat is traffic with nothing new to show. `Player#seen!` writes `last_seen_at` without callbacks for that reason; the guard against a stale message is the version check below, not the bookkeeping.
+
+### Screens ignore broadcasts older than what they show
+
+Action Cable hands each message to a pool of worker threads, so two broadcasts to one stream can reach a screen out of order: the first ready vote's `board` (still waiting) can land after the game start's and leave the big screen and every player screen on the waiting state. Each replaced region therefore carries a version, and a screen drops a replace older than what it shows.
+
+- Every hook root listed below carries `data-version`: an `updated_at` as integer microseconds since the epoch. `#board`, `#announcement`, `#start_button` and `#room_tile` carry the game's. `#scoreboard` and `#controller_status` also show player state (scores, lockouts), and a lockout or a join writes the player without touching the game, so they carry the newer of the game's and the players' (`#scoreboard`: every player in the room; `#controller_status`: that player).
+- A global `turbo:before-stream-render` listener compares a `replace` stream's root `data-version` with that of the element it targets on the page and drops the stream when its version is strictly older. A stream with no version, or whose target is not on the page, renders as before.
+- Equal versions render. `UnblockNoSetJob` and `UnlockBroadcastJob` rebroadcast because time passed, with no write, so their version equals the one on the page and the No Set pill, the big screen band and the SET! button come back.
+- The version is `updated_at`, not a counter column: SQLite's single writer and Rails 8's immediate transactions keep it monotonic within a room, and no migration is needed. A column named `lock_version` would turn on optimistic locking, so a counter is ruled out by name as well.
 
 ### Hooks that must survive any markup change
 
-Turbo Streams replace these by id, so each stays the outermost element of its region:
+Turbo Streams replace these by id, so each stays the outermost element of its region, and each carries `data-version` (above):
 
 - Big screen: `#board` (holds the waiting state and `#start_button`), `#scoreboard`, `#announcement`, `#start_button`, `#room_tile`
 - Player screen: `#controller_status` (wraps the header or scoreboard, the deck count, the state body and the found-set banner)
