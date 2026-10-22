@@ -17,8 +17,10 @@
       "Bash(bin/rails tailwindcss:build)",
       "Bash(bin/rails db:test:prepare:*)"
     ],
+    "ask": [
+      "Bash(git push:*)"
+    ],
     "deny": [
-      "Bash(git push:*)",
       "Bash(git reset --hard:*)",
       "Bash(rm -rf:*)",
       "Bash(sudo:*)",
