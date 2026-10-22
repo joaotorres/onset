@@ -637,4 +637,26 @@ RSpec.describe Game do
       end
     end
   end
+
+  describe "broadcast versions (§7, Screens ignore broadcasts older than what they show)" do
+    include ActiveSupport::Testing::Assertions
+    include Turbo::Broadcastable::TestHelper
+
+    def version(stream) = stream.to_html[/data-version="(\d+)"/, 1].to_i
+
+    it "stamps the starting vote's board with the game's new updated_at, newer than the earlier vote's" do
+      game = Game.create!
+      alice = game.players.create!(name: "Alice", color: "#648FFF")
+      bob = game.players.create!(name: "Bob", color: "#FE6100")
+
+      first = capture_turbo_stream_broadcasts("game:#{game.code}") { game.vote_start!(alice) }
+      second = capture_turbo_stream_broadcasts("game:#{game.code}") { game.vote_start!(bob) }
+      expect(game.reload).to be_playing
+
+      first_board = first.reverse.find { |s| s["target"] == "board" }
+      second_board = second.reverse.find { |s| s["target"] == "board" }
+      expect(version(second_board)).to eq((game.updated_at.to_r * 1_000_000).to_i)
+      expect(version(second_board)).to be > version(first_board)
+    end
+  end
 end

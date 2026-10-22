@@ -16,7 +16,7 @@
   # During the block after a refusal the refused panel takes the status slot (§8, Player screen 2 and 6).
   blocked = game.playing? && game.no_set_blocked?
 %>
-<div id="controller_status" class="relative flex-1 min-h-0 flex flex-col">
+<div id="controller_status" data-version="<%= stream_version(game, player) %>" class="relative flex-1 min-h-0 flex flex-col">
   <%= game_events_tag(game, player) %>
   <% if flash_claim&.correct? && flash_claim.card_ids.present? %>
     <%= render "players/controller/found_banner", claim: flash_claim %>

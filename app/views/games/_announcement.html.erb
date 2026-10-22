@@ -1,6 +1,6 @@
 <% flash_claim = local_assigns[:flash_claim] %>
 <% empty = !flash_claim && !(game.playing? && (game.claim_active? || game.no_set_active? || game.no_set_blocked?)) %>
-<div id="announcement" class="h-36 shrink-0 <%= "grid place-items-center" if empty %>">
+<div id="announcement" data-version="<%= stream_version(game) %>" class="h-36 shrink-0 <%= "grid place-items-center" if empty %>">
   <% if flash_claim %>
     <% flash_cards = flash_claim.card_ids&.map { |cid| Card.new(cid) } || [] %>
     <div class="h-full flex items-center gap-8 rounded-3xl px-8 ring-2 ring-inset <%= flash_claim.correct? ? "bg-green-500/10 ring-green-500 found-set-flash" : "bg-red-500/10 ring-red-500" %>">

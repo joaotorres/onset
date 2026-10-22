@@ -7,4 +7,10 @@ module ApplicationHelper
   def canonical_link(path)
     tag.link(rel: "canonical", href: "#{CANONICAL_ORIGIN}#{path}")
   end
+
+  # SPEC.md §7, Screens ignore broadcasts older than what they show: the newest
+  # updated_at among loaded records, as integer microseconds (a float drops digits).
+  def stream_version(*records)
+    records.map { |record| (record.updated_at.to_r * 1_000_000).to_i }.max
+  end
 end

@@ -1,11 +1,11 @@
 # 34: Screens ignore broadcasts older than what they show
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: Starting a game no longer leaves the big screen or a phone stuck on the lobby when two updates arrive out of order.
 
 ## Request
 

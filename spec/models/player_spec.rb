@@ -127,4 +127,29 @@ RSpec.describe Player do
       expect(player.lockout_reason).to eq("expired")
     end
   end
+
+  describe "broadcast versions (§7, Screens ignore broadcasts older than what they show)" do
+    include ActiveSupport::Testing::Assertions
+    include Turbo::Broadcastable::TestHelper
+
+    def version(stream) = stream.to_html[/data-version="(\d+)"/, 1].to_i
+    def micros(time) = (time.to_r * 1_000_000).to_i
+
+    it "stamps a lockout's controller_status with the player's time, and the room's scoreboard after it" do
+      game.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: [])
+      player = Player.create!(valid_attrs)
+      game_version = micros(game.reload.updated_at)
+
+      streams = capture_turbo_stream_broadcasts("player:#{player.id}") do
+        player.update!(locked_until: 15.seconds.from_now)
+      end
+      status = streams.find { |s| s["target"] == "controller_status" }
+      expect(micros(game.reload.updated_at)).to eq(game_version)
+      expect(version(status)).to be > game_version
+
+      scoreboard = capture_turbo_stream_broadcasts("game:#{game.code}") { game.broadcast_game_state }
+        .find { |s| s["target"] == "scoreboard" }
+      expect(version(scoreboard)).to eq(version(status))
+    end
+  end
 end

@@ -1,5 +1,5 @@
 <% if game.waiting? %>
-  <div id="board" class="flex-1 min-h-0 flex flex-col justify-center gap-12">
+  <div id="board" data-version="<%= stream_version(game) %>" class="flex-1 min-h-0 flex flex-col justify-center gap-12">
     <div class="flex items-center gap-14">
       <div class="shrink-0 flex flex-col items-center gap-4">
         <div class="rounded-3xl bg-white p-6" data-qr-tile><%= join_qr_svg(game, "size-72") %></div>
@@ -34,7 +34,7 @@
 <% elsif game.ended? %>
   <% standings = game.standings %>
   <% winner = game.winner %>
-  <div id="board" class="flex-1 min-h-0 flex flex-col items-center justify-center">
+  <div id="board" data-version="<%= stream_version(game) %>" class="flex-1 min-h-0 flex flex-col items-center justify-center">
     <p class="text-2xl uppercase tracking-[0.3em] text-gray-400">Game over</p>
     <h2 class="mt-3 font-display text-8xl font-extrabold"><%= winner ? "#{winner.name} wins" : "It's a tie" %></h2>
 
@@ -66,7 +66,7 @@
   </div>
 
 <% else %>
-  <div id="board" class="flex-1 min-h-0 flex flex-col gap-4">
+  <div id="board" data-version="<%= stream_version(game) %>" class="flex-1 min-h-0 flex flex-col gap-4">
     <% if game.deck.empty? %>
       <p class="text-right"><span class="inline-block rounded-full bg-orange-500/15 px-5 py-1.5 text-xl font-semibold text-orange-400 ring-1 ring-inset ring-orange-500/40">Deck is empty · play out the remaining cards</span></p>
     <% else %>

@@ -27,5 +27,20 @@ RSpec.describe UnblockNoSetJob do
         expect(streams.map { |s| s["target"] }).to include("controller_status")
       end
     end
+
+    # §7: the job rebroadcasts because time passed, with no write, so its version equals the page's and renders.
+    it "broadcasts board and announcement at the version the page already shows" do
+      game.update!(no_set_refuser_id: bob.id, no_set_refused_at: (Game::NO_SET_TIMEOUT + 1).seconds.ago)
+      game.reload
+      version = ->(html) { html[/data-version="(\d+)"/, 1] }
+      page_board = ApplicationController.render(partial: "games/board", locals: {game: game})
+      page_announcement = ApplicationController.render(partial: "games/announcement", locals: {game: game, flash_claim: nil})
+
+      streams = capture_turbo_stream_broadcasts("game:#{game.code}") { described_class.new.perform(game) }
+
+      expect(version.call(page_board)).to be_present
+      expect(version.call(streams.find { |s| s["target"] == "board" }.to_html)).to eq(version.call(page_board))
+      expect(version.call(streams.find { |s| s["target"] == "announcement" }.to_html)).to eq(version.call(page_announcement))
+    end
   end
 end

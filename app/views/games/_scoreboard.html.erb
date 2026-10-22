@@ -1,5 +1,6 @@
-<ol id="scoreboard" class="space-y-2">
-  <% game.players.order(score: :desc).each do |player| %>
+<% players = game.players.order(score: :desc).to_a %>
+<ol id="scoreboard" data-version="<%= stream_version(game, *players) %>" class="space-y-2">
+  <% players.each do |player| %>
     <% claiming = game.claim_player_id == player.id %>
     <% locked = !claiming && player.locked? %>
     <li class="flex items-center gap-4 rounded-2xl px-5 py-3 <%= "bg-yellow-400 text-gray-950" if claiming %> <%= "text-gray-500" if locked %>">
@@ -11,7 +12,7 @@
       <span class="font-display text-5xl font-bold leading-none tabular-nums"><%= player.score %></span>
     </li>
   <% end %>
-  <% if game.players.none? %>
+  <% if players.none? %>
     <li class="px-5 text-2xl text-gray-500">No one yet</li>
   <% end %>
 </ol>
