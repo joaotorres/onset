@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-22  review 20261022-163847: suite green, no hard violation, two pending decisions (join reorder on the waiting board, the seen! comment). Next: settle them, then bin/deploy.
 - 2026-10-22  build 34: done, six hook roots stamped with data-version and a stream listener drops older replaces, full suite green. Next: review.
 - 2026-10-22  triage 34: ready, spec gains "Screens ignore broadcasts older than what they show" under §7, six Decided lines. Next: build.
 - 2026-10-22  request 34: filed, behavioural. Next: triage.
