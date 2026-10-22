@@ -14,7 +14,7 @@ RSpec.describe "Stimulus polish", type: :system do
     fill_in "player[name]", with: "Alice"
     all("label.cursor-pointer").first.click
     click_button "Join"
-    # browser is now on the controller page with player_token cookie set
+    expect(page).to have_current_path(game_controller_path(game_code))
 
     game = Game.find_by!(code: game_code)
     game.start!
