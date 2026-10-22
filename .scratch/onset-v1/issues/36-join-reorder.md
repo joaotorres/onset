@@ -1,11 +1,11 @@
 # 36: Lobby screens ignore an older join broadcast
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: The lobby roster and player count no longer fall one join behind when two players join at once.
 
 ## Request
 

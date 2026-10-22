@@ -1,5 +1,5 @@
 <% if game.waiting? %>
-  <div id="board" data-version="<%= stream_version(game) %>" class="flex-1 min-h-0 flex flex-col justify-center gap-12">
+  <div id="board" data-version="<%= stream_version(game, *game.players) %>" class="flex-1 min-h-0 flex flex-col justify-center gap-12">
     <div class="flex items-center gap-14">
       <div class="shrink-0 flex flex-col items-center gap-4">
         <div class="rounded-3xl bg-white p-6" data-qr-tile><%= join_qr_svg(game, "size-72") %></div>

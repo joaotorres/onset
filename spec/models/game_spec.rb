@@ -658,5 +658,32 @@ RSpec.describe Game do
       expect(version(second_board)).to eq((game.updated_at.to_r * 1_000_000).to_i)
       expect(version(second_board)).to be > version(first_board)
     end
+
+    it "stamps a join's board, start button and the other players' controller_status with the new player's version" do
+      game = Game.create!
+      alice = nil
+      first_board = capture_turbo_stream_broadcasts("game:#{game.code}") {
+        alice = game.players.create!(name: "Alice", color: "#648FFF")
+      }.find { |s| s["target"] == "board" }
+      # Alice's own controller_status in her join carried the newer of the game's and hers.
+      alice_join_version = [game.reload.updated_at, alice.updated_at].map { |t| (t.to_r * 1_000_000).to_i }.max
+
+      bob = nil
+      board_streams = nil
+      status_streams = capture_turbo_stream_broadcasts("player:#{alice.id}") {
+        board_streams = capture_turbo_stream_broadcasts("game:#{game.code}") {
+          bob = game.players.create!(name: "Bob", color: "#FE6100")
+        }
+      }
+      bob_version = (bob.updated_at.to_r * 1_000_000).to_i
+      board = board_streams.find { |s| s["target"] == "board" }
+      status = status_streams.find { |s| s["target"] == "controller_status" }
+
+      expect(version(board)).to eq(bob_version)
+      expect(board.at_css("#start_button")["data-version"].to_i).to eq(bob_version)
+      expect(version(status)).to eq(bob_version)
+      expect(version(board)).to be > version(first_board)
+      expect(version(status)).to be > alice_join_version
+    end
   end
 end
