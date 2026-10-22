@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-22  request 34: filed, behavioural. Next: triage.
 - 2026-10-21  deploy deploy-20261021-2033: no ticket deployed. Next: new requests.
 - 2026-10-21  deploy deploy-20261021-2026: 32, 33 deployed. Next: new requests.
 - 2026-10-21  review 20261021-004236: tickets 32 and 33, suite green, no pending decisions, 3 Oxford commas and 6 judgement calls in findings. Next: bin/deploy.
