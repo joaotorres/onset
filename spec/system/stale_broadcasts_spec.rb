@@ -37,6 +37,22 @@ RSpec.describe "Stale broadcasts", type: :system do
     expect(page_version("room_tile")).to eq(stamped)
   end
 
+  # Turbo checks a stream before the next repaint and renders it after, so a newer
+  # and an older replace landing in one frame are both checked against the same page.
+  it "drops an older replace that lands in the same frame as a newer one" do
+    stamped = page_version("room_tile")
+    page.execute_script(<<~JS, tile(stamped + 2, "NEWER MARKER"), tile(stamped + 1, "STALE MARKER"))
+      for (const html of arguments) {
+        document.body.insertAdjacentHTML("beforeend",
+          `<turbo-stream action="replace" target="room_tile"><template>${html}</template></turbo-stream>`)
+      }
+    JS
+
+    expect(page).to have_css("#room_tile", text: "NEWER MARKER")
+    expect(page).not_to have_content("STALE MARKER")
+    expect(page_version("room_tile")).to eq(stamped + 2)
+  end
+
   it "renders a replace at the same version" do
     replace("room_tile", tile(page_version("room_tile"), "EQUAL MARKER"))
     expect(page).to have_css("#room_tile", text: "EQUAL MARKER")

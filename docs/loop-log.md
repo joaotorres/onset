@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-22  fix 34: the version check runs at render time, so a stale replace landing in the same frame as a newer one is dropped, suite green (493). Next: review.
 - 2026-10-22  build 36: done, waiting board, start button and controller status carry the room players' version, suite green (492). Next: review.
 - 2026-10-22  build 35: done, Player#seen! comment gives §7's reason, model spec green. Next: build 36.
 - 2026-10-22  triage 36: ready, spec §7 stamps the waiting board, start button and controller status with the room players' version, five Decided lines. Next: build.
