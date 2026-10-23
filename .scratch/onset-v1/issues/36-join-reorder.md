@@ -5,7 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog: The lobby roster and player count no longer fall one join behind when two players join at once.
+Changelog: The waiting roster and player count no longer fall one join behind when two players join at once.
 
 ## Request
 

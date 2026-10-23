@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-23  changelog 34, 36: lines reworded to the glossary's terms (waiting state, player screen), settling the review's pending decision. Next: bin/deploy.
 - 2026-10-22  review 20261022-173539: tickets 34 to 36, suite green (493), no code finding, one pending decision (glossary words in two Changelog lines). Next: settle it, then bin/deploy.
 - 2026-10-22  fix 34: the version check runs at render time, so a stale replace landing in the same frame as a newer one is dropped, suite green (493). Next: review.
 - 2026-10-22  build 36: done, waiting board, start button and controller status carry the room players' version, suite green (492). Next: review.

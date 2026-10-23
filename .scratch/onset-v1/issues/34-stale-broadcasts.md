@@ -5,7 +5,7 @@ Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog: Starting a game no longer leaves the big screen or a phone stuck on the lobby when two updates arrive out of order.
+Changelog: Starting a game no longer leaves the big screen or a player screen stuck on the waiting state when two updates arrive out of order.
 
 ## Request
 
