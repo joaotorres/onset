@@ -28,7 +28,7 @@ _Avoid_: Table, grid
 Three cards whose four attributes are each all the same or all different.
 
 **Claim**:
-A player's call of SET!, which gives them the sole right to pick three cards before the claim window closes.
+A player's call of SET!, which gives them the sole right to pick three cards and submit them before the claim window closes; a claim never submitted is judged on its picks when the window closes.
 _Avoid_: Call, turn
 
 **Lockout**:

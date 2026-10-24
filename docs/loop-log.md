@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-24  triage 37: gap settled, SPEC §2, §5, §6, §7, §8, §11, §12, §16, §17 and the glossary take the Submit button, seven Decided lines. Next: design brief, then triage.
 - 2026-10-24  design-brief 37: spec gap, SPEC §11 has no submit step, six questions under Comments. Next: triage settles the gap, then the brief.
 - 2026-10-24  request 37: filed, submit button for a SET! claim, visual. Next: design brief, then triage.
 - 2026-10-23  changelog 34, 36: lines reworded to the glossary's terms (waiting state, player screen), settling the review's pending decision. Next: bin/deploy.
