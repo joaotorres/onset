@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-24  design-brief 37: brief written against design system v4, four claiming states per layout, claiming boards left as they are. Next: the design pass, then design-entry and triage.
 - 2026-10-24  triage 37: gap settled, SPEC §2, §5, §6, §7, §8, §11, §12, §16, §17 and the glossary take the Submit button, seven Decided lines. Next: design brief, then triage.
 - 2026-10-24  design-brief 37: spec gap, SPEC §11 has no submit step, six questions under Comments. Next: triage settles the gap, then the brief.
 - 2026-10-24  request 37: filed, submit button for a SET! claim, visual. Next: design brief, then triage.

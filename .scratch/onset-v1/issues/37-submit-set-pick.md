@@ -36,3 +36,5 @@ Decided: no `claim_submitted` event, listed under §17 Not tracked, because like
 Decided: the big screen is unchanged, the Claiming panel ending through the existing Correct and Wrong panels, because the resolution broadcasts are the ones expiry sends. Instead of: a new panel or early-end treatment.
 
 Decided: no column records whether a claim was submitted or timed out, because that is a schema change and `resolved_at` against `started_at` plus the timeout already tells. Instead of: a `submitted_at` column on `Claim`.
+
+Decided: the brief leaves the four claiming boards (`play-p8-claiming`, `play-p3-claiming`, `play-l-claiming`, `play-c-claiming`) as they are, because the only change since they were drawn (ticket 19, no dimming at three picks) does not show at their 1/3, and the brief tells the design tool the code is the truth for it. Instead of: redrawing them from the code first.
