@@ -1,6 +1,6 @@
 # 37: Submit button for a SET! claim
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Model:

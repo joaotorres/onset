@@ -2,6 +2,14 @@
 
 What each deploy shipped, newest first, from the tickets' Changelog: lines.
 
+## 2026-10-25, deploy-20261025-1730
+
+- Starting a game no longer leaves the big screen or a player screen stuck on the waiting state when two updates arrive out of order. (34)
+- The waiting roster and player count no longer fall one join behind when two players join at once. (36)
+- A Submit button lets you send your three cards as soon as they are picked, instead of waiting out the 15 seconds. (37)
+- Behind the scenes: the comment on Player#seen! gives SPEC §7's reason for skipping callbacks, a heartbeat broadcast shows nothing new. (35)
+- Behind the scenes: a Submit that never reaches the server now unfreezes the claiming screen even when a room update redrew it meanwhile. (38)
+
 ## 2026-10-21, deploy-20261021-2026
 
 - Countdown rings show the same time left on every screen, even on a device whose clock is off. (32)

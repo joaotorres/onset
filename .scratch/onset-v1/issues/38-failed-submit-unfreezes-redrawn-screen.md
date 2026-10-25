@@ -1,6 +1,6 @@
 # 38: Failed Submit unfreezes a redrawn claiming screen
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

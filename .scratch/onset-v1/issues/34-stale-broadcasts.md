@@ -1,6 +1,6 @@
 # 34: Screens ignore broadcasts older than what they show
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

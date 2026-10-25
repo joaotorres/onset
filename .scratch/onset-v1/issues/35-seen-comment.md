@@ -1,6 +1,6 @@
 # 35: Player#seen! comment gives the spec's reason
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:

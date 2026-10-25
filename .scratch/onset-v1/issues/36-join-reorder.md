@@ -1,6 +1,6 @@
 # 36: Lobby screens ignore an older join broadcast
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Model:
