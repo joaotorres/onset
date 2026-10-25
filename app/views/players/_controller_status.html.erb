@@ -87,14 +87,16 @@
     </div>
 
   <% elsif my_claim %>
-    <%# Claiming (mine): pick 3 cards. Portrait: the claim bar in the status slot, the tray in place of SET! and its pill.
-        Landscape and computer: one yellow block in place of the status panel and SET!, the pill slot empty. %>
-    <div data-controller="card-selection" data-card-selection-url-value="<%= game_claim_path(game.code, my_claim.id) %>" class="<%= body %>">
+    <%# Claiming (mine): pick 3 cards, then Submit in the pill slot in every layout.
+        Portrait: the claim bar in the status slot, the 128px tray in place of SET!, Submit under it, 176px as SET! and its pill.
+        Landscape and computer: one yellow block in place of the status panel and SET!. %>
+    <div data-controller="card-selection" data-card-selection-url-value="<%= game_claim_path(game.code, my_claim.id) %>"
+         data-card-selection-submit-url-value="<%= submit_game_claim_path(game.code, my_claim.id) %>" class="<%= body %>">
       <%= render "players/controller/scoreboard", game: game, player: player %>
       <%= render "players/controller/board_strip", game: game, mode: :select, claim: my_claim %>
       <div data-action-column class="<%= column %>">
         <%= render "players/controller/status_panel", game: game, player: player, variant: :claim, class: "landscape:max-lg:hidden lg:hidden" %>
-        <div class="landscape:max-lg:hidden lg:hidden flex h-44 shrink-0 items-center justify-center gap-3.5">
+        <div data-tray class="landscape:max-lg:hidden lg:hidden flex h-32 shrink-0 items-center justify-center gap-3.5">
           <% 3.times do |i| %>
             <div data-card-selection-target="slot" class="w-[72px] aspect-[5/7] grid place-items-center overflow-hidden rounded-[7px] border-2 border-dashed border-gray-700 font-display text-2xl font-bold text-gray-500"><%= i + 1 %></div>
           <% end %>
@@ -105,10 +107,10 @@
              data-countdown-duration-value="<%= Game::CLAIM_TIMEOUT %>">
           <%= render "players/controller/small_ring", size: "size-16 lg:size-[72px]", track: "stroke-gray-950/20", stroke: "stroke-gray-950", digits: "text-2xl lg:text-[26px]", duration: Game::CLAIM_TIMEOUT %>
           <p class="font-display text-[22px] font-extrabold leading-none lg:text-[28px]">Your SET!</p>
-          <p class="text-[13px] font-semibold lg:text-[15px]">Tap 3 cards</p>
+          <p data-card-selection-target="hint" class="text-[13px] font-semibold lg:text-[15px]">Tap 3 cards</p>
           <p class="font-display text-[30px] font-extrabold tabular-nums lg:text-[32px] lg:leading-none"><span data-card-selection-target="count">0</span>/3</p>
         </div>
-        <div data-pill-slot class="portrait:max-lg:hidden <%= pill_slot %>"></div>
+        <div data-pill-slot class="<%= pill_slot %>"><%= render "players/controller/submit" %></div>
       </div>
     </div>
 

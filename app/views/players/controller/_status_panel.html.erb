@@ -10,7 +10,7 @@
       <%= render "players/controller/small_ring", size: "size-11", track: "stroke-gray-950/20", stroke: "stroke-gray-950", digits: "text-[17px]", duration: Game::CLAIM_TIMEOUT %>
       <div class="min-w-0 flex-1">
         <p class="font-display text-[21px] font-extrabold leading-tight">Your SET!</p>
-        <p class="text-[13px] font-semibold">Tap 3 cards</p>
+        <p data-card-selection-target="hint" class="text-[13px] font-semibold">Tap 3 cards</p>
       </div>
       <p class="font-display text-[26px] font-extrabold tabular-nums"><span data-card-selection-target="count">0</span>/3</p>
     </div>

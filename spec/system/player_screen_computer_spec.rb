@@ -116,7 +116,7 @@ RSpec.describe "Player screen during play, computer", type: :system do
         expect(board_overflow).to eq([0, 0])
         if name == "claiming (mine)"
           expect_computer_layout(panel: "[data-claim-block]")
-          expect(find("[data-pill-slot]", visible: :all).text).to eq("")
+          expect(find("[data-pill-slot]").text).to eq("Submit")
         else
           expect_computer_layout
           status = rect("[data-status-slot]")

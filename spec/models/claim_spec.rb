@@ -263,6 +263,72 @@ RSpec.describe Claim do
     end
   end
 
+  describe "#submit!" do
+    it "judges a submitted Set at once, as expiry would" do
+      ids = find_set_on_board
+      claim.submit!(ids)
+      expect(claim.reload).to be_correct
+      expect(claim.card_ids).to eq(ids)
+      expect(claim.resolved_at).to be_present
+      expect(player.reload.score).to eq(1)
+      expect(game.reload.board).not_to include(*ids)
+      expect(game.claim_player_id).to be_nil
+      expect(game.flash_claim_id).to eq(claim.id)
+    end
+
+    it "judges a submitted non-Set as wrong with the lockout" do
+      player.update!(score: 2)
+      ids = find_non_set_on_board
+      claim.submit!(ids)
+      expect(claim.reload).to be_wrong
+      expect(claim.card_ids).to eq(ids)
+      expect(player.reload.score).to eq(1)
+      expect(player.locked_until).to be_within(1.second).of(Game::CLAIM_TIMEOUT.seconds.from_now)
+      expect(game.reload.claim_player_id).to be_nil
+    end
+
+    it "judges the submitted selection, not the stored picks" do
+      ids = find_set_on_board
+      claim.pick!((game.board - ids).first(2))
+      claim.submit!(ids)
+      expect(claim.reload).to be_correct
+      expect(claim.card_ids).to eq(ids)
+    end
+
+    it "ignores a selection that is not 3 distinct board cards" do
+      ids = find_set_on_board
+      [ids.first(2), ids + [ids.first], [ids[0], ids[0], ids[1]], [ids[0], ids[1], 50], nil, [], ["a", 1, 2]].each do |bad|
+        claim.submit!(bad)
+        expect(claim.reload).to be_pending
+        expect(claim.card_ids).to be_nil
+      end
+      expect(player.reload.score).to eq(0)
+      expect(game.reload.claim_player_id).to eq(player.id)
+    end
+
+    it "ignores a submit once the claim is no longer pending" do
+      claim.expire!
+      expect { claim.submit!(find_set_on_board) }.not_to change { [claim.reload.attributes, player.reload.score] }
+      expect(claim).to be_expired
+    end
+
+    it "ignores a second submit" do
+      ids = find_set_on_board
+      claim.submit!(ids)
+      expect { claim.submit!(find_non_set_on_board) }.not_to change { [claim.reload.attributes, player.reload.score, game.reload.board] }
+    end
+
+    it "leaves nothing for ExpireClaimJob to judge after a submit" do
+      claim.submit!(find_set_on_board)
+      expect { ExpireClaimJob.new.perform(claim) }.not_to change { [claim.reload.attributes, player.reload.score, game.reload.board] }
+    end
+
+    it "holds the game lock while judging" do
+      expect(claim.game).to receive(:with_lock).and_call_original
+      claim.submit!(find_set_on_board)
+    end
+  end
+
   describe "card_ids validation" do
     def claim_with(result, ids)
       game.claims.new(player: player, result: result, card_ids: ids, started_at: Time.current)

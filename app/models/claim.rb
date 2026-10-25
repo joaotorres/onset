@@ -31,6 +31,22 @@ class Claim < ApplicationRecord
     end
   end
 
+  # Submit (§11): judges the selection the request carries, not the stored
+  # picks, at once. Ignored unless the claim is pending and the selection is
+  # exactly 3 distinct board cards.
+  def submit!(ids)
+    game.with_lock do
+      return unless reload.pending?
+      return unless ids.is_a?(Array) && ids.size == 3 && valid_selection?(ids)
+
+      if Card.valid_set?(*ids.map { |id| Card.new(id) })
+        resolve_correct!(ids)
+      else
+        resolve_wrong!(ids)
+      end
+    end
+  end
+
   private
 
   def valid_selection?(ids)

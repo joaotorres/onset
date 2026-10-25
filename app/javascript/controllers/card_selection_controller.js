@@ -12,7 +12,7 @@ let current = null
 
 function claimFor(url, renderedPicks) {
   if (!current || current.url !== url) {
-    current = { url, selected: renderedPicks, inFlight: false, dirty: false }
+    current = { url, selected: renderedPicks, inFlight: false, dirty: false, submitted: false }
   }
   return current
 }
@@ -20,6 +20,19 @@ function claimFor(url, renderedPicks) {
 // One request at a time, each carrying the whole selection, so the picks
 // arrive in order; the latest selection goes when the previous returns,
 // whichever controller sent the previous one.
+function request(url, method, ids) {
+  return fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "text/vnd.turbo-stream.html, text/html",
+      "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
+    },
+    body: JSON.stringify({ card_ids: ids }),
+    credentials: "same-origin"
+  })
+}
+
 async function send(claim) {
   if (claim.inFlight) {
     claim.dirty = true
@@ -28,16 +41,7 @@ async function send(claim) {
 
   claim.inFlight = true
   try {
-    await fetch(claim.url, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "text/vnd.turbo-stream.html, text/html",
-        "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || ""
-      },
-      body: JSON.stringify({ card_ids: claim.selected }),
-      credentials: "same-origin"
-    })
+    await request(claim.url, "PATCH", claim.selected)
   } catch (_error) {
     // A lost request: the next tap sends the whole selection again.
   } finally {
@@ -50,10 +54,12 @@ async function send(claim) {
 }
 
 // Claiming (mine): a tap picks or unpicks a card, up to three, and sends the
-// whole selection to the server. Nothing is judged until the time runs out (§11).
+// whole selection to the server. Submit, enabled at exactly three picks, sends
+// the selection to be judged at once and freezes the screen until the
+// resolving broadcast replaces it; otherwise the time running out judges (§11).
 export default class extends Controller {
-  static targets = ["card", "slot", "count"]
-  static values = { url: String }
+  static targets = ["card", "slot", "count", "hint", "submit"]
+  static values = { url: String, submitUrl: String }
 
   connect() {
     // The picks are server state: a redraw renders them aria-pressed. Within
@@ -79,6 +85,7 @@ export default class extends Controller {
   }
 
   toggleCard(card) {
+    if (this.claim.submitted) return
     const id = parseInt(card.dataset.cardId)
 
     if (this.selected.includes(id)) {
@@ -95,6 +102,23 @@ export default class extends Controller {
 
     this.updateCount()
     send(this.claim)
+  }
+
+  // Sends the whole selection at once, whatever pick request is in flight.
+  // Only a request that never reaches the server lifts the freeze; any
+  // response leaves the screen to the broadcast, or to the timer.
+  async submit() {
+    if (this.claim.submitted || this.selected.length !== 3) return
+
+    const claim = this.claim
+    claim.submitted = true
+    this.updateCount()
+    try {
+      await request(this.submitUrlValue, "POST", claim.selected)
+    } catch (_error) {
+      claim.submitted = false
+      if (this.claim === claim && this.element.isConnected) this.updateCount()
+    }
   }
 
   // Marks the board, tray and count to match the picks.
@@ -121,8 +145,26 @@ export default class extends Controller {
     card.setAttribute("aria-pressed", String(picked))
   }
 
+  // The n/3 count, the hint, Submit and the board's freeze, from the picks.
   updateCount() {
-    this.countTargets.forEach(el => { el.textContent = this.selected.length })
+    const count = this.selected.length
+    const submitted = this.claim.submitted
+    const state = submitted ? "submitted" : (count === 3 ? "enabled" : "disabled")
+    const hint = submitted ? "Judging…" : (count === 3 ? "Tap Submit" : "Tap 3 cards")
+
+    this.countTargets.forEach(el => { el.textContent = count })
+    this.hintTargets.forEach(el => { el.textContent = hint })
+    this.cardTargets.forEach(card => { card.disabled = submitted })
+    this.submitTargets.forEach(button => {
+      button.dataset.state = state
+      button.disabled = state !== "enabled"
+      button.querySelector("[data-submit-label]").textContent = submitted ? "Submitted" : "Submit"
+      if (submitted) {
+        button.setAttribute("aria-label", "Submitted, waiting for the result")
+      } else {
+        button.removeAttribute("aria-label")
+      }
+    })
   }
 
   fillSlot(id, card) {

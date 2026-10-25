@@ -798,7 +798,7 @@ RSpec.describe "Games" do
         expect(column.at_css("[data-pill-slot]").text).to include("No Set")
       end
 
-      it "replaces the status panel and SET! with one yellow block during my claim, the pill slot empty" do
+      it "replaces the status panel and SET! with one yellow block during my claim, Submit in the pill slot" do
         game.try_claim!(alice)
         s = status
         column = s.at_css("[data-action-column]")
@@ -808,8 +808,10 @@ RSpec.describe "Games" do
         expect(column.at_css("[data-set-slot]")).to be_nil
         expect(buttons(s, "SET!")).to be_empty
         pill = column.at_css("[data-pill-slot]")
-        expect(pill["class"]).to include("portrait:max-lg:hidden")
-        expect(pill.text.strip).to be_empty
+        expect(pill["class"]).not_to include("portrait:max-lg:hidden")
+        submit = pill.at_css("button[data-card-selection-target='submit']")
+        expect(submit.text.squish).to eq("Submit")
+        expect(submit["disabled"]).to be_present
         expect(s.css("button[data-card-selection-target='card']").size).to eq(game.board.size)
       end
 

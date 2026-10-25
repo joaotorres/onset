@@ -1,11 +1,11 @@
 # 37: Submit button for a SET! claim
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: A Submit button lets you send your three cards as soon as they are picked, instead of waiting out the 15 seconds.
 
 ## Request
 
@@ -124,3 +124,5 @@ Decided: Submit enables at exactly 3 picks while a pick request is still in flig
 Decided: SPEC §5 states the holder-only `403` on the PATCH row and as the one exception to the 204 sentence, and §11 History says "board" for "grid", settling the review's two wording items, because the submit row said "as the PATCH" about a 403 the spec never gave the PATCH. Instead of: dropping "as the PATCH".
 
 Decided: the brief leaves the four `stream_version(game, *game.players)` sites alone, Out of scope, although the build touches `_controller_status`, because a refactor the request did not ask for belongs to a ticket of its own and the review listed it as a judgement call, not a pending decision. Instead of: gathering them into a `room_version(game)` helper in this build.
+
+Decided: the freeze after a Submit tap is kept in the page's memory of the current claim, so a room update that redraws the screen before the claim resolves keeps it frozen, because §11 says the freeze lasts until the resolving broadcast. Instead of: a redraw giving the screen back at 3/3 mid-judging.

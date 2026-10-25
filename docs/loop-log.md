@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-25  build 37: done, Submit judges a claim at once under the game lock, suite green at 520 examples, one Decided line. Next: review.
 - 2026-10-25  triage 37: ready, design proposes and questions settled in SPEC §5, §7, §8 and §11, the review's two wording items tidied, seven Decided lines. Next: build.
 - 2026-10-25  context cap: stopped before triage 37. Next: /clear, then /skills-loop:auto.
 - 2026-10-25  design-entry 37: design system v5, `_submit` in the pill slot, two Design proposes and three Design questions for triage. Next: triage 37.

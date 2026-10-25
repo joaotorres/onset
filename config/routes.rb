@@ -13,7 +13,9 @@ Rails.application.routes.draw do
       collection { get :join }
     end
     resource :controller, only: [:show], controller: "controllers"
-    resources :claims, only: [:create, :update]
+    resources :claims, only: [:create, :update] do
+      member { post :submit }
+    end
     resource :no_set, only: [:create, :update, :destroy] do
       post :refuse
     end

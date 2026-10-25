@@ -1,0 +1,12 @@
+<%# Submit in the pill slot during the player's own claim (§8 Player screen 3, design system v5 _submit).
+    Rendered disabled; card-selection sets data-state: disabled below 3 picks, enabled at 3, submitted from the tap. %>
+<% look = "data-[state=disabled]:cursor-not-allowed data-[state=disabled]:bg-blue-600/35 data-[state=disabled]:text-blue-200 " \
+          "data-[state=enabled]:bg-blue-600 data-[state=enabled]:text-white data-[state=enabled]:shadow-[0_0_24px_rgba(37,99,235,0.55)] data-[state=enabled]:hover:bg-blue-500 data-[state=enabled]:active:scale-95 " \
+          "data-[state=submitted]:bg-blue-600 data-[state=submitted]:text-white" %>
+<button type="button" disabled data-state="disabled"
+        data-card-selection-target="submit"
+        data-action="click->card-selection#submit"
+        class="group flex h-11 items-center justify-center gap-1.5 rounded-full text-base font-bold transition portrait:max-lg:w-[220px] landscape:max-lg:w-full landscape:max-lg:px-2 landscape:max-lg:text-[15px] lg:h-[46px] lg:w-full <%= look %>">
+  <svg aria-hidden="true" viewBox="0 0 24 24" class="hidden size-[18px] fill-none stroke-current stroke-3 group-data-[state=submitted]:block" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+  <span data-submit-label>Submit</span>
+</button>

@@ -10,15 +10,15 @@ class ClaimsController < ApplicationController
   end
 
   def update
-    claim = @game.claims.find(params[:id])
+    # Stores the picks; nothing is judged until Submit or the time runs out (§11).
+    held_claim&.pick!(picked_ids)
+    head(held_claim ? :no_content : :forbidden)
+  end
 
-    unless claim.player_id == @player.id
-      head :forbidden and return
-    end
-
-    # Stores the picks; nothing is judged until the time runs out (§11).
-    claim.pick!(picked_ids)
-    head :no_content
+  def submit
+    # Judges the selection the request carries at once (§11).
+    held_claim&.submit!(picked_ids)
+    head(held_claim ? :no_content : :forbidden)
   end
 
   private
@@ -26,6 +26,14 @@ class ClaimsController < ApplicationController
   # Before the lookups and the lock, so a wait for them does not inflate the near-tie gap (§6).
   def stamp_arrival
     @arrived_at = Time.current
+  end
+
+  # The claim in the URL, or nil when this player does not hold it.
+  def held_claim
+    return @held_claim if defined?(@held_claim)
+
+    claim = @game.claims.find(params[:id])
+    @held_claim = (claim.player_id == @player.id) ? claim : nil
   end
 
   # The player screen sends a JSON array; a JSON string is accepted too.
