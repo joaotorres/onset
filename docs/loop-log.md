@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-25  context cap: stopped before triage 37. Next: /clear, then /skills-loop:auto.
 - 2026-10-25  design-entry 37: design system v5, `_submit` in the pill slot, two Design proposes and three Design questions for triage. Next: triage 37.
 - 2026-10-24  review 20261024-205314: 21 commits since deploy-20261021-2033, tickets 34 to 36 match their spec, no pending decisions, suite green at 493 examples, two spec wording items for ticket 37's triage. Next: bin/deploy, or ticket 37's design pass.
 - 2026-10-24  design-brief 37: brief written against design system v4, four claiming states per layout, claiming boards left as they are. Next: the design pass, then design-entry and triage.
