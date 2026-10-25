@@ -1,11 +1,11 @@
 # 38: Failed Submit unfreezes a redrawn claiming screen
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: a Submit that never reaches the server now unfreezes the claiming screen even when a room update redrew it meanwhile.
 
 ## Request
 
@@ -55,3 +55,5 @@ bundle exec rspec
 Decided: no spec change, because SPEC §11 already promises the unfreeze on a failed request and the memory across a redraw; the code falls short of it. Instead of: a §11 clause saying the unfreeze may wait for the next redraw.
 
 Decided: the brief names the behaviour (the connected controller for the claim gets the unfreeze) and leaves the mechanism to the build, because the two mechanisms the review offered differ in nothing a player would notice. Instead of: prescribing a controller reference on the claim's memory.
+
+Decided: the claim's memory keeps the controller connected for it (set on connect) and a rejected Submit refreshes that one, because it is two lines and needs no re-check on every connect. Instead of: a connecting controller re-checking a finished request.

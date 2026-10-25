@@ -68,6 +68,7 @@ export default class extends Controller {
       .filter(card => card.getAttribute("aria-pressed") === "true")
       .map(card => parseInt(card.dataset.cardId))
     this.claim = claimFor(this.urlValue, rendered)
+    this.claim.controller = this
     this.showPicks()
 
     // A claim started by tapping an idle card opens with that card picked.
@@ -105,8 +106,9 @@ export default class extends Controller {
   }
 
   // Sends the whole selection at once, whatever pick request is in flight.
-  // Only a request that never reaches the server lifts the freeze; any
-  // response leaves the screen to the broadcast, or to the timer.
+  // Only a request that never reaches the server lifts the freeze, on the
+  // screen connected for this claim at that moment (a redraw may have replaced
+  // this one); any response leaves the screen to the broadcast, or to the timer.
   async submit() {
     if (this.claim.submitted || this.selected.length !== 3) return
 
@@ -117,7 +119,8 @@ export default class extends Controller {
       await request(this.submitUrlValue, "POST", claim.selected)
     } catch (_error) {
       claim.submitted = false
-      if (this.claim === claim && this.element.isConnected) this.updateCount()
+      const screen = claim.controller
+      if (current === claim && screen?.element.isConnected) screen.updateCount()
     }
   }
 

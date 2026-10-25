@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-25  build 38: done, a failed Submit unfreezes the claiming screen connected for the claim, suite green at 522 examples, one Decided line. Next: review.
 - 2026-10-25  triage 38: ready, no spec change, a failed Submit unfreezes whichever claiming screen is connected, two Decided lines. Next: build.
 - 2026-10-25  request 38: filed from the review's pending decision, a failed Submit unfreezes a redrawn claiming screen, behavioural. Next: triage 38.
 - 2026-10-25  review 20261025-165721: 26 commits since deploy-20261021-2033, ticket 37 matches its spec and design system v5, suite green at 520 examples, one pending decision (a lost Submit request does not unfreeze a redrawn screen), copy pass skipped because its skill failed to load. Next: settle the pending decision, then bin/deploy.

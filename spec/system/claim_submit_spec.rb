@@ -63,16 +63,21 @@ RSpec.describe "Submitting a claim", type: :system do
   def hint = all("[data-card-selection-target='hint']", visible: true).map(&:text)
 
   # Holds PATCH and POST fetches until release! lets them go, and records each
-  # one; with fail_submits the submit POST rejects as a lost request would.
+  # one; with fail_submits the submit POST rejects as a lost request would, and
+  # with fail_submits: :held it waits for fail_submits! to reject it.
   def hold_requests!(fail_submits: false)
     page.execute_script(<<~JS)
       window.__held = []
+      window.__heldSubmits = []
       window.__sent = []
       const original = window.fetch
       window.fetch = (url, options) => {
         if (!options || !["PATCH", "POST"].includes(options.method)) return original(url, options)
         window.__sent.push({ url: String(url), method: options.method, body: options.body })
-        if (#{fail_submits} && String(url).endsWith("/submit")) return Promise.reject(new TypeError("Failed to fetch"))
+        if (#{(fail_submits == :held).to_json} && String(url).endsWith("/submit")) {
+          return new Promise((_resolve, reject) => window.__heldSubmits.push(() => reject(new TypeError("Failed to fetch"))))
+        }
+        if (#{(fail_submits == true).to_json} && String(url).endsWith("/submit")) return Promise.reject(new TypeError("Failed to fetch"))
         return new Promise(resolve => window.__held.push(resolve)).then(() => original(url, options))
       }
     JS
@@ -80,6 +85,16 @@ RSpec.describe "Submitting a claim", type: :system do
 
   def release!
     page.execute_script("window.__held.splice(0).forEach(r => r())")
+  end
+
+  def fail_submits!
+    page.execute_script("window.__heldSubmits.splice(0).forEach(r => r())")
+  end
+
+  def redraw!
+    page.execute_script("document.getElementById('controller_status').dataset.beforeRedraw = 'yes'")
+    game.update!(flash_claim_id: nil)
+    expect(page).to have_no_css("#controller_status[data-before-redraw]")
   end
 
   def sent = page.evaluate_script("window.__sent")
@@ -172,6 +187,59 @@ RSpec.describe "Submitting a claim", type: :system do
       tap(ids.first)
       expect(find("[data-card-id='#{ids.first}']")["aria-pressed"]).to eq("false")
       expect(claim.reload).to be_pending
+    end
+
+    it "gives the redrawn screen back at 3/3 when the submit fails after a redraw" do
+      claim = claim!
+      ids = set_ids
+      hold_requests!(fail_submits: :held)
+      ids.each { |id| tap(id) }
+      submit_button.click
+      expect(hint).to eq(["Judging…"])
+
+      redraw!
+      expect(hint).to eq(["Judging…"])
+      expect(submit_button).to be_disabled
+      expect(find("[data-card-id='#{ids.first}']")).to be_disabled
+
+      fail_submits!
+      expect(page).to have_css("[data-card-selection-target='submit']:not([disabled])", text: "Submit", visible: true)
+      expect(hint).to eq(["Tap Submit"])
+      expect(page).to have_css("[data-card-selection-target='count']", text: "3", visible: true)
+      expect(find("[data-card-id='#{ids.first}']")).not_to be_disabled
+      tap(ids.first)
+      expect(find("[data-card-id='#{ids.first}']")["aria-pressed"]).to eq("false")
+      expect(claim.reload).to be_pending
+    end
+
+    it "leaves a new claim's screen alone when the old claim's submit fails late" do
+      claim = claim!
+      ids = set_ids
+      hold_requests!(fail_submits: :held)
+      ids.each { |id| tap(id) }
+      submit_button.click
+      expect(hint).to eq(["Judging…"])
+
+      page.execute_script(<<~JS)
+        window.__errors = []
+        window.addEventListener("error", e => window.__errors.push(String(e.message)))
+        window.addEventListener("unhandledrejection", e => window.__errors.push(String(e.reason)))
+      JS
+      game.with_lock { claim.expire! }
+      expect(page).to have_no_css("[data-controller='card-selection']")
+      me.update!(locked_until: nil)
+      game.reload.try_claim!(me)
+      expect(page).to have_css("[data-controller='card-selection']")
+      tap(ids.first)
+      expect(page).to have_css("[data-card-selection-target='count']", text: "1", visible: true)
+
+      fail_submits!
+      expect(page.evaluate_script("window.__heldSubmits.length")).to eq(0)
+      expect(page).to have_css("[data-card-selection-target='count']", text: "1", visible: true)
+      expect(hint).to eq(["Tap 3 cards"])
+      expect(submit_button).to be_disabled
+      expect(find("[data-card-id='#{ids.first}']")["aria-pressed"]).to eq("true")
+      expect(page.evaluate_script("window.__errors")).to eq([])
     end
 
     it "keeps the tray and Submit at 176px so the board does not move" do
