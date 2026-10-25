@@ -1,6 +1,6 @@
-# Onset design system, version 4
+# Onset design system, version 5
 
-The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, and the No Set refusal drawn for ticket 21. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
+The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, the No Set refusal drawn for ticket 21, and the claim's Submit button drawn for ticket 37. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
 
 Boards for every screen and state are on the canvas named in `docs/design-handoff.md`. Where this file and a board differ, this file wins; tell the design tool in the next brief.
 
@@ -39,6 +39,10 @@ ERB partials, no component library.
 - `players/controller/_secondary_action`: the pill under SET!: No Set, the End game vote, or during a No Set countdown I agree, no Set (filled purple) or the waiting text (outlined purple). v4 variants:
   - refusal pair, while the player may refuse: two equal pills side by side, There's a Set on the left (outlined, 2px `purple-400` border, no fill, white bold text), I agree, no Set on the right (filled `purple-700`, white text). The pair fills its column: portrait the status slot's width (351px at 375, 8px gap, 16px labels), landscape the 9rem column (two 69×44 pills, 6px gap, 13px labels on two lines), computer 248×46 (two 120px pills, 8px gap, 15px labels). SET! does not move. Once this board's refusal is used, the lone I agree, no Set sits as before (220×44 in portrait, centered)
   - blocked No Set, after a refusal: the No Set pill at its usual size (portrait 220×44, landscape 144×44, computer 248×46), disabled, `purple-700` at 35% with `purple-200` text, "No Set in 12 s" with the seconds in display type. The block's seconds show only here, not in the status panel
+- `players/controller/_submit` (v5): the Submit pill in the pill slot during the player's own claim, at the slot's usual size (portrait 220×44, landscape 144×44, computer 248×46), body font 16px/700 (15px in landscape). States:
+  - disabled, fewer than 3 picks: `blue-600` at 35% with `blue-200` text, "Submit"
+  - enabled, exactly 3 picks: `blue-600`, white text, "Submit", glow `0 0 24px rgba(37, 99, 235, 0.55)` (SET!'s glow without the 8px ring)
+  - submitted, from the tap until the resolving broadcast: `blue-600`, white text, disabled, an inline check icon (18px, stroke 3) then "Submitted", `aria-label` "Submitted, waiting for the result". Full strength, not the disabled look, so a frozen screen reads as sent, not as not yet allowed
 - `players/controller/_scoreboard` (v2): the play scoreboard, every player in score order. Portrait: chips, 4 per row, at most 2 rows, the Locked tag a red badge on the chip's top-right corner. Landscape and computer: one row per player, the Locked tag inline before the score. Own entry `gray-800` with a `gray-500` border; claiming entry solid `yellow-400` with `gray-950` text; locked entry content at 45% opacity
 - `players/controller/_status_panel` (v2): one fixed slot above SET!, portrait 64px tall, landscape 144×104, computer 248×76. Variants:
   - claim bar: `yellow-400`, ring, "Your SET!", "Tap 3 cards", n/3
@@ -54,7 +58,7 @@ ERB partials, no component library.
 - `players/controller/_standings` (v2): game over rows, each rank, dot, truncated name, "you" for the player, score. Own row `gray-800` with a `gray-600` border, other rows transparent. Rows 32px portrait, 34px landscape, 44px computer (computer list in a `gray-900` panel)
 - Landing mode toggle (v2): two radios styled as a segmented control inside the Start a game form, on a `gray-950` (desktop) or `gray-900` (phone) track with a `gray-700` border. Selected Standard `gray-700`, selected First to 5 `violet-600`, unselected `gray-400` text on transparent
 - `layouts/_byline_footer` (v3): "by joaotorr.es" after `main` on the landing, How to play and the join page, never on the big screen or player screen. `gray-400` 14px weight 500 with a 1px red underline; on hover or keyboard focus the dot hops and the domain fades into the logo colours (`--wm-*`), held until the next page load. Styles in `app/assets/tailwind/application.css` (`.byline`, `.wm-*`), fixed across joaotorr.es apps
-- Stimulus: `card-selection` (picks sent to the server, tray, count), `countdown` (rings and seconds)
+- Stimulus: `card-selection` (picks sent to the server, tray, count, Submit and the freeze after it), `countdown` (rings and seconds)
 
 ## Screens
 
@@ -88,7 +92,9 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Landscape: the board on the left, a 9rem action column (status panel, SET!, pill), a scores column
 - Computer: the board on the left; a 248px side column with the scoreboard stacked above the status panel, SET! and its pill
 - Deck: "N cards left in the deck" with the board, or an orange "Deck is empty" pill
-- Claiming (mine): portrait, the claim bar takes the status slot and the 3-slot tray replaces SET! and its pill. Landscape and computer: one yellow block replaces the panel and SET!, and the pill slot is empty
+- Claiming (mine): portrait, the claim bar takes the status slot and the 3-slot tray and Submit replace SET! and its pill. Landscape and computer: one yellow block replaces the panel and SET!, and Submit takes the pill slot (v5)
+- Portrait tray (v5): a 128px row of three 72×101 slots, 14px apart, above the 44px pill slot holding Submit, 4px between, 176px in all, the height SET! and its pill take, so nothing else moves. An empty slot is a dashed `gray-700` box with its number (1, 2, 3) centred in display type, 22px/700, `gray-500`; a filled slot shows the picked card. Slots fill in pick order
+- Submitted (v5): the board's cards are disabled, the three picks keep the selected ring, the tray and the n/3 count stay as at 3/3, the countdown ring keeps draining and Submit shows its submitted state. The board never dims, at 3 picks or after the tap
 - Someone else claiming: the disabled SET! shows the seconds large with a small "SET!" label under them, inside the yellow ring
 - Read-only boards (someone else claiming, No Set, locked out) are not dimmed
 - No Set countdown, may refuse (v4): the No Set status panel, SET!, and the refusal pair in the pill slot. Locked out at the same time: the No Set panel keeps the status slot, since the call is the news; SET! shows the lockout ring with the seconds and "Locked", as in Locked out, and the chip shows the Locked tag
@@ -112,6 +118,10 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - SET! slot 128×128 in every layout, the button 104px (108px on computer). Ring states put a 128px ring around a 100px disabled `gray-800` button
 - Portrait keeps the status slot at 64px in every state, so the board never resizes on a state change
 - Copy link feedback stays neutral gray: green and red are reserved by the meaning table
+
+## Rules added in v5
+
+- A disabled filled pill keeps its label legible: the fill at 35% with the light tint of its color as text at full opacity (blocked No Set: `purple-700` at 35%, `purple-200`; disabled Submit: `blue-600` at 35%, `blue-200`), never the whole button faded
 
 ## Visual rules
 
@@ -198,6 +208,7 @@ None
 
 ## Changelog
 
+- v5, 2026-10-25: ticket 37, Submit for a claim: `_submit` in the pill slot in every layout (disabled below 3 picks, enabled at 3, submitted after the tap), the portrait tray resized to fit it, the submitted state of the claiming screen and the disabled filled pill rule.
 - v4, 2026-10-16: ticket 21, refusing a No Set call: the refusal pill pair and the blocked No Set pill in `_secondary_action`, the refused `_status_panel` variant, the Refused `_announcement` panel, the lockout ring on SET! during a No Set countdown, and the first big screen board.
 - v3, 2026-10-16: ticket 24, the byline footer `_byline_footer` and the `--wm-*` logo colours, taken from the cross-app byline brief as built in d7f1cc8, not from a design pass.
 - v2, 2026-10-12: ticket 07, game over standings on the player screen in portrait, landscape and computer: `_standings`, own row `gray-800`, Play again on `green-700`.

@@ -38,3 +38,15 @@ Decided: the big screen is unchanged, the Claiming panel ending through the exis
 Decided: no column records whether a claim was submitted or timed out, because that is a schema change and `resolved_at` against `started_at` plus the timeout already tells. Instead of: a `submitted_at` column on `Claim`.
 
 Decided: the brief leaves the four claiming boards (`play-p8-claiming`, `play-p3-claiming`, `play-l-claiming`, `play-c-claiming`) as they are, because the only change since they were drawn (ticket 19, no dimming at three picks) does not show at their 1/3, and the brief tells the design tool the code is the truth for it. Instead of: redrawing them from the code first.
+
+Design proposes: the claim bar's hint line follows the pick count: "Tap 3 cards" at 0, 1 and 2 picks, "Tap Submit" at 3, "Judging…" from the Submit tap until the resolving broadcast, in the same slot at the same size. SPEC §8 state 3 words it as a fixed "Tap 3 cards".
+
+Design proposes: Submit takes the pill slot in every layout (design system v5, `_submit`), so SPEC §8 state 3's "the pill slot left empty" for landscape and computer no longer holds and "in place of SET! and its pill" for portrait now covers the tray and Submit.
+
+Design question: should the hint line say "Click Submit" on computer, or is "Tap" fine everywhere, as today's "Tap 3 cards" is?
+
+Design question: does a submit that never reaches the server get a visible cue (for example the hint line reading "Not sent, tap Submit again" for a few seconds)? None is drawn; the screen returns to 3/3, as SPEC §11 says.
+
+Design question: does Submit enable at exactly 3 picks while a pick request is still in flight? The boards assume yes, per SPEC §11 ("on the tap it sends the submit at once, whatever pick request is in flight").
+
+Decided: design system v5 changes the Claiming (mine) screen rule from "the pill slot is empty" to Submit in the pill slot, and resizes the portrait tray to a 128px row above it, because the brief asked where Submit sits and the pill slot is the fixed place that already exists. Instead of: Submit inside the yellow bar or block.

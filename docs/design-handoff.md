@@ -5,7 +5,7 @@ Where the design tool's work lives and what it was last given.
 ## Design links
 
 - Canvas: https://claude.ai/artifact/123TNq7nwcKGoXDaroSGcM (private, created 2026-10-12)
-- Handed off: docs/design-system.md v4, 2026-10-16 (return in `.scratch/onset-v1/design/20261013-21/return.md`)
+- Handed off: docs/design-system.md v5, 2026-10-25 (return in `.scratch/onset-v1/design/20261024-37/return.md`)
 - Components (each also a board): Main (landing), Join, Waiting, PlayPortrait, PlayLandscape, PlayComputer, PlayPortraitRefusal, PlayLandscapeRefusal, PlayComputerRefusal, GameOver, BigScreen. Every other board imports one of them with a state. Board files are `project/<name>.dc.html`
 
 | Screen | Tickets | Boards | State |
@@ -24,3 +24,4 @@ Where the design tool's work lives and what it was last given.
 | Player screen, play, No Set refusal, landscape | 21 | PlayLandscapeRefusal, play-l-blocked | exploring |
 | Player screen, play, No Set refusal, computer | 21 | PlayComputerRefusal, play-c-blocked | exploring |
 | Big screen, during play | 21 | BigScreen | exploring |
+| Player screen, play, claiming with Submit, every layout | 37 | play-p8-, play-p3-, play-l- and play-c- each with -claim0, -claiming, -claim2, -claim3, -submitted (PlayPortrait, PlayLandscape, PlayComputer states claiming0, claiming2, claiming3, submitted) | exploring |
