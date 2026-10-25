@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-25  review 20261025-165721: 26 commits since deploy-20261021-2033, ticket 37 matches its spec and design system v5, suite green at 520 examples, one pending decision (a lost Submit request does not unfreeze a redrawn screen), copy pass skipped because its skill failed to load. Next: settle the pending decision, then bin/deploy.
 - 2026-10-25  build 37: done, Submit judges a claim at once under the game lock, suite green at 520 examples, one Decided line. Next: review.
 - 2026-10-25  triage 37: ready, design proposes and questions settled in SPEC §5, §7, §8 and §11, the review's two wording items tidied, seven Decided lines. Next: build.
 - 2026-10-25  context cap: stopped before triage 37. Next: /clear, then /skills-loop:auto.
