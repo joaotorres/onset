@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-25  deploy deploy-20261025-1733: no ticket deployed. Next: new requests.
 - 2026-10-25  deploy deploy-20261025-1730: 34, 35, 36, 37, 38 deployed. Next: new requests.
 - 2026-10-25  review 20261025-171603: 30 commits since deploy-20261021-2033, ticket 38 closes the earlier review's pending decision and matches SPEC §11, suite green at 522 examples, no pending decisions, copy pass skipped again because its skill failed to load. Next: bin/deploy.
 - 2026-10-25  build 38: done, a failed Submit unfreezes the claiming screen connected for the claim, suite green at 522 examples, one Decided line. Next: review.
