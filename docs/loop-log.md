@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-10-27  copy pass: 0 fixed, 0 flagged, 14 lines from tickets 31 to 38 since the last pass, catching up the two reviews that skipped it. Next: new requests.
 - 2026-10-27  deploy deploy-20261027-0006: no ticket deployed. Next: new requests.
 - 2026-10-25  deploy deploy-20261025-1733: no ticket deployed. Next: new requests.
 - 2026-10-25  deploy deploy-20261025-1730: 34, 35, 36, 37, 38 deployed. Next: new requests.
