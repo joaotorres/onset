@@ -11,10 +11,12 @@ plugin's `README.md`, the contract in its `docs/workflow.md`
 plugin change never leaves this file stale. `docs/loop-log.md` records each
 step, newest first.
 
-When triaging, splitting, implementing, reviewing or designing a ticket,
-call the Skill tool with `loop-rules`: the gates, the implement loop, the
-headless exit, the design pass, the chain and the log live there. If it is not available in
-this session, stop and say so.
+When triaging, splitting, implementing, reviewing or designing a ticket, call
+the Skill tool with `loop-rules`: the gates, the implement loop, the headless
+exit, the design pass, the chain and the log live there. Before making a
+change a user would notice outside a ticket, call `loop-rules` too: section 11
+says how it enters the loop. If it is not available in this session, stop and
+say so.
 
 ## Stack guardrails
 
