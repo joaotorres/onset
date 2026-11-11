@@ -1,0 +1,23 @@
+# Same rules as `bundle exec standardrb`, so bin/rubocop and standardrb agree.
+require:
+  - standard
+plugins:
+  - standard-custom
+  - standard-performance
+  - rubocop-performance
+
+inherit_gem:
+  standard: config/base.yml
+  standard-custom: config/base.yml
+  standard-performance: config/base.yml
+
+AllCops:
+  SuggestExtensions: false
+  Exclude:
+    # standardrb ignores these by default
+    - "bin/**/*"
+    - "db/schema.rb"
+    - "db/*_schema.rb"
+    - "vendor/**/*"
+    - "tmp/**/*"
+    - "node_modules/**/*"

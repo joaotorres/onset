@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Full rspec suite in parallel, one database per process (storage/testN.sqlite3).
+# Files are split by the runtime each took last run (tmp/parallel_runtime_rspec.log).
+# Databases: bin/setup creates them (parallel:create[8] parallel:load_schema[8]).
+# 8 processes, measured on 12 cores (serial bundle exec rspec: 190 s warm), two runs each:
+#   -n 2: 95, 128 s   -n 4: 108, 64 s   -n 6: 47, 52 s   -n 8: 47, 47 s
+# 6 and 8 tie; 8 is the steadier. Headless Chrome specs make 2 and 4 noisy.
+# A smaller count passes through: bin/test-all -n 4 (CI's 4-core runner).
+# Ends with the combined "N examples, M failures" line; exits non-zero on a failure.
+set -o pipefail
+cd "$(dirname "$0")/.."
+
+out=$(mktemp)
+trap 'rm -f "$out"' EXIT
+
+bundle exec parallel_rspec spec -n 8 --serialize-stdout --combine-stderr \
+  --runtime-log tmp/parallel_runtime_rspec.log "$@" | tee "$out"
+status=$?
+
+# A file over the limit sets the floor for the whole run: split it by describe group.
+awk -F: -v limit=8 '$2 > limit { printf "Slow spec file: %s took %.1f s, over the %d s limit. Split it by describe group.\n", $1, $2, limit }' \
+  tmp/parallel_runtime_rspec.log 2>/dev/null
+
+summary=$(grep -E '^[0-9]+ examples?, [0-9]+ failures?' "$out" | tail -1)
+echo "${summary:-no combined summary: the run did not finish}"
+[ -n "$summary" ] || [ "$status" -ne 0 ] || status=1
+exit "$status"

@@ -54,6 +54,7 @@ group :development, :test do
   gem "brakeman", require: false
 
   gem "rspec-rails"
+  gem "parallel_tests"
   gem "standard", ">= 1.35.1", require: false
 end
 

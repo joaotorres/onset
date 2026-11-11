@@ -80,7 +80,8 @@ jobs:
       - name: Run specs
         env:
           RAILS_ENV: test
-        run: bin/rails db:test:prepare tailwindcss:build && bundle exec rspec
+        # One database per process; the runner has 4 cores.
+        run: bin/rails db:test:prepare 'parallel:create[4]' 'parallel:load_schema[4]' tailwindcss:build && bin/test-all -n 4
 
       - name: Keep screenshots from failed system specs
         uses: actions/upload-artifact@v7
