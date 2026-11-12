@@ -1,0 +1,8 @@
+#!/bin/sh
+# Trim the local Kamal builder's cache after each deploy. Buildkit drops the
+# least recently used layers first, so the last build's layers stay and the
+# next deploy keeps its cache. Unchecked, old layers grew to over 50 GB and
+# filled the disk mid-build.
+docker buildx prune --builder kamal-local-docker-container --max-used-space 10gb -f >/dev/null ||
+  echo "post-deploy: builder cache prune failed, deploy unaffected" >&2
+exit 0
