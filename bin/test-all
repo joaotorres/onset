@@ -6,6 +6,7 @@
 #   -n 2: 95, 128 s   -n 4: 108, 64 s   -n 6: 47, 52 s   -n 8: 47, 47 s
 # 6 and 8 tie; 8 is the steadier. Headless Chrome specs make 2 and 4 noisy.
 # A smaller count passes through: bin/test-all -n 4 (CI's 4-core runner).
+# Extra arguments pass through; spec paths run those alone and leave the runtime log as it was.
 # Ends with the combined "N examples, M failures" line; exits non-zero on a failure.
 set -o pipefail
 cd "$(dirname "$0")/.."
@@ -13,13 +14,23 @@ cd "$(dirname "$0")/.."
 out=$(mktemp)
 trap 'rm -f "$out"' EXIT
 
-bundle exec parallel_rspec spec -n 8 --serialize-stdout --combine-stderr \
-  --runtime-log tmp/parallel_runtime_rspec.log "$@" | tee "$out"
+# The whole spec folder unless an argument names a spec path: then only those.
+target=spec
+for arg in "$@"; do case "$arg" in spec | spec/*) target= ;; esac; done
+
+# A partial run would rewrite the runtime log with its files alone: keep the full run's.
+log=tmp/parallel_runtime_rspec.log
+[ -z "$target" ] && [ -f "$log" ] && cp "$log" "$log.full"
+
+bundle exec parallel_rspec $target -n 8 --serialize-stdout --combine-stderr \
+  --runtime-log "$log" "$@" | tee "$out"
 status=$?
 
+[ -z "$target" ] && [ -f "$log.full" ] && mv "$log.full" "$log"
+
 # A file over the limit sets the floor for the whole run: split it by describe group.
-awk -F: -v limit=8 '$2 > limit { printf "Slow spec file: %s took %.1f s, over the %d s limit. Split it by describe group.\n", $1, $2, limit }' \
-  tmp/parallel_runtime_rspec.log 2>/dev/null
+[ -n "$target" ] && awk -F: -v limit=8 '$2 > limit { printf "Slow spec file: %s took %.1f s, over the %d s limit. Split it by describe group.\n", $1, $2, limit }' \
+  "$log" 2>/dev/null
 
 summary=$(grep -E '^[0-9]+ examples?, [0-9]+ failures?' "$out" | tail -1)
 echo "${summary:-no combined summary: the run did not finish}"
