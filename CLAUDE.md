@@ -2,6 +2,8 @@
 
 The full design lives in `SPEC.md`. Read it before starting any non-trivial task. Section numbers in this file (e.g. §15) refer to that spec.
 
+`docs/future-direction.md` lists later directions; nothing in it is built until a ticket asks.
+
 ## Workflow
 
 Work moves from request to deploy through the skills-loop plugin. Config in
