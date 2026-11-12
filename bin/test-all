@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Full rspec suite in parallel, one database per process (storage/testN.sqlite3).
 # Files are split by the runtime each took last run (tmp/parallel_runtime_rspec.log).
-# Databases: bin/setup creates them (parallel:create[6] parallel:load_schema[6]).
-# 6 processes, measured on 12 cores (serial bundle exec rspec: 190 s warm), two runs each,
+# Databases: bin/setup creates them (parallel:create[8] parallel:load_schema[8]).
+# 8 processes, measured on 12 cores (serial bundle exec rspec: 190 s warm), two runs each,
 # after splitting the slowest system spec files (2026-11-12):
 #   -n 4: 44, 45 s   -n 6: 37, 37 s   -n 8: 38, 42 s   -n 10: 48, 54 s
-# 8 is level with 6 within the noise; 10 saturates the CPU with headless Chrome.
+# 8 is kept: level with 6 within the noise, and the count every app uses. 10 saturates the CPU.
+# With every file split under 8 s at -n 8: 36-41 s. Under 8 processes a file flaps 1-2 s around
+# the limit from run to run: split a file the warning names run after run, not once.
 # A smaller count passes through: bin/test-all -n 4 (CI's 4-core runner).
 # Extra arguments pass through; spec paths run those alone and leave the runtime log as it was.
 # Ends with the combined "N examples, M failures" line; exits non-zero on a failure.
@@ -23,7 +25,7 @@ for arg in "$@"; do case "$arg" in spec | spec/*) target= ;; esac; done
 log=tmp/parallel_runtime_rspec.log
 [ -z "$target" ] && [ -f "$log" ] && cp "$log" "$log.full"
 
-bundle exec parallel_rspec $target -n 6 --serialize-stdout --combine-stderr \
+bundle exec parallel_rspec $target -n 8 --serialize-stdout --combine-stderr \
   --runtime-log "$log" "$@" | tee "$out"
 status=$?
 
