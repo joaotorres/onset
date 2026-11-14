@@ -2,6 +2,8 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-14  request 41: colour-blind card palette filed, visual, blocked by 40. Next: triage.
+- 2026-11-14  request 40: dark mode and settings menu filed, visual. Next: triage.
 - 2026-11-14  request 39: content-page width standard filed, visual. Next: triage.
 - 2026-11-11  deploy deploy-20261111-1635: no ticket deployed. Next: new requests.
 - 2026-10-27  copy pass: 0 fixed, 0 flagged, 14 lines from tickets 31 to 38 since the last pass, catching up the two reviews that skipped it. Next: new requests.
