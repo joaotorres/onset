@@ -62,5 +62,31 @@
         <% end %>
       </div>
     </fieldset>
+
+    <%# §10 Palette. The chips show each option's own colors whatever is picked, so they carry fixed hex values. %>
+    <fieldset>
+      <legend class="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-gray-400 light:text-gray-600">Card colors</legend>
+      <div class="grid grid-cols-2 gap-1 rounded-[14px] border border-gray-700 bg-gray-950 p-1 light:border-gray-300 light:bg-gray-100">
+        <% [["classic", "Classic"], ["colorblind", "Color-blind"]].each do |value, label| %>
+          <label class="flex h-14 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[10px] text-[13px] font-semibold text-gray-400 has-checked:bg-gray-700 has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-blue-500 light:text-gray-600 light:has-checked:bg-gray-800 light:has-checked:text-white">
+            <input type="radio" name="card_colors" value="<%= value %>" <%= "checked" if value == (chosen_card_colors || "classic") %> class="sr-only" data-action="settings#pickCardColors">
+            <span class="flex h-4 w-[54px] items-center justify-center gap-2 rounded bg-[#FAFAFA]" aria-hidden="true">
+              <% if value == "classic" %>
+                <% %w[#C1121F #198A1E #5E2CA5].each do |hex| %>
+                  <span class="size-[9px] rounded-full" style="background-color: <%= hex %>;"></span>
+                <% end %>
+              <% else %>
+                <% [["#648FFF", "0,-14 14,12 -14,12"],
+                    ["#FE6100", "-4.5,-14 4.5,-14 4.5,-4.5 14,-4.5 14,4.5 4.5,4.5 4.5,14 -4.5,14 -4.5,4.5 -14,4.5 -14,-4.5 -4.5,-4.5"],
+                    ["#DC267F", "0,-13.5 3.64,-3.52 14.27,-3.14 5.9,3.42 8.82,13.64 0,7.7 -8.82,13.64 -5.9,3.42 -14.27,-3.14 -3.64,-3.52"]].each do |hex, points| %>
+                  <svg class="size-2.5" viewBox="-15 -15 30 30"><polygon fill="<%= hex %>" points="<%= points %>"/></svg>
+                <% end %>
+              <% end %>
+            </span>
+            <%= label %>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
   </div>
 </div>

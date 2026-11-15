@@ -22,6 +22,32 @@
   }
 }
 
+/* Card colors (SPEC §10 Palette, DESIGN v6): Classic by default, Color-blind
+   under data-card-colors="colorblind" on <html>, the same in both themes. The
+   _card partial never carries a hex: card-c0..2 picks the color, card-shape
+   strokes and card-ink fills with it, and the color mark shows under
+   Color-blind only. cc-classic and cc-colorblind words show under their own */
+:root {
+  --card-color-0: #C1121F;
+  --card-color-1: #198A1E;
+  --card-color-2: #5E2CA5;
+}
+:root[data-card-colors="colorblind"] {
+  --card-color-0: #648FFF;
+  --card-color-1: #FE6100;
+  --card-color-2: #DC267F;
+}
+.card-c0 { --card: var(--card-color-0); }
+.card-c1 { --card: var(--card-color-1); }
+.card-c2 { --card: var(--card-color-2); }
+.card-shape { stroke: var(--card); }
+.card-ink { fill: var(--card); }
+.color-mark { display: none; }
+:root[data-card-colors="colorblind"] .color-mark { display: inline; }
+.cc-colorblind { display: none; }
+:root[data-card-colors="colorblind"] .cc-colorblind { display: inline; }
+:root[data-card-colors="colorblind"] .cc-classic { display: none; }
+
 /* Card wrapper edge, light only, so a card reads on a light surface (DESIGN v6) */
 .card-edge {
   border-radius: 6%/4.3%;

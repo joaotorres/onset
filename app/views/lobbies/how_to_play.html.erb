@@ -49,9 +49,9 @@
         <div class="rounded-3xl bg-gray-900 p-5 md:p-6 light:bg-white light:shadow-[inset_0_0_0_1px_var(--color-gray-200)]">
           <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 light:text-gray-600">Color</h3>
           <div class="mt-4 grid grid-cols-3 gap-3 md:gap-4">
-            <figure class="flex flex-col items-center gap-2"><div class="card-edge h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 0) %></div><figcaption class="text-sm text-gray-300 light:text-gray-700">blue</figcaption></figure>
-            <figure class="flex flex-col items-center gap-2"><div class="card-edge h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 1) %></div><figcaption class="text-sm text-gray-300 light:text-gray-700">orange</figcaption></figure>
-            <figure class="flex flex-col items-center gap-2"><div class="card-edge h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 2) %></div><figcaption class="text-sm text-gray-300 light:text-gray-700">magenta</figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="card-edge h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 0) %></div><figcaption class="text-sm text-gray-300 light:text-gray-700"><span class="cc-classic">red</span><span class="cc-colorblind">blue</span></figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="card-edge h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 1) %></div><figcaption class="text-sm text-gray-300 light:text-gray-700"><span class="cc-classic">green</span><span class="cc-colorblind">orange</span></figcaption></figure>
+            <figure class="flex flex-col items-center gap-2"><div class="card-edge h-28 aspect-[5/7] md:h-36"><%= example_card(1, 1, 1, 2) %></div><figcaption class="text-sm text-gray-300 light:text-gray-700"><span class="cc-classic">purple</span><span class="cc-colorblind">magenta</span></figcaption></figure>
           </div>
         </div>
       </div>
@@ -106,7 +106,7 @@
             <li class="flex justify-between gap-4"><span class="text-gray-400 light:text-gray-600">Number</span><span class="text-gray-200 light:text-gray-800">all different <span class="text-green-400 light:text-green-700">✓</span></span></li>
             <li class="flex justify-between gap-4"><span class="text-gray-400 light:text-gray-600">Shape</span><span class="text-gray-200 light:text-gray-800">all different <span class="text-green-400 light:text-green-700">✓</span></span></li>
             <li class="flex justify-between gap-4"><span class="text-gray-400 light:text-gray-600">Shading</span><span class="text-gray-200 light:text-gray-800">all different <span class="text-green-400 light:text-green-700">✓</span></span></li>
-            <li class="flex justify-between gap-4 rounded-lg bg-red-500/10 px-2 py-1 -mx-2 light:bg-red-50"><span class="text-red-300 light:text-red-700">Color</span><span class="text-red-200 light:text-red-800">two blue, one orange <span class="text-red-400 light:text-red-700">✗</span></span></li>
+            <li class="flex justify-between gap-4 rounded-lg bg-red-500/10 px-2 py-1 -mx-2 light:bg-red-50"><span class="text-red-300 light:text-red-700">Color</span><span class="text-red-200 light:text-red-800"><span class="cc-classic">two red, one green</span><span class="cc-colorblind">two blue, one orange</span> <span class="text-red-400 light:text-red-700">✗</span></span></li>
           </ul>
         </div>
       </div>

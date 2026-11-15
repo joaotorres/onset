@@ -2,7 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 
 // SPEC.md §8, Settings menu, and §10, Themes. The theme lives in the `theme`
 // cookie and on <html data-theme>; Match device deletes both and leaves the
-// page to the media query. Picking never reaches the server.
+// page to the media query. Card colors works the same way (pickCardColors).
+// Picking never reaches the server.
 const THEME_COLORS = { light: "#F9FAFB", dark: "#030712" }
 const YEAR = 60 * 60 * 24 * 365
 
@@ -62,6 +63,27 @@ export default class extends Controller {
     window.jtTrack?.("theme_changed", { theme })
   }
 
+  get cardColors() {
+    return document.documentElement.dataset.cardColors || "classic"
+  }
+
+  // §10 Palette: Color-blind lives in the `card_colors` cookie and on
+  // <html data-card-colors>; Classic deletes both. CSS does the rest.
+  pickCardColors(event) {
+    const cardColors = event.target.value
+    if (cardColors === this.cardColors) return
+
+    const root = document.documentElement
+    if (cardColors === "colorblind") {
+      root.dataset.cardColors = cardColors
+      document.cookie = `card_colors=${cardColors}; path=/; max-age=${YEAR}; samesite=lax`
+    } else {
+      delete root.dataset.cardColors
+      document.cookie = "card_colors=; path=/; max-age=0; samesite=lax"
+    }
+    window.jtTrack?.("card_colors_changed", { card_colors: cardColors })
+  }
+
   applyTheme(theme) {
     const root = document.documentElement
     if (theme === "device") {
@@ -93,6 +115,9 @@ export default class extends Controller {
   syncRadios() {
     this.element.querySelectorAll('input[name="theme"]').forEach((radio) => {
       radio.checked = radio.value === this.theme
+    })
+    this.element.querySelectorAll('input[name="card_colors"]').forEach((radio) => {
+      radio.checked = radio.value === this.cardColors
     })
   }
 }

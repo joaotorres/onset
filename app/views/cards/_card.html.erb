@@ -1,29 +1,37 @@
 <%
-  palette_hex  = %w[#648FFF #FE6100 #DC267F]
-  palette_name = %w[blue orange magenta]
-  hex   = palette_hex[card.color]
-  cname = palette_name[card.color]
+  # §10 Palette: the card's color comes from CSS keyed on <html> (card-c0..2 sets
+  # --card, card-shape strokes and card-ink fills with it), never from a hex here,
+  # so the markup is the same for every viewer and both card colors settings.
   count = card.number + 1
   step     = 72           # 56px shape + 16px gap
   first_cy = 140 - (count - 1) * step / 2
   cx = 100; hw = 55; hh = 28
   # Unique per rendered SVG (§10): the same card can render twice on one page.
-  pattern_id = "stripes-#{cname}-#{SecureRandom.hex(4)}"
-  fill = case card.shading
-         when 0 then hex
-         when 1 then "url(##{pattern_id})"
-         else        "none"
-         end
+  pattern_id = "stripes-c#{card.color}-#{SecureRandom.hex(4)}"
+  paint = case card.shading
+          when 0 then 'class="card-shape card-ink"'
+          when 1 then %(class="card-shape" fill="url(##{pattern_id})")
+          else        'class="card-shape" fill="none"'
+          end.html_safe
   sw = [0, 2, 5][card.shading]  # stroke-width per shading
+  # Color mark (DESIGN v6 cards/_card): triangle, plus, five-point star, shown under Color-blind only.
+  mark = [
+    "0,-14 14,12 -14,12",
+    "-4.5,-14 4.5,-14 4.5,-4.5 14,-4.5 14,4.5 4.5,4.5 4.5,14 -4.5,14 -4.5,4.5 -14,4.5 -14,-4.5 -4.5,-4.5",
+    "0,-13.5 3.64,-3.52 14.27,-3.14 5.9,3.42 8.82,13.64 0,7.7 -8.82,13.64 -5.9,3.42 -14.27,-3.14 -3.64,-3.52"
+  ][card.color]
 %>
-<svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-sm">
+<svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" class="card-c<%= card.color %> w-full h-full drop-shadow-sm">
   <defs>
     <pattern id="<%= pattern_id %>" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(40)">
-      <rect width="3.5" height="7" fill="<%= hex %>"/>
+      <rect width="3.5" height="7" class="card-ink"/>
     </pattern>
   </defs>
 
   <rect width="200" height="280" rx="12" ry="12" fill="#FAFAFA" stroke="#E5E5E5" stroke-width="2"/>
+
+  <polygon class="color-mark card-ink" transform="translate(22 20)" points="<%= mark %>"/>
+  <polygon class="color-mark card-ink" transform="translate(178 260) rotate(180)" points="<%= mark %>"/>
 
   <% count.times do |i| %>
     <% cy = first_cy + i * step %>
@@ -31,11 +39,11 @@
     <% if card.shape == 0 %>
       <%# oval %>
       <ellipse cx="<%= cx %>" cy="<%= cy %>" rx="<%= hw %>" ry="<%= hh %>"
-               fill="<%= fill %>" stroke="<%= hex %>" stroke-width="<%= sw %>"/>
+               <%= paint %> stroke-width="<%= sw %>"/>
 
     <% elsif card.shape == 1 %>
       <%# squiggle: closed S-shaped bezier, left half bulges up, right half bulges down %>
-      <path fill="<%= fill %>" stroke="<%= hex %>" stroke-width="<%= sw %>"
+      <path <%= paint %> stroke-width="<%= sw %>"
             d="M <%= cx - hw %> <%= cy %>
                C <%= cx - hw - 10 %> <%= cy - 25 %>
                  <%= cx - hw + 10 %> <%= cy - hh %>
@@ -58,7 +66,7 @@
 
     <% else %>
       <%# diamond %>
-      <polygon fill="<%= fill %>" stroke="<%= hex %>" stroke-width="<%= sw %>"
+      <polygon <%= paint %> stroke-width="<%= sw %>"
                points="<%= cx %>,<%= cy - hh %> <%= cx + hw %>,<%= cy %> <%= cx %>,<%= cy + hh %> <%= cx - hw %>,<%= cy %>"/>
     <% end %>
   <% end %>

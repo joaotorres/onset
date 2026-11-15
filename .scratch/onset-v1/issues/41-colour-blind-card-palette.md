@@ -1,12 +1,12 @@
 # 41: Colour-blind friendly card palette, toggled in settings
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by: 43, 44, 45
 Priority: normal
 Model:
 Effort:
-Changelog:
+Changelog: Cards now come in Set's classic red, green and purple, and a Color-blind option in Settings switches them to blue, orange and magenta with a small mark in each corner that tells the colors apart.
 
 ## Request
 
