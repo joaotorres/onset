@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  copy pass: 0 fixed, 0 flagged, 17 lines from tickets 39, 41, 43, 44, 45 (settings menu labels, How to play color words, Changelog lines). Next: quick review.
 - 2026-11-15  build 41: done, Classic and Color-blind card palettes from CSS keyed on <html>, the color mark in `_card`, the Card colors group in the settings menu with the `card_colors` cookie and event, How to play's color words following it, suite green at 630 examples. Next: auto.
 - 2026-11-15  build 45: done, the big screen settings button in the bottom-right corner and the light theme of every big screen state, two Decided lines, suite green at 599 examples. Next: auto.
 - 2026-11-15  build 44: done, the player screen settings button in the Room footer and the light theme of every player screen state, both disabled No Set pills on the v5 rule, four Decided lines, suite green at 578 examples (bin/rubocop refused by permissions, `bundle exec rubocop` clean with the same config). Next: auto.
