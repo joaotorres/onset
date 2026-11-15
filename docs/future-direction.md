@@ -28,12 +28,9 @@ So until then:
 
 ## AI opponent (certain, v2)
 
-A bot player: a `Player` row with no `session_token` and no User, driven by a
-background job that claims a random valid Set after a configurable delay.
-Difficulty is the delay distribution (§14 AI opponent).
-
-So until then:
-- Nothing. `Card.any_set_on?` is already the brute-force solver it would reuse
+Taken by ticket 47 and specified in SPEC AI opponent: bots the host adds to a
+waiting room, at Easy, Medium or Hard, each a delay range before it claims a
+random Set.
 
 ## Claim fairness (parked)
 

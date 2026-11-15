@@ -40,6 +40,10 @@ _Avoid_: Color symbol, pattern (shading already means solid, striped, outline)
 One game, identified by its six-character room code, from waiting through play to the end.
 _Avoid_: Lobby, session, match
 
+**Bot**:
+A player Onset plays itself, added by the host while the room is waiting, at Easy, Medium or Hard. It only claims Sets, after a delay its level sets, and never votes.
+_Avoid_: AI, computer, CPU
+
 **Board**:
 The face-up cards in play, 12 to 18 of them.
 _Avoid_: Table, grid

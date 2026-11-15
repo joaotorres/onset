@@ -14,7 +14,7 @@ This document is the source of truth for the v1 MVP. It is intentionally tight; 
 
 **Stack.** Ruby on Rails 8, SQLite, Hotwire (Turbo + Stimulus), Action Cable with Solid Cable adapter, Solid Queue, Tailwind CSS, deployed with Kamal to a VPS.
 
-**Non-goals for v1.** No accounts, no AI opponent, no solo/practice mode, no cross-room matchmaking, no native apps.
+**Non-goals for v1.** No accounts, no solo/practice mode, no cross-room matchmaking, no native apps. The AI opponent, once v2, has its own section (AI opponent): bots the host adds to a waiting room.
 
 ---
 
@@ -58,6 +58,7 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 - Wrong-claim lockout (15s, `Game::CLAIM_TIMEOUT`) only prevents that player from calling SET; they can still observe, call No Set, join No-Set votes and refuse a call.
 - If the board grows beyond 12 (after No-Set draws), it stays oversized until a Set is found and removed; replacement cards only re-fill up to 12. Concretely: if board has 15 and a Set is found, board shrinks to 12 (no replacements).
 - If the deck runs out mid-game, the board is not refilled. Game continues until no Sets remain on the board.
+- A bot (AI opponent) plays only by claiming. It never calls No Set, agrees, refuses or votes to end or play again, and it is never active, so every vote above that counts active players counts people only. The ready vote to start counts it as voted.
 
 ---
 
@@ -96,7 +97,7 @@ The room.
 | `deck` | json | Array of remaining card ids `0..80`, in draw order |
 | `board` | json | Array of card ids currently face-up (length 12, 15, or 18) |
 | `discard` | json | Array of card ids already collected |
-| `host_player_id` | bigint | nullable; unused. The host is the browser that created the room, marked by its `host_game` cookie (§8 Landing), not a player |
+| `host_player_id` | bigint | nullable; the player who joined from the host browser, set at join. The host is the browser that created the room, marked by its `host_game` cookie (§8 Landing), not a player: this column only tells which player screen shows the bot control (AI opponent), and every host action still checks the cookie |
 | `claim_player_id` | bigint | nullable; the player currently holding the claim lock |
 | `claim_started_at` | datetime | nullable; for the 15s claim window |
 | `no_set_started_at` | datetime | nullable; for 15s No-Set countdown |
@@ -131,10 +132,13 @@ A participant in a Game.
 | `locked_until` | datetime | nullable; the timestamp until which the player cannot call SET (the `Game::CLAIM_TIMEOUT` lockout) |
 | `last_seen_at` | datetime | updated on every player screen request via `Player#seen!`, which skips callbacks so it never broadcasts |
 | `left_at` | datetime | nullable; for graceful disconnect |
+| `bot_level` | enum | nullable; `easy`, `medium`, `hard` for a bot (AI opponent), nil for a person |
+
+A bot keeps a random `session_token` like every player, held by no browser, so no request can act as it: a nil token would match a request that carries no player cookie.
 
 **Validations**: `name` present, length 1..20. `color` matches a hex pattern. `(game_id, name)` unique-case-insensitive (no two players in the same game can share a name). `(game_id, color)` unique (no two players in the same game can share a color).
 
-**Methods**: `active?` (last_seen within 30s), `locked?`, `host?`.
+**Methods**: `active?` (last_seen within 30s; a bot is never seen, so never active), `locked?`, `host?`, `bot?`.
 
 ### `Claim`
 
@@ -202,6 +206,7 @@ Rails.application.routes.draw do
     resources :players, only: [:new, :create] do
       collection { get :join }
     end
+    resources :bots, only: [:create]
     resource :controller, only: [:show], controller: "controllers"
     resources :claims, only: [:create, :update] do
       member { post :submit }
@@ -231,7 +236,8 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | GET | `/games/:code/players/join` | Join page, after starting a game, the QR scan or a code: name + color form |
 | POST | `/games/:code/players` | Create player, set cookie, redirect to the player screen |
 | GET | `/games/:code/controller` | Player screen |
-| POST | `/games/:code/ready` | A player votes to start; the game starts when every player (2+) has voted. Once ended, a player votes to play again; the room restarts when every active player has voted |
+| POST | `/games/:code/ready` | A player votes to start; the game starts when every player (2+, at least one a person) has voted, a bot counting as voted (AI opponent). Once ended, a player votes to play again; the room restarts when every active player has voted |
+| POST | `/games/:code/bots` | The host (the browser holding `host_game`, `403` otherwise) adds a bot at `level` `easy`, `medium` or `hard` (AI opponent). Ignored, still `204`, unless the room is waiting, the level is one of the three and a color is free |
 | POST | `/games/:code/start` | The host (the browser holding `host_game`) starts the game from the big screen |
 | POST | `/games/:code/restart` | Play again from the big screen (host): reset deck, clear scores and votes, status `playing`, at once |
 | POST | `/games/:code/claims` | Try to take the claim lock; a lost race changes nothing, and one lost to a running claim is logged (§6 Lost races are logged) |
@@ -470,6 +476,9 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 - **`UnblockNoSetJob`** — enqueued with `wait: Game::NO_SET_TIMEOUT` when a call is refused. Broadcasts so the No Set pill and the big screen band return to idle; the block itself is enforced by `no_set_refused_at` at call time.
 - **`ExpirePlayerLockoutJob`** — optional; the lockout is enforced by checking `locked_until` at claim time, but a job that broadcasts UI updates when the lockout expires is nice-to-have.
 
+- **`BotMoveJob`** — a bot's timer (AI opponent): enqueued with the delay its level draws whenever the room starts or restarts, the board changes or a claim resolves, each replacing the bot's earlier one. If it is the bot's latest, the room is playing and no claim runs, call SET! for the bot on a random Set on the board, or do nothing when there is none.
+- **`BotSubmitJob`** — enqueued 2 seconds after a bot's claim is acquired. If the claim is still pending, submit its three cards as a Submit does (§11).
+
 All jobs are idempotent: they re-check the relevant state inside a transaction and no-op if no longer applicable.
 
 ---
@@ -519,15 +528,16 @@ Every event goes through `window.jtTrack(name, props)`, which the gem defines in
 | `game_created` | `mode` (`standard` or `quick`) | `GamesController#create`, sent from the creator's join page |
 | `player_joined` | `player_count` (the room's players, the new one included), `is_creator` (this browser holds the room's `host_game` cookie), `mode` | `PlayersController#create`, sent from the new player's player screen |
 | `invite_shared` | `method`: `web_share` (the share sheet completed), `copy` (the link was copied) or `qr` (Show QR opened) | The waiting invite (`invite` controller, §8 Player screen) |
-| `game_started` | `mode`, `player_count` | Status `waiting` to `playing`: the host's Start game or the ready vote |
-| `game_restarted` | `mode`, `player_count` | Status `ended` to `playing`: the big screen's Play again or the ready vote |
-| `game_finished` | `mode`, `player_count`, `end_reason` (`quick_win`, `vote` or `deck_exhausted`), `is_tie` (no sole winner), `duration_seconds` when known | Status `playing` to `ended` |
+| `bot_added` | `level`: `easy`, `medium` or `hard` | The host's add-bot control (AI opponent), on the tap, from the big screen or the host's player screen |
+| `game_started` | `mode`, `player_count`, `bot_count` (the bots among `player_count`) | Status `waiting` to `playing`: the host's Start game or the ready vote |
+| `game_restarted` | `mode`, `player_count`, `bot_count` | Status `ended` to `playing`: the big screen's Play again or the ready vote |
+| `game_finished` | `mode`, `player_count`, `bot_count`, `end_reason` (`quick_win`, `vote` or `deck_exhausted`), `is_tie` (no sole winner), `duration_seconds` when known | Status `playing` to `ended` |
 | `theme_changed` | `theme`: `device`, `light` or `dark`, the option picked | The settings menu (§8), when the player picks a theme other than the one already chosen |
 | `card_colors_changed` | `card_colors`: `classic` or `colorblind`, the option picked | The settings menu (§8), when the player picks card colors other than the ones already chosen |
 
 **Server actions ride the flash.** `game_created` and `player_joined` happen in an action that redirects, so no page is there to send them. `track_event` (`TracksEvents`, included in `ApplicationController`) appends the event to `flash[:tracked_events]`. The next page's layout renders it into a hidden `track` controller element, which sends each event once on connect and then empties its value, so a Turbo restoration visit to the cached page does not send it again. Nothing calls PostHog from the server.
 
-**Game state events come from one player screen.** The status reaches every screen by broadcast (§7), so no request marks a game starting, restarting or finishing. `#controller_status` carries a hidden `game-events` element (`TrackingHelper#game_events_tag`) with the room code, the status, the event properties and whether this player is the reporter. On each render the `game-events` controller compares the status with the last one this tab saw for the room; an event is a change it saw. Every player screen keeps track, and only the reporter sends: the player at the top of the standings (`Game#standings.first`, ties in join order), so each event is counted once. If the reporter's screen is not open at that moment, the event is not sent. The big screen sends no game events.
+**Game state events come from one player screen.** The status reaches every screen by broadcast (§7), so no request marks a game starting, restarting or finishing. `#controller_status` carries a hidden `game-events` element (`TrackingHelper#game_events_tag`) with the room code, the status, the event properties and whether this player is the reporter. On each render the `game-events` controller compares the status with the last one this tab saw for the room; an event is a change it saw. Every player screen keeps track, and only the reporter sends: the person at the top of the standings (the first player in `Game#standings`, ties in join order, who is not a bot: a bot has no screen), so each event is counted once. If the reporter's screen is not open at that moment, the event is not sent. The big screen sends no game events.
 
 **`duration_seconds` is measured on the screen.** Each player screen notes when it saw play start, and `game_finished` carries the seconds from then to the finish. A reporter screen opened fresh mid-game (a closed and reopened tab, another browser) did not see play start, so its `game_finished` leaves `duration_seconds` out. `Game` has no `started_at` column; adding one would make the duration exact, from the server, for every game.
 
@@ -565,7 +575,7 @@ On phones the join form comes first, since joining is what phones come here for.
 Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wide. Two columns: the play area (`#board` over `#announcement`) and a 26rem right rail with the room tile (room code and the site address to open, `join_host`, no QR) and the **Players** scoreboard. The room tile is hidden while waiting, since the join hero carries the code, and appears once the game starts without a reload. The join hero holds the only QR on the screen: once play starts, late joining is blocked, so nothing needs one.
 
 - **Scoreboard**: rows sorted by score, dot, name, big score. The claiming player's row turns solid yellow. A locked-out player is greyed with a red **Locked** tag.
-- **Waiting**: a join hero with a 288px QR and, under it, a **Join from this computer →** link that opens the join page in a new tab, for someone playing on the same computer as the big screen. A browser holds one player (one `player_token` cookie), so a second player on that computer needs a private window or another browser. Beside the QR, "Scan to join, or open HOST and enter" and the room code at up to 10rem, shrinking with the viewport so it never runs past the play area into the rail. The hero's text wraps or shrinks the same way. Player pills with a ✓ once ready. `#start_button`: **Start game** with "n of m ready" beside it, or disabled with "Need at least 2 players".
+- **Waiting**: a join hero with a 288px QR and, under it, a **Join from this computer →** link that opens the join page in a new tab, for someone playing on the same computer as the big screen. A browser holds one player (one `player_token` cookie), so a second player on that computer needs a private window or another browser. Beside the QR, "Scan to join, or open HOST and enter" and the room code at up to 10rem, shrinking with the viewport so it never runs past the play area into the rail. The hero's text wraps or shrinks the same way. Player pills with a ✓ once ready, bots included with their bot mark (AI opponent). `#start_button`: **Start game** with "n of m ready" beside it, or disabled with "Need at least 2 players", or with "Need a person to play" when every player is a bot. The **add-bot control** (AI opponent) sits in the waiting state, shown on every big screen and accepted from the host only, as Start game is.
 - **Playing**: "N cards left in the deck" top right, or an orange "Deck is empty" pill. The card grid (§10). Cards dealt by the last replace get a green outline that fades over 3s.
 - **Announcement band**: always 9rem tall so the grid never jumps. Empty while playing: "Spot a Set? Hit SET! on your screen." Otherwise one tinted panel:
   - Claiming (yellow): countdown ring, "Alex is calling SET!".
@@ -577,7 +587,7 @@ Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wid
 
 ## 8. Join page (`/games/:code/players/join`)
 
-Portrait. "Joining room" with the code in large type, since the code is what people check. The creator sees the same page after **Start a game**. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken the room is full: none is selected, the red base error box says "This room is full" and **Join** is disabled. The page does not update live as others join. **Join** sits at the bottom, under the thumb. In the browser that created the room (its `host_game` cookie matches), a **Use this screen as the big screen instead** text link sits under Join and opens the room's big screen `/games/:code` in the same tab; other browsers do not show it. Joining does not make the creator `host_player_id`: hosting stays with the browser, which gets the big screen's **Start game** and **Play again**, and on player screens everyone starts and plays again by the ready vote. Field errors show under their field; base errors (game already started) in a red box.
+Portrait. "Joining room" with the code in large type, since the code is what people check. The creator sees the same page after **Start a game**. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken the room is full: none is selected, the red base error box says "This room is full" and **Join** is disabled. The page does not update live as others join. **Join** sits at the bottom, under the thumb. In the browser that created the room (its `host_game` cookie matches), a **Use this screen as the big screen instead** text link sits under Join and opens the room's big screen `/games/:code` in the same tab; other browsers do not show it. Hosting stays with the browser, which gets the big screen's **Start game** and **Play again**, and on player screens everyone starts and plays again by the ready vote. Joining from the host browser records that player as `host_player_id` (§4) only so their player screen shows the add-bot control (AI opponent); it grants nothing else. Field errors show under their field; base errors (game already started) in a red box.
 
 ## 8. Player screen (`/games/:code/controller`)
 
@@ -597,7 +607,9 @@ Shared by all three during play:
 
 SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**, with **There's a Set** (the refusal) beside it while the player may refuse.
 
-1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more". Alone in the room, a player cannot vote: "Waiting for more players to join…" takes the place of I'm ready, so the voted line never reads "waiting for 0 more".
+1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more", n counting people only, since a bot is always ready. Alone in the room, a player cannot vote: "Waiting for more players to join…" takes the place of I'm ready, so the voted line never reads "waiting for 0 more". A bot in the room counts as a player here, so a person with a bot can vote and play (AI opponent). Bots sit in the roster with their bot mark and ✓.
+
+   On the host's own player screen (the player who joined from the host browser, §4 `host_player_id`) the waiting screen also carries the **add-bot control** (AI opponent). Other player screens show the bots, not the control.
 
    Every player's waiting screen also carries the **invite**, so anyone in the room can bring in the next player; it goes once play starts, since late joining stays blocked, remote players included:
    - The room code in large type, with "or open HOST and enter the code" (`join_host`), as on the big screen.
@@ -605,7 +617,7 @@ SET! sits in the same fixed slot across idle, locked out, someone else claiming 
    - **Show QR**: opens a sheet over the player screen with the join URL's QR on a white tile, as large as fits up to 18rem, the room code under it and **Done** to close it. The QR stays behind this tap so the waiting screen fits without it. Any room update (someone joins or votes) re-renders `#controller_status` and closes the sheet; one tap reopens it.
    - **Show on a big screen →**: a text link that opens the room's big screen `/games/:code` in a new tab, as **Join from this computer →** does, so the player screen stays open.
 
-   With 8 players and the invite there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640. The exact layout comes from the design pass.
+   With 8 players and the invite, and on the host's screen the add-bot control, there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640. The exact layout comes from the design pass.
 2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. During the block after a refusal (§2), No Set is disabled and shows the seconds left ("No Set in 12 s"), the status slot reads "Alex says there's a Set" ("You say there's a Set" on the refuser's own screen, with their own dot) and SET! stays as it is; the pill comes back on its own when the block ends. Once the block ends the refusal stays used until the board changes: No Set works again, but a call on this board cannot be refused. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
 3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", a hint line and an n/3 count, and the **Submit** pill in the pill slot, in every layout. Portrait puts the bar in the status slot above a tray of three slots, which fill as cards are tapped, in place of SET!; landscape and computer show the bar as one block in place of the panel and SET!. The hint follows the picks: "Tap 3 cards" at 0, 1 and 2 picks, "Tap Submit" at 3, "Judging…" from the Submit tap until the claim resolves. It says "Tap" in every layout, since the layout is chosen by the viewport, not the input. No Set is not offered during the player's own claim. A claim started by tapping a card opens with that card picked (1/3) if it is still on the board. Tap a card to pick it, tap again to unpick, up to three; three picks stay changeable until Submit is tapped or the time runs out. Submit is shown disabled below three picks and enabled at exactly three, whatever pick request is still in flight, in its fixed slot as SET! keeps its own. Tapping it sends the three picks and the server judges them at once (§11): correct or wrong, announced on every screen exactly as a claim judged at expiry (the found-set banner, or state 6). From the tap the screen is frozen, Submit reading "Submitted", until the broadcast that resolves the claim replaces it; a request that never reaches the server gives the screen back at 3/3 with no further cue, and the player taps again (§11). A redraw of the screen during the claim (any room update, §7) shows the picks again, tray and count included, the latest ones even with a pick still on its way to the server (§11).
 4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
@@ -664,6 +676,39 @@ History: v1 auto-submitted 250 ms after the third tap, the board dimmed during t
 
 ---
 
+## AI opponent
+
+A **bot** is a player Onset plays itself (`GLOSSARY.md`), so a room can play with fewer people, a single person included. The host adds bots while the room is waiting, and each plays by the same claim rules as a person: first to reach the server wins (§6). User-facing text says "bot".
+
+### Adding a bot
+
+- **Who**: the host, the browser holding the room's `host_game` cookie, from the big screen's waiting state and from the host's own player screen while waiting (§8). `POST /games/:code/bots` (§5) checks the cookie, as Start game does
+- **When**: only while the room is waiting; once play starts the control goes, as late joining is blocked. Bots stay in the room for Play again, their scores reset with everyone's
+- **Levels**: **Easy**, **Medium** and **Hard**, picked with each add. A room may hold several bots, of any levels, up to its eight colors. With every color taken the control is disabled, as Join is on a full room
+- **Name and color**: "Easy bot", "Medium bot", "Hard bot"; a second bot at the same level is "Easy bot 2", and so on, so names stay unique (§4). The first free color in preset order, as the join page selects one
+- **Ready at once**: a bot counts as voted in the ready vote from the moment it joins, so its ✓ shows at once. A room starts with at least 2 players, bots included, and at least one person: the ready vote starts it when every person has voted, and the big screen's Start game is disabled while every player is a bot, since nobody could call No Set or vote to end
+- **Shown everywhere a player is**: the waiting roster and pills, both scoreboards, the standings, the podium and the announcements ("Easy bot is calling SET!", "Easy bot found a Set", "Easy bot wins"), with a bot mark beside the name. The control's look, where it sits on each screen and the bot mark come from the design pass
+- **Telemetry**: the tap sends `bot_added` (§17)
+
+### How a bot plays
+
+- **Its timer.** Each bot draws a delay, uniform within its level's range, whenever the room starts or restarts, the board changes (a Set removed or cards dealt) and a claim resolves. Each bot keeps its own timer, and each new draw replaces the bot's earlier one, which then does nothing when it runs out
+
+  | Level | Delay |
+  |---|---|
+  | Easy | 30 to 50 s |
+  | Medium | 15 to 30 s |
+  | Hard | 6 to 15 s |
+
+- **When it runs out**, if it is the bot's latest timer, the room is playing and no claim runs, the bot calls SET! on a random Set among those on the board, through the same lock a person's claim takes (§6), so a person's SET! that reaches the server first wins. A running No Set countdown is cancelled, as a person's SET! cancels it. With no Set on the board it does nothing until the board changes. A timer runs out during a claim only when the claim began after it was drawn, and then does nothing: the claim's end draws a new one
+- **Its claim** shows on every screen as a person's, with the ring. After 2 seconds it submits its three cards, judged as any Submit (§11), so a bot never makes a wrong claim and is never locked out
+- **It never votes** (§2 Edge cases): no No Set call, agreement or refusal, no End game or Play again vote. A No Set call on a board that holds a Set still meets the bot's timer, and the bot claims that Set when its delay runs out
+- **It cannot be impersonated**: it keeps a random `session_token` no browser holds (§4)
+
+Removing a bot from a waiting room is not offered yet.
+
+---
+
 ## 14. Future Work (post-v1)
 
 ### Accounts (v1.5)
@@ -679,7 +724,7 @@ The Game logic does not change. `Player` continues to be the in-game identity; `
 
 ### AI opponent (v2)
 
-Brute-force solver runs in `Card.any_set_on?` already. A "bot player" is a `Player` row with no `session_token` and no User, animated by a background job that, after a configurable delay, attempts to claim a random valid Set. Difficulty = delay distribution.
+Specified in AI opponent above (ticket 47). History: this note planned a bot as a `Player` row with no `session_token`; it keeps a random one instead, because a nil token would match a request carrying no player cookie (§4).
 
 ### Claim fairness
 

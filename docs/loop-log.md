@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  triage 47: spec settled, new SPEC AI opponent section (bots at Easy, Medium, Hard added by the host while waiting, claiming after a delay, never voting) with SPEC 1, 2, 4, 5, 8, 12, 17 and the glossary, blocked by 44, 45, fourteen Decided lines and one Deferred, waiting for its design pass, split after the design entry. Next: /design-brief 47.
 - 2026-11-15  triage 46: spec settled, SPEC 10 Visual system holds every text in both themes, muted and placeholders included, to 4.5:1 and form field borders at rest to 3:1, blocked by 43, 44, 45, five Decided lines, waiting for its design pass (v6 keeps dark muted `gray-500`, field border `gray-700`). Next: /design-brief 42 and 46, then triage 47.
 - 2026-11-15  request 47: AI opponent the host can add from the lobby filed, visual, from the inbox (handoff aae500). Next: triage.
 - 2026-11-15  auto: stopped, the 5h window is at 88%, resetting at 06:20. Next: triage 46 and 42's brief, then the queued AI opponent request, after the reset.
