@@ -42,7 +42,7 @@ Decided: Blocked by 44 and 45, because the add-bot control and the bot mark go o
 
 Decided: the split waits for the triage after the design entry, as ticket 40's did, because a child briefed now would be ready before its screens are drawn and gate 2 would fail it. Expect a split into bots in play (column, endpoint, timers, the rule changes, telemetry, the big screen control) and the host's player screen control. Instead of: splitting now with no design.
 
-Deferred: The host can remove a bot from a waiting room, from the big screen and the host's player screen.
+Deferred: The host can remove a bot from a waiting room, from the big screen and the host's player screen. Filed as 48.
 
 Decided: removing a bot is left to a request of its own, because the request asks only to add one and a room can be made again. Instead of: adding a remove control here.
 
