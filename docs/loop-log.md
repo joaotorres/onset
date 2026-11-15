@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-16  request 52: filed the deferred follow-up from 43, a tab that follows a link takes on the theme and card colors picked in another tab, behavioural. Next: triage.
 - 2026-11-16  request 51: filed the deferred follow-up from 43, Escape closes the open settings menu wherever focus is, behavioural. Next: triage.
 - 2026-11-16  request 50: filed the deferred follow-up from 41, one source each for the card palette, the color marks and the theme colors, behavioural. Next: triage.
 - 2026-11-16  review security-20261115: security pass over the whole app on Fable, no critical or high finding, one medium (the 8-player cap is not enforced on the server), three low, two info, Brakeman and bundler-audit clean, no pending decisions. Next: file the medium finding.
