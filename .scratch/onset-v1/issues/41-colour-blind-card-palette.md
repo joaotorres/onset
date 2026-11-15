@@ -1,9 +1,9 @@
 # 41: Colour-blind friendly card palette, toggled in settings
 
-Status: needs-triage
+Status: ready-for-agent
 Kind: visual
 Blocked by: 43, 44, 45
-Priority:
+Priority: normal
 Model:
 Effort:
 Changelog:
@@ -17,6 +17,58 @@ Settled in conversation:
 - It also applies to the card diagrams on the How to play page.
 - The setting is stored per device in the browser, like ticket 40's, not on `Player`.
 - Stack stays Hotwire (Stimulus) and Tailwind only.
+
+## Spec references
+
+- SPEC.md, Shared: 10. Cards and visual system > Palette, Component, Themes (Same in both themes)
+- SPEC.md, 8. Settings menu (Card colors, Picking, The current choice, Telemetry)
+- SPEC.md, Shared: 7. Realtime > Hooks that must survive any markup change
+- SPEC.md, Shared: 17. Telemetry > Custom events (`card_colors_changed`) and Privacy
+- SPEC.md, 8. Landing (the fanned cards), 8. Big screen, 8. Player screen (board, tray, found-set banner)
+- docs/design-system.md v6: Shared: Tokens (Card palettes), Shared: Rules added in v6 (Card colors), Components > cards/_card (Color mark), Settings menu (Fieldset "Card colors"), Stimulus controllers; Screens > How to play
+- Boards (canvas in docs/design-handoff.md): CardColorsSheet, SettingsMenu, s-play-p-picked-cb, cb-play-p-dark, -light, cb-play-p-claim2-dark, -light, cb-play-p-found-dark, -light, cb-play-c-dark, -light, cb-landing-p-dark, -light, cb-landing-d-dark, -light, cb-big-correct-dark, -light, cb-htp-d-dark, -light; every other v6 board shows Classic cards
+- GLOSSARY.md: Card colors, Color mark
+
+## Scope
+
+- **The two palettes**, card color 0, 1, 2: Classic red `#C1121F`, green `#198A1E`, purple `#5E2CA5` (the default) and Color-blind blue `#648FFF`, orange `#FE6100`, magenta `#DC267F`, as CSS custom properties in `app/assets/tailwind/application.css` keyed on `<html>`, the same in both themes. The `_card` partial stops writing hex values: its fills, strokes and the striped pattern's lines take the card's color from those properties (through `style` or classes, since a `var()` in an SVG presentation attribute does not resolve), so the markup is the same under both palettes and every viewer
+- **The color mark** in `_card`, always in the markup and shown only under Color-blind: one solid mark in the card's own color, no stroke, top-left and again turned 180° bottom-right, at the points DESIGN v6 cards/_card gives (color 0 a triangle, 1 a plus, 2 a five-point star). Face, border, shapes, shading, the viewBox and every wrapper size stay as they are. Copies the `card-selection` controller makes for the tray keep the mark and fresh pattern ids
+- **The `card_colors` cookie** (`colorblind`, path `/`, a year, SameSite Lax, not HttpOnly; Classic deletes it), read by the layout and rendered on `<html>` beside 43's theme, so the first paint has the right cards
+- **The Card colors fieldset** in 43's settings menu, under Theme, as DESIGN v6 Settings menu draws it: Classic and Color-blind as native radios, each a chip on the card face (three Classic dots, three color marks), Classic checked with no cookie. The `settings` controller writes or deletes the cookie, applies the choice to `<html>` at once with no reload and the menu still open, and sends `card_colors_changed` with `card_colors` (`classic`, `colorblind`) when the pick differs from the current one, once per arrow-key step as the Theme radios do. The fieldset shows wherever the menu does: the landing, join page, How to play, the player screen and the big screen
+- **Words that name a card color** on How to play: the three Color captions (red, green, purple / blue, orange, magenta) and the Not a Set row ("two red, one green" / "two blue, one orange"), both versions in the markup, CSS showing the one that matches, the hidden one hidden from screen readers too. The colour comment in `LobbiesHelper` names both palettes
+- Must not touch: the card face `#FAFAFA` and border, the card wrapper edge and the light theme (43, 44, 45), `Card`'s color indices, `PlayersController::PRESET_COLORS`, the meaning colors, layouts, sizes, animations, SPEC 7's hook ids and Stimulus attributes
+
+## Acceptance criteria
+
+- With no `card_colors` cookie, a solid card of color 0, 1 and 2 paints its shapes `#C1121F`, `#198A1E` and `#5E2CA5` (computed style), on the landing's fanned cards, How to play, the big screen board and band, and the player screen board, tray and found-set banner; no color mark is displayed
+- With `card_colors=colorblind`, the server-rendered `<html>` already carries the choice (the response body, before any script), the same cards paint `#648FFF`, `#FE6100` and `#DC267F`, and every card shows two color marks, a triangle on color 0, a plus on color 1 and a star on color 2, in the card's color
+- Striped and outline cards follow the palette too: the hatch lines and the outlines take the card's color under both palettes
+- The `_card` partial renders the same markup with and without the cookie, pattern ids aside (a request or partial spec), and a broadcast partial that holds cards (`#board`, `#controller_status`) renders the same HTML whatever the viewer's `card_colors` and `theme` cookies, pattern ids aside
+- A card's computed colors and marks are the same under `theme=light` and `theme=dark`
+- Every page's settings menu holds a Card colors group with the radios Classic and Color-blind under Theme; with no cookie Classic is checked
+- Picking Color-blind sets `card_colors=colorblind` (a year, SameSite Lax, path `/`), every card on the page turns to the Color-blind palette with its marks, How to play's words switch, with no reload and the menu still open; picking Classic deletes the cookie and the cards turn back; a reload keeps the choice
+- `card_colors_changed` carries `card_colors` `classic` or `colorblind`, through `window.jtTrack?.`, once per change; picking the option already chosen sends nothing
+- How to play under Classic reads "red", "green", "purple" and "two red, one green"; under Color-blind "blue", "orange", "magenta" and "two blue, one orange"; the other version is neither visible nor in the accessibility tree
+- A card copied into the portrait tray shows the palette in force and, under Color-blind, its marks
+- Card sizes and every layout are unchanged: the existing layout and no-page-scroll specs pass unchanged
+
+## Verification
+
+`bin/test-all && bin/rubocop`
+
+Tests first:
+
+- A request spec: the layout renders `card_colors` on `<html>` for `card_colors=colorblind` and none, and `_card` markup does not depend on the cookie (pattern ids normalised)
+- A view or partial spec: `_card` always holds the two color marks of its color, and no hex card color
+- System specs (headless Chrome): computed fills under each palette on a board, How to play captions and the Not a Set row, the menu pick that switches cards live and writes and deletes the cookie, a reload keeping it, arrow-key picking, and `card_colors_changed` (stub `window.jtTrack` and read its calls, as the existing telemetry specs do)
+
+## Out of scope
+
+- Darkening the Color-blind blue and orange to 3:1 (Decided below)
+- A color mark under Classic, or any other cue on Classic cards
+- Card colors stored on `Player` or `Game`, or any request to the server when picking
+- Naming card colors anywhere other than How to play's captions and Not a Set row
+- The light theme, the card wrapper edge and the settings button and Theme option (43, 44, 45)
 
 ## Comments
 
@@ -55,3 +107,11 @@ Decided: the brief draws every new board in Classic, plus a Color-blind set in b
 Design question: the Color-blind blue `#648FFF` and orange `#FE6100` measure 2.91:1 against the `#FAFAFA` card face, below 3:1 for graphics. They are unchanged, as SPEC 10 Palette fixes them, and the color marks keep the colors apart by form. Keep them, or let a later pass darken them?
 
 Decided: design entry v6 sets the Classic shades red `#C1121F`, green `#198A1E`, purple `#5E2CA5`, the color mark (a triangle, a plus and a star in the top-left corner and again turned in the bottom-right) and the Card colors option in the settings menu, and replaces the single card palette token, as this ticket asked. Instead of: asking first.
+
+Decided: the Color-blind blue `#648FFF` and orange `#FE6100` stay at 2.91:1 on the card face, written into SPEC 10 Palette and the design system's open question marked answered, because the user chose the IBM palette as it is for the option, players already know it from every card before v6, and the color mark tells the three colors apart by form, not contrast. Instead of: darkening them to 3:1, which would change the palette the user picked.
+
+Decided: no split, because 43, 44 and 45 build the theme mechanism, the settings menu and every screen's light theme, leaving this ticket CSS palette properties, the mark in one partial, one fieldset in an existing menu, the cookie beside the theme's, How to play's words and one event, which fit one session. Instead of: splitting by palette and menu.
+
+Decided: the card's color comes from CSS custom properties through `style` or classes, not SVG presentation attributes, because `var()` does not resolve in a presentation attribute and SPEC 10 keeps the partial's markup the same for every viewer. Instead of: rendering hex values per viewer.
+
+Decided: Priority normal and Model left empty, because it is a new option, not broken behaviour, and its code is view and CSS work a review checks at a glance. Instead of: high, or Model: fable.
