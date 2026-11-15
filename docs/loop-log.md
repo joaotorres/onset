@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  request 47: AI opponent the host can add from the lobby filed, visual, from the inbox (handoff aae500). Next: triage.
 - 2026-11-15  auto: stopped, the 5h window is at 88%, resetting at 06:20. Next: triage 46 and 42's brief, then the queued AI opponent request, after the reset.
 - 2026-11-15  triage 42: spec settled, the static error pages take Onset's dark and light themes, the device by default and the `theme` cookie through an inline script, in SPEC 10 Themes and Shared 8 Views & UX, four Decided lines, still waiting for its design pass (v6 does not cover them). Next: triage 46, then /design-brief 42.
 - 2026-11-15  triage 41: ready, blocked by 43, 44, 45, the Design question settled (Color-blind blue and orange kept at 2.91:1, SPEC 10 Palette), no split, four Decided lines. Next: triage 42 and 46.
