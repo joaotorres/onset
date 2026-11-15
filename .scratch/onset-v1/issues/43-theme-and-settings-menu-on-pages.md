@@ -1,12 +1,12 @@
 # 43: Light theme and the settings menu on the landing, join page and How to play
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by: 39
 Priority: normal
 Model:
 Effort:
-Changelog:
+Changelog: The landing, the join page and How to play now come in a light theme too, following your device or your pick in a new settings menu.
 
 ## Request
 
@@ -68,3 +68,11 @@ Tests first:
 ## Comments
 
 Decided: blocked by 39, because 39 rebuilds How to play's box and the byline footer's, and DESIGN v6 draws How to play's light boards in that box. Instead of: building on the old box and redoing it.
+
+Decided: the one way to give an element its light value is a `light:` Tailwind custom variant in `application.css` (matches `html[data-theme=light]`, or no `data-theme` under `prefers-color-scheme: light`), plus `@variant light` inside plain CSS rules (byline, card edge, `color-scheme`), because it puts each light class next to its dark one in the same static markup. Instead of: remapping the gray scale through CSS variables.
+
+Decided: the settings partial (`layouts/_settings`) is rendered by each page's own view, top-right inside `main` on the landing and join page and in the nav row on How to play, because How to play's button sits in its nav and none of the three pages has a broadcast target. Instead of: one fixed spot in the layout file. 44 and 45 render it outside `#controller_status` and the big screen's targets.
+
+Decided: a tap outside lands on a transparent full-window layer under the open menu, which closes it on click, so the tap never reaches what is under it and nothing is dimmed. Instead of: a document click listener that cancels the event, which a touch tap can still slip past.
+
+Decided: opening the menu moves focus to the checked Theme radio, so arrow keys work at once. Instead of: leaving focus on the settings button.

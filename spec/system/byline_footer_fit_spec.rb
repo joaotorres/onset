@@ -44,7 +44,7 @@ RSpec.describe "Byline footer fit", type: :system do
         expect(page).to have_css("h1", text: "Onset")
         expect_fits_screen
         main = rect("body > main")
-        content = rect("body > main > *")
+        content = rect("body > main > :not([data-controller=settings])")
         expect((content["top"] + content["bottom"]) / 2).to be_within(1).of((main["top"] + main["bottom"]) / 2)
       end
 

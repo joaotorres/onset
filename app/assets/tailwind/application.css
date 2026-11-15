@@ -1,5 +1,35 @@
 @import "tailwindcss";
 
+/* Themes (SPEC §10): dark is every class as written; `light:` gives an element
+   its light value next to it. Keyed on <html> only, never on markup rendered per
+   viewer: data-theme comes from the theme cookie, and with none the device
+   decides through the media query, a device with no preference getting dark */
+@custom-variant light {
+  &:where([data-theme="light"], [data-theme="light"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: light) {
+    &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
+      @slot;
+    }
+  }
+}
+
+:root {
+  color-scheme: dark;
+  @variant light {
+    color-scheme: light;
+  }
+}
+
+/* Card wrapper edge, light only, so a card reads on a light surface (DESIGN v6) */
+.card-edge {
+  border-radius: 6%/4.3%;
+  @variant light {
+    box-shadow: 0 0 0 1px #D1D5DB, 0 1px 3px rgba(3, 7, 18, 0.12);
+  }
+}
+
 @theme {
   --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
 
@@ -25,7 +55,7 @@
   animation: found-set-fade-out 3s ease-in-out forwards;
 }
 
-/* Byline footer: the joaotorr.es logo colours. The app is always dark, so the footer takes the dark values */
+/* Byline footer: the joaotorr.es logo colours, the dark values in the dark theme and the light ones on :root in the light theme */
 :root {
   --wm-green: #009C3B;
   --wm-blue: #002776;
@@ -38,11 +68,20 @@
   --wm-red: #FF4F5E;
   --wm-gold: #FFD21F;
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  @variant light {
+    --wm-green: #009C3B;
+    --wm-blue: #002776;
+    --wm-red: #C60B1E;
+    --wm-gold: #E08A00;
+  }
 }
 
 .byline {
   --byline-font: var(--font-sans);
   --byline-text: var(--color-gray-400);
+  @variant light {
+    --byline-text: var(--color-gray-600);
+  }
   --byline-focus: var(--color-blue-500);
   display: inline-block;
   padding: 0.75rem 0.5rem;

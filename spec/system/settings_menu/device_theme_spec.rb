@@ -1,0 +1,56 @@
+require "rails_helper"
+
+# SPEC §10 Themes: with no cookie the page follows the device, live, and a
+# device with no preference gets dark. A cookie wins over the device.
+RSpec.describe "Theme from the device and the cookie", type: :system do
+  include_context "settings menu"
+
+  let(:game) { Game.create! }
+
+  def meta_theme_color
+    page.evaluate_script(<<~JS)
+      [...document.querySelectorAll('meta[name="theme-color"]')].find(m => !m.media || matchMedia(m.media).matches).content
+    JS
+  end
+
+  def color_scheme = style("html", "color-scheme")
+
+  it "follows the device with no cookie, live, and gets dark with no preference" do
+    emulate_color_scheme("light")
+    visit root_path
+    expect(page_background).to eq(color("gray-50"))
+    expect(color_scheme).to eq("light")
+    expect(meta_theme_color).to eq("#F9FAFB")
+
+    emulate_color_scheme("dark")
+    expect(page_background).to eq(color("gray-950"))
+    expect(color_scheme).to eq("dark")
+    expect(meta_theme_color).to eq("#030712")
+
+    emulate_color_scheme("")
+    visit root_path
+    expect(page_background).to eq(color("gray-950"))
+    expect(color_scheme).to eq("dark")
+  end
+
+  it "takes the cookie over the device on every page" do
+    emulate_color_scheme("dark")
+    visit root_path
+    page.driver.browser.manage.add_cookie(name: "theme", value: "light", path: "/")
+    [root_path, how_to_play_path, join_game_players_path(game.code)].each do |path|
+      visit path
+      expect(page_background).to eq(color("gray-50"))
+      expect(color_scheme).to eq("light")
+      expect(meta_theme_color).to eq("#F9FAFB")
+    end
+
+    emulate_color_scheme("light")
+    page.driver.browser.manage.add_cookie(name: "theme", value: "dark", path: "/")
+    [root_path, how_to_play_path, join_game_players_path(game.code)].each do |path|
+      visit path
+      expect(page_background).to eq(color("gray-950"))
+      expect(color_scheme).to eq("dark")
+      expect(meta_theme_color).to eq("#030712")
+    end
+  end
+end
