@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  triage 42: spec settled, the static error pages take Onset's dark and light themes, the device by default and the `theme` cookie through an inline script, in SPEC 10 Themes and Shared 8 Views & UX, four Decided lines, still waiting for its design pass (v6 does not cover them). Next: triage 46, then /design-brief 42.
 - 2026-11-15  triage 41: ready, blocked by 43, 44, 45, the Design question settled (Color-blind blue and orange kept at 2.91:1, SPEC 10 Palette), no split, four Decided lines. Next: triage 42 and 46.
 - 2026-11-15  triage 40: split into 43, 44, 45 by screen, five Design proposes into SPEC 8 Settings menu, three Design questions settled (light field border `gray-500` in the design system, player screen settings button kept 40×28, dark contrast deferred), 41 and 42 re-blocked on the children, eight Decided lines and one Deferred. Next: file the deferral, then triage 41.
 - 2026-11-15  request 46: filed the deferral from 40, dark muted text and field borders meet contrast, visual. Next: triage 41.

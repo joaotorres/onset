@@ -229,9 +229,9 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 
 - **The theme never reaches a broadcast.** Turbo Stream partials (§7) are rendered once for every screen in a room, so nothing in them depends on the viewer's theme: every themed color comes from CSS keyed on `<html>`, never from markup rendered per theme
 - **Same in both themes:** the cards (the `_card` partial is never restyled, its near-white face and border included; on light surfaces the design pass may give the card's wrapper an edge so it reads), the card palettes (which one shows is the card colors setting, Palette above, not the theme), the player colors, what each color means (the meaning table above; the light theme may use other shades of the same color for contrast), the QR tile (dark modules on white), the layouts, sizes and animations
-- **Every page the app renders** takes the theme: the landing, How to play, the join page, the big screen, the player screen and the byline footer, which uses the light logo colours in the light theme and the dark ones in the dark theme (§8, Byline footer). The static error pages in `public/` stay dark
+- **Every page the app renders** takes the theme: the landing, How to play, the join page, the big screen, the player screen and the byline footer, which uses the light logo colours in the light theme and the dark ones in the dark theme (§8, Byline footer)
 
-`SPEC.md` §10 Themes also holds the `theme` cookie, the no-flash rule and `color-scheme`.
+`SPEC.md` §10 Themes also holds the `theme` cookie, the no-flash rule, `color-scheme` and the static error pages, which take both themes in Onset's own surfaces and text shades, not drawn yet (ticket 42).
 
 ## Components
 
