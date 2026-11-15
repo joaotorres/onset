@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  design-brief 40, 41: brief 20261115-40-41 against docs/design-system.md v5, the light theme of every screen, the settings menu and the Classic and Color-blind card colors with the color mark, every existing board left as drawn, two Decided lines. Next: draw.
 - 2026-11-15  triage 41: spec settled, a new default Classic card palette (red, green, purple) and the IBM palette with a color mark as the Color-blind option in SPEC 10 Palette, SPEC 8 Settings menu, SPEC 17 and the glossary, thirteen Decided lines, still waiting for its design pass. Next: /design-brief 40 41.
 - 2026-11-15  triage 40: spec settled, light theme following the device in SPEC 10 Themes, a new SPEC 8 Settings menu, SPEC 7 and 17 and the glossary, ten Decided lines and one Deferred, still waiting for its design pass, split after the design entry. Next: /design-brief 40.
 - 2026-11-15  triage 39: ready, behavioural, Width rule in SPEC Shared 8 and the glossary, six Decided lines. Next: build.
