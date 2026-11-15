@@ -14,6 +14,10 @@ _Avoid_: Controller, phone, remote
 An optional shared display of a game, such as a TV or laptop the whole table can see. It is not a player.
 _Avoid_: Board, TV, host screen
 
+**Content page**:
+A page people read rather than play on, held in the 944px content box with its prose capped at 65ch. Today only How to play.
+_Avoid_: Static page, info page
+
 ### Game
 
 **Room**:

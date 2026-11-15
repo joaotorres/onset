@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  triage 39: ready, behavioural, Width rule in SPEC Shared 8 and the glossary, six Decided lines. Next: build.
 - 2026-11-15  shape-records: SPEC.md and docs/design-system.md, 16 shared sections, 7 features, 27 components and screens. Next: auto.
 - 2026-11-14  request 41: colour-blind card palette filed, visual, blocked by 40. Next: triage.
 - 2026-11-14  request 40: dark mode and settings menu filed, visual. Next: triage.
