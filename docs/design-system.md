@@ -301,12 +301,12 @@ ERB partials, no component library.
 ### layouts/_byline_footer
 - `layouts/_byline_footer` (v3): "by joaotorr.es" after `main` on the landing, How to play and the join page, never on the big screen or player screen. `gray-400` 14px weight 500 with a 1px red underline; on hover or keyboard focus the dot hops and the domain fades into the logo colours (`--wm-*`), held until the next page load. Styles in `app/assets/tailwind/application.css` (`.byline`, `.wm-*`), fixed across joaotorr.es apps
 ### Settings button
-- Settings button (v6): an icon button, `aria-label="Settings"`, `aria-expanded` true while the menu is open, the Lucide gear icon (stroke 2). Closed: transparent, icon in secondary text. Open: the raised fill, icon in primary text. In the layout, outside every broadcast target. Two sizes:
+- Settings button (v6): an icon button, `aria-label="Settings"`, `aria-expanded` true while the menu is open, the Lucide gear icon (stroke 2). Closed: transparent, icon in secondary text. Open: the raised fill, icon in primary text. In the `layouts/_settings` partial, which each page's own view renders, outside every broadcast target. Two sizes:
   - Pages (landing, join page, How to play) and the big screen: 44×44, radius 12, 1px subtle border, 20px icon. Big screen: 56×56, radius 16, 26px icon
   - Player screen: 40×28 (40×32 in the computer Waiting and Game over footers), radius 8, no border, 16px icon (18px on computer), icon in muted text. It sits in the "Room CODE" footer row, outside `#controller_status`, at the row's right end, and adds no height
   - Where it sits on each screen: Screens below
 ### Settings menu
-- Settings menu (v6): a popover, 304×290, radius 16, panel fill, strong border, menu shadow, 16px padding, 14px gaps, `role="dialog"`, `aria-label="Settings"`. No overlay and no dimming. In the layout with its button, outside every broadcast target. Top to bottom:
+- Settings menu (v6): a popover, 304×278, radius 16, panel fill, strong border, menu shadow, 16px padding, 14px gaps, `role="dialog"`, `aria-label="Settings"`. No overlay and no dimming. With its button in the `layouts/_settings` partial, which each page's own view renders, outside every broadcast target. Top to bottom:
   - "Settings" (17px/700) with a close button on the right (36×36, × icon, `aria-label="Close settings"`)
   - Fieldset "Theme": legend 12px/600 uppercase, 0.08em tracking, secondary text. A segmented control like the landing mode toggle (track, strong border, radius 14, 4px padding and gap) of three 56px segments, each an 18px icon over a 12px/600 label: Match device (a half-filled circle), Light (a sun), Dark (a moon)
   - Fieldset "Card colors": the same control with two segments, Classic and Color-blind, each a 54×16 chip on the card face (`#FAFAFA`) over a 13px/600 label. Classic shows three 9px dots in the Classic red, green and purple; Color-blind shows the three color marks in blue, orange and magenta
@@ -324,9 +324,9 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Landing: top-right, phone 20px from the top and 16px from the right, desktop 28px and 32px
 - Join page: top-right, 16px and 16px
 - How to play: in the nav row, after the "Onset" wordmark, 12px gap
-- Player screen, portrait: in the "Room CODE" footer, 8px from the right edge, in every state; the menu opens 8px from the right and 36px from the bottom
+- Player screen, portrait: in the "Room CODE" footer, 8px from the right edge, in every state; the menu opens 8px from the right and 46px from the bottom
 - Player screen, landscape: play, on the Room line at the foot of the scores column (that line becomes a 28px row); Waiting, on the Room line under the invite; Game over, on the Room line under Play again
-- Player screen, computer: play, at the right end of the Room footer under the deck line, on the board column's right edge; the menu opens with its right edge there, 60px from the bottom. Waiting and Game over: 40px from the right of the 32px footer
+- Player screen, computer: play, at the right end of the Room footer under the deck line, on the board column's right edge; the menu opens with its right edge there, 46px from the bottom. Waiting and Game over: 40px from the right of the 32px footer; the menu opens 40px from the right and 48px from the bottom
 - Big screen: 56×56, bottom-right, 40px in from both edges, under the rail; the menu opens 40px from the right and 108px from the bottom
 
 ### Landing (ticket 08)
@@ -403,6 +403,7 @@ None
 
 ## Changelog
 
+- v6, 2026-11-15: ticket 49, the records corrected to the build, nothing new designed: the settings button and menu sit in the `layouts/_settings` partial each page's own view renders, the menu measures 304×278, and on the player screen it opens 46px from the bottom in portrait and computer play, 48px in the computer Waiting and Game over footers.
 - v6, 2026-11-15: ticket 40, a light theme and the settings menu: the light value of every surface, border, text and meaning color (Shared: Themes (v6)), the card wrapper's edge and inset panel edges in light, the settings button on every screen and the settings menu with its Theme option, light boards of every screen, the readable disabled No Set pills in both themes.
 - v6, 2026-11-15: ticket 41, card colors: the Classic red, green and purple as the default card palette, the Color-blind palette with the color mark in `cards/_card`, the Card colors option in the settings menu, and Color-blind boards of every place a card renders in both themes.
 - v5, 2026-10-25: ticket 37, Submit for a claim: `_submit` in the pill slot in every layout (disabled below 3 picks, enabled at 3, submitted after the tap), the portrait tray resized to fit it, the submitted state of the claiming screen and the disabled filled pill rule.

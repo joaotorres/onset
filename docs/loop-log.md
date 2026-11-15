@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  build 49: DESIGN reworded to the per-view `layouts/_settings` partial, menu offsets measured (46px, 48px) and pinned in two system specs, menu size 304×278, three Decided lines. Next: review.
 - 2026-11-15  triage 49: ready, priority low, SPEC §7 Hooks (Settings menu) reworded to the per-view `layouts/_settings` partial, the build rewords DESIGN and writes the measured player screen menu offsets and menu size, five Decided lines. Next: build.
 - 2026-11-15  request 49: filed deferred follow-up from 43, records drift on the settings menu, behavioural. Next: triage.
 - 2026-11-15  quick review 20261115-132523: tickets 39, 41, 43, 44, 45 meet their criteria, no standards breach, no pending decisions, Changelog lines of 41 and 44 corrected, one Deferred on 43 (records drift on the settings menu). Next: file the deferred follow-up.

@@ -1,12 +1,12 @@
 # 49: Bring the records in line with the built settings menu
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the design records now match the built settings menu's placement and size, pinned by system specs.
 
 ## Request
 
@@ -62,3 +62,9 @@ Decided: the build pins the player screen menu offsets in a system spec, as the 
 Decided: the DESIGN fix gets a v6 Changelog entry with no version bump, because nothing new is designed and no visual ticket waits on it. Instead of: bumping DESIGN to v7.
 
 Decided: Priority low, because no user notices a records fix. Instead of: normal.
+
+Decided: the offset specs were green on their first run with no red step, because this ticket changes no code and the classes' values (46px, 48px) matched the measurement. Instead of: forcing a red run against wrong values.
+
+Decided: the offset specs are two files, portrait and computer, and computer play pins the right offset to the board column's right edge rather than a number, because DESIGN states it that way. Instead of: one file, or a fixed pixel value that changes with the board width.
+
+Decided: the menu's measured size is 304×278 (dark, player screen), written into DESIGN; it is not pinned in a spec, because the ticket asks only for the offsets to be pinned. Instead of: a size assertion.
