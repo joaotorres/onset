@@ -1,12 +1,13 @@
 # 40: Dark mode, with a settings menu to toggle it
 
-Status: needs-triage
+Status: split
 Kind: visual
 Blocked by:
-Priority:
+Priority: normal
 Model:
 Effort:
 Changelog:
+Split: yes
 
 ## Request
 
@@ -70,3 +71,23 @@ Decided: the canvas, not the return, is followed where they differ: the canvas a
 Decided: the light QR tile's 1px `gray-200` inset edge, the light selected join swatch's `gray-900` ring and the light `blue-500` selected card ring are not conflicts with SPEC 10 Themes, SPEC 8 Join page ("a white ring") or SPEC 10 Palette (`ring-blue-400`): the QR modules and white tile are unchanged, a white ring cannot show on the light page the brief asked a counterpart for, and SPEC 10 Themes lets the light theme use other shades of a meaning color. Instead of: flagging each as a conflict.
 
 Decided: the return's note that How to play's code holds `max-w-5xl`, not the 944px box, gets no question here, because ticket 39 builds that box. Instead of: a design question.
+
+Decided: the five Design proposes go into SPEC 8 Settings menu as proposed (a tap outside only closes the menu and never reaches what it lands on; the game carries on under an open menu; native radio groups, so arrows pick and send the event per step; Escape and the close button return focus to the settings button, a tap outside does not; Match device selected with no cookie, the resolved theme never named), because each follows the spec's intent (a stray SET! costs a point, a room update never closes the menu) and the platform's own radio behaviour. Instead of: the alternatives the design entry names.
+
+Decided: dark muted text (`gray-500`) and the dark field border at rest (`gray-700`) stay as built, because the user chose that dark stays as it is today apart from the disabled No Set pills, and SPEC 10 names `gray-500` for dark muted text; raising them is deferred below. Instead of: moving dark muted text to `gray-400` and the dark field border up in this ticket.
+
+Deferred: In the dark theme, muted text (the "Room CODE" footer, the big screen's empty band text, the tray slot numbers) reads at 4.5:1 or more on its ground, and field borders at rest at 3:1 or more, as the light theme's do.
+
+Decided: the dark contrast fix above is deferred to a request of its own, because it changes how every dark screen looks and this ticket keeps dark as it is. Instead of: dropping it, or folding it in here.
+
+Decided: the light field border at rest is `gray-500` (4.84:1 on white), not the boards' `gray-400` (2.54:1), docs/design-system.md updated, because a light input sits white on a white panel and its border is all that shows the field. Instead of: keeping `gray-400`.
+
+Decided: the player screen settings button stays 40×28 (40×32 in the computer Waiting and Game over footers), because it meets the WCAG 2.2 AA 24px minimum, is tapped rarely, and growing the footer would shrink the board that every tap of play lands on. Instead of: a footer 16px taller in portrait.
+
+Decided: split by screen into 43 (the theme mechanism, the settings menu with its Theme option and the light landing, join page, How to play and byline footer), 44 (the player screen, with the readable dark disabled No Set pills) and 45 (the big screen), 44 and 45 blocked by 43, because the light theme of every screen and its specs do not fit one session, and each screen gets its settings button in the ticket that themes it, so no deploy shows a menu whose choice leaves its screen dark. Instead of: one ticket, or splitting by layer (CSS, then menu).
+
+Decided: 43 is blocked by 39, because 39 rebuilds How to play's and the byline footer's box, in which DESIGN v6 draws How to play's light boards. Instead of: building 43 on the old box.
+
+Decided: ticket 41 is now blocked by 43, 44 and 45, and 42 by 43, because a split parent never reaches done, so their `Blocked by: 40` would wait forever; 41 recolours cards on every screen and needs each screen's light theme, 42 needs only the light values 43 builds. Instead of: leaving them blocked by 40.
+
+Split into 43, 44, 45.

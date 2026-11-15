@@ -45,7 +45,7 @@ Surfaces and borders
 | Raised, borderless (SET! while unavailable, Join with a room code) | `gray-800` | `gray-200` | `gray-800` text 11.85:1 |
 | Border, strong (toggle tracks, settings menu, QR sheet) | `gray-700` | `gray-300` | decorative |
 | Border, subtle (panel borders, header rule, dividers, settings button) | `gray-800` | `gray-200` | decorative |
-| Field border at rest | `gray-700` | `gray-400` | 2.54:1 on white |
+| Field border at rest | `gray-700` | `gray-500` (triage 40; the boards draw `gray-400`, 2.54:1) | 4.84:1 on white |
 | Field border with an error | `red-500` | `red-600` | 4.62:1 |
 | Input fill | `gray-950` (desktop), `gray-900` (phone) | white | ground |
 | Empty tray slot border (dashed) | `gray-700` | `gray-400` | decorative |
@@ -387,10 +387,10 @@ None
 ## Open questions
 
 - The dark Locked out boards (`-wrong`, `-timeup`) still draw the 5-second ring, though lockout is 15 s since ticket 20. The v6 light boards draw it at 15 s (12 s left). Redraw the dark ones in the next brief that touches lockout
-- Dark muted text (`gray-500`) measures 4.16:1 on `gray-950` and 3.67:1 on `gray-900`, below the 4.5:1 SPEC §10 holds body and secondary text to. Dark is unchanged in v6. Move the dark muted role to `gray-400`, or keep it? (ticket 40)
+- Answered by triage 40: dark muted text (`gray-500`, 4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest (`gray-700`, 1.72:1 on `gray-900`) stay as built in ticket 40, which keeps dark as it is; raising them is a request of its own, deferred from ticket 40
 - The Color-blind blue and orange measure 2.91:1 against the card face, below 3:1 for graphics. They are unchanged, as SPEC §10 fixes them, and the color marks keep them apart by form (ticket 41)
-- Field borders at rest are below 3:1 in both themes (dark `gray-700` 1.72:1 on `gray-900`, light `gray-400` 2.54:1 on white). Raise the light one to `gray-500` (4.84:1) and the dark one to match? (ticket 40)
-- The player screen settings button is 40×28, below the 44px touch height used elsewhere, because the 28px footer cannot grow without shrinking the board. It meets the WCAG 2.2 AA 24px minimum. Accept it, or give the footer 16px from the board in portrait? (ticket 40)
+- Answered by triage 40: the light field border at rest is `gray-500` (4.84:1 on white), not the boards' `gray-400` (Shared: Themes (v6))
+- Answered by triage 40: the player screen settings button stays 40×28 (40×32 in the computer Waiting and Game over footers), above the WCAG 2.2 AA 24px minimum; the footer does not grow, so the board keeps its size
 - A 20-character name at 1280px wide pushes a big screen headline (No Set, claiming) to three lines and out of the 9rem band. The design tool recommends truncating the name with an ellipsis so the headline stays within two lines. Triage 21 took it for the Refused headline in SPEC §8; the No Set and claiming headlines wait for a request of their own
 - Answered by triage 07 in SPEC §8 Player screen > 8. Game over: a tied rank stays a plain "1st", and the winner line reads "★ You win with 7" when the viewer wins, as the code already does. Redraw the -win boards to match in the next brief that touches game over
 

@@ -632,7 +632,10 @@ One menu for the choices a player makes about how Onset looks on their browser, 
 Later options join it the same way.
 
 - **Opening it**: a settings button with the accessible name "Settings", always in the same place on a screen. Where it sits on each screen and how the menu opens (a sheet, a popover) comes from the design pass. It never moves SET!, the pill slot or the board, and it keeps the player screen's and the big screen's no-page-scroll rules (§8, Player screen; §10 Component)
-- **Picking** applies the option at once (§10, Themes and Palette) and leaves the menu open, so the player sees the result; Escape, a tap outside it or its close button closes it. It is a plain browser control with no request to the server: the settings menu's Stimulus controller writes the cookies
+- **Picking** applies the option at once (§10, Themes and Palette) and leaves the menu open, so the player sees the result. It is a plain browser control with no request to the server: the settings menu's Stimulus controller writes the cookies. Each option is a native radio group, so the arrow keys move and pick in one step, as radios do: arrowing from Match device to Dark picks Light on the way, and each step applies its choice and sends its event, as a tap would
+- **The current choice**: with no `theme` cookie, Match device is the selected Theme option. The menu never says which theme the device resolved to: the page shows it
+- **Closing it**: Escape, a tap outside it or its close button. A tap outside only closes the menu and never reaches what it lands on, so it cannot press SET!, pick a card or follow a link: a stray SET! costs a point. Escape and the close button return focus to the settings button; a tap outside leaves focus where it was
+- **The game carries on under it**: an open menu never pauses play. Broadcasts keep updating the board, the scores and the status panel, and the menu stays open; on the portrait player screen it covers SET! until it is closed
 - **Outside every broadcast target**: the menu and its button sit outside the regions Turbo Streams replace (§7, Hooks), so a room update never closes it or resets it, unlike the QR sheet inside `#controller_status`
 - **Telemetry**: picking a theme sends `theme_changed`, picking card colors `card_colors_changed` (§17, Custom events)
 
