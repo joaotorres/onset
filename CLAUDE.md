@@ -35,7 +35,7 @@ The spec is intentionally minimal. Do not add the following without flagging in 
 ## Testing
 
 - Use RSpec (`rspec-rails`) for all tests: unit, request, and system specs.
-- Specs live in `spec/`. The full suite runs with `bin/test-all` (parallel); single files and examples still run with `bundle exec rspec <path>`. A ticket's Verification command is `bin/test-all && bin/rubocop`.
+- Specs live in `spec/`. The full suite runs with `bin/test-all` (parallel); single files and examples still run with `bundle exec rspec <path>`. A ticket's Verification command is `bin/test-all && bundle exec standardrb`.
 - Keep each spec file under 8 s: `bin/test-all` names any file over it. Split such a file by its `describe` groups.
 - System specs use the default headless Chrome driver (Capybara + Selenium).
 

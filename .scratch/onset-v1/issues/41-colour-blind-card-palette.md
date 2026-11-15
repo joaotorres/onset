@@ -54,7 +54,7 @@ Settled in conversation:
 
 ## Verification
 
-`bin/test-all && bin/rubocop`
+`bin/test-all && bundle exec standardrb`
 
 Tests first:
 

@@ -40,7 +40,7 @@ Split from 40 (Dark mode, with a settings menu to toggle it): the settings butto
 
 ## Verification
 
-`bin/test-all && bin/rubocop`
+`bin/test-all && bundle exec standardrb`
 
 Tests first:
 
