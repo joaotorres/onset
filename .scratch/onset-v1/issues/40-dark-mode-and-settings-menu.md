@@ -39,7 +39,7 @@ Decided: the split waits for the triage after the design entry, as ticket 09's d
 
 Waiting for the design pass: docs/design-system.md has no changelog entry for this ticket (the latest, v5, is ticket 37's). The brief draws the light theme of every screen and the settings menu on each. The board's check counts the shape-records commit 6f3bf0c as the design pass, which it is not, so start the brief with `/design-brief 40`.
 
-Deferred: Static error pages (404, 422, 500 and the others in public/) follow the device's light or dark setting, as the app's own pages do since the light theme.
+Deferred: Static error pages (404, 422, 500 and the others in public/) follow the device's light or dark setting, as the app's own pages do since the light theme. Filed as 42.
 
 Decided: the static error pages stay dark and are deferred to a request of their own, because they cannot read the theme cookie and nobody plays on them. Instead of: folding them into this ticket.
 
