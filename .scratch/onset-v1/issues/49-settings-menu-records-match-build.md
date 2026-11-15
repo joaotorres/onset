@@ -6,7 +6,7 @@ Blocked by:
 Priority: low
 Model:
 Effort:
-Changelog: Behind the scenes: the design records now match the built settings menu's placement and size, pinned by system specs.
+Changelog: Behind the scenes: the design records now match where the built settings menu opens and its size, and system specs pin where it opens.
 
 ## Request
 
