@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  triage 40: spec settled, light theme following the device in SPEC 10 Themes, a new SPEC 8 Settings menu, SPEC 7 and 17 and the glossary, ten Decided lines and one Deferred, still waiting for its design pass, split after the design entry. Next: /design-brief 40.
 - 2026-11-15  triage 39: ready, behavioural, Width rule in SPEC Shared 8 and the glossary, six Decided lines. Next: build.
 - 2026-11-15  shape-records: SPEC.md and docs/design-system.md, 16 shared sections, 7 features, 27 components and screens. Next: auto.
 - 2026-11-14  request 41: colour-blind card palette filed, visual, blocked by 40. Next: triage.

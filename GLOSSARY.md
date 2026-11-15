@@ -18,6 +18,14 @@ _Avoid_: Board, TV, host screen
 A page people read rather than play on, held in the 944px content box with its prose capped at 65ch. Today only How to play.
 _Avoid_: Static page, info page
 
+**Settings menu**:
+The menu on every page where a player chooses how Onset looks on their browser, such as the theme. Stored per browser, never on the player.
+_Avoid_: Preferences, options page
+
+**Theme**:
+Dark or light, the colors every page is drawn in. Each browser picks Match device (the default), Light or Dark in the settings menu.
+_Avoid_: Mode (a game's mode is Standard or First to 5), skin
+
 ### Game
 
 **Room**:

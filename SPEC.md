@@ -355,6 +355,7 @@ Stimulus attributes stay on whatever element plays the role:
 - `card-selection`: `card` targets with `data-card-id`, `aria-pressed` (the server renders `true` for a picked card) and `click->card-selection#toggle`, plus `slot`, `count` and `hint` targets (the tray, the n/3 count and the claim bar's hint line), the `submit` target (the Submit button, `click->card-selection#submit`, `disabled` until three picks), the claim's PATCH URL in `data-card-selection-url-value` and its submit URL in `data-card-selection-submit-url-value`
 - Idle board, in every player screen layout: each card carries `data-card-id` and its tap posts the SET! claim (§8, Player screen, Idle). `card-tap`: `data-controller="card-tap"` on the claim form around the cards, each card a submit button with `click->card-tap#tap`. It remembers the tapped card in memory, and `card-selection` selects it on connect
 - Waiting invite (§8, Player screen, Waiting): `data-controller="invite"` around the invite with `url` (the join page URL) and `code` values. The Copy link / Share link button is the `link` target with `click->invite#share`; the QR sheet is a `<dialog>`, the `sheet` target, inside `#controller_status`, opened by Show QR with `click->invite#open` and closed by Done with `click->invite#close`
+- Settings menu (§8, Settings menu): `data-controller="settings"` around the settings button and the menu, in the layout, outside every hook root above, so no stream replaces it
 - Telemetry (§17): the hidden `game-events` element stays inside `#controller_status`, so every room update re-renders it, and the layout keeps `tracked_events_tag` at the top of `<body>`
 - `countdown`: `data-controller="countdown"` with `started-at` and `duration` values, and `ring` and `display` targets. Rings keep `r="45"` and `stroke-dasharray="282.74"`. Elapsed time is measured on the server's clock, through the page's clock offset (§6 Server-side timers), which lives outside the controller instance so a redraw keeps it.
 
@@ -408,14 +409,14 @@ On the player screen, in every layout, a card takes the largest size at which `c
 
 ### Visual system
 
-Dark UI where the cards are the only bright surfaces. Tailwind default palette plus these tokens in `app/assets/tailwind/application.css`:
+Two themes, dark and light, on every page the app renders (Themes below). In the dark theme the cards are the only bright surfaces. Tailwind default palette plus these tokens in `app/assets/tailwind/application.css`:
 
 - `font-display`: Bricolage Grotesque (Google Fonts link in the layout). Only for display text: wordmark, room code, scores, SET!, headlines, countdown digits. Body copy stays on the default sans.
 - `animate-shake`: once, 0.4s. Locked-out player screen panel.
 - `animate-arrive`: green outline that holds 1.5s and fades by 3s. Cards dealt by the last replace (`Game#last_dealt`), on the big screen and the player screen board.
 - `.found-set-flash`: holds 1.5s, fades by 3s. Correct-claim panels on the big screen and the player screen.
 
-Surfaces: page `gray-950`, panels `gray-900`, borders `gray-700`/`gray-800`. Secondary text `gray-400`, muted `gray-500` (not `gray-600`, which fails contrast on `gray-950`).
+Surfaces, dark theme: page `gray-950`, panels `gray-900`, borders `gray-700`/`gray-800`. Secondary text `gray-400`, muted `gray-500` (not `gray-600`, which fails contrast on `gray-950`). The light theme's surfaces, borders and text shades come from the design pass (`docs/design-system.md`), held to the same contrast: body and secondary text at least 4.5:1 on their ground, as the white-on-color rules in the meaning table below are.
 
 Each color means one thing everywhere:
 
@@ -434,6 +435,17 @@ Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberat
 Countdown rings: `r=45` in a 100 viewBox, gray track, colored progress with round caps, rotated -90° so they drain clockwise from the top. Seconds sit inside the ring, or inside the button the ring surrounds.
 
 QR codes: dark modules on a white tile. Inverted codes fail on some phone cameras.
+
+### Themes
+
+**Dark** is the look every screen had before themes. **Light** puts dark text on light surfaces. Each browser picks one in the settings menu (§8, Settings menu): **Match device** (the default), **Light** or **Dark**. Match device follows the device's light or dark setting (`prefers-color-scheme`), live: switching the device's setting while a page is open switches the page with it. A device that states no preference gets dark.
+
+- **Stored per browser**, never on `Player` or `Game`: a `theme` cookie, `light` or `dark`, path `/`, a year long, SameSite Lax, not HttpOnly so the settings menu can write it. Match device deletes it. It holds no identity and is read only by Onset's own pages. A player keeps their theme in every room on that browser, the big screen included; another browser or device has its own
+- **No flash of the other theme.** The layout renders the chosen theme on `<html>` from the cookie, so the first paint is already right, and Match device is pure CSS (the media query), so it needs no script either. The page's `color-scheme` follows the theme, so form fields and scrollbars match it
+- **Picking a theme applies at once**, to the page it is picked on, with no reload. Other open tabs of the same browser take it on their next page load
+- **The theme never reaches a broadcast.** Turbo Stream partials (§7) are rendered once for every screen in a room, so nothing in them depends on the viewer's theme: every themed color comes from CSS keyed on `<html>`, never from markup rendered per theme
+- **Same in both themes:** the cards (the `_card` partial is never restyled, its near-white face and border included; on light surfaces the design pass may give the card's wrapper an edge so it reads), the card palette, the player colors, what each color means (the meaning table above; the light theme may use other shades of the same color for contrast), the QR tile (dark modules on white), the layouts, sizes and animations
+- **Every page the app renders** takes the theme: the landing, How to play, the join page, the big screen, the player screen and the byline footer, which uses the light logo colours in the light theme and the dark ones in the dark theme (§8, Byline footer). The static error pages in `public/` stay dark
 
 ---
 
@@ -497,6 +509,7 @@ Every event goes through `window.jtTrack(name, props)`, which the gem defines in
 | `game_started` | `mode`, `player_count` | Status `waiting` to `playing`: the host's Start game or the ready vote |
 | `game_restarted` | `mode`, `player_count` | Status `ended` to `playing`: the big screen's Play again or the ready vote |
 | `game_finished` | `mode`, `player_count`, `end_reason` (`quick_win`, `vote` or `deck_exhausted`), `is_tie` (no sole winner), `duration_seconds` when known | Status `playing` to `ended` |
+| `theme_changed` | `theme`: `device`, `light` or `dark`, the option picked | The settings menu (§8), when the player picks a theme other than the one already chosen |
 
 **Server actions ride the flash.** `game_created` and `player_joined` happen in an action that redirects, so no page is there to send them. `track_event` (`TracksEvents`, included in `ApplicationController`) appends the event to `flash[:tracked_events]`. The next page's layout renders it into a hidden `track` controller element, which sends each event once on connect and then empties its value, so a Turbo restoration visit to the cached page does not send it again. Nothing calls PostHog from the server.
 
@@ -512,7 +525,7 @@ Every event goes through `window.jtTrack(name, props)`, which the gem defines in
 
 ### Privacy
 
-PostHog runs with memory persistence: it sets no cookies and keeps nothing in browser storage, so there is no consent banner. Onset's own browser state is unchanged by telemetry, apart from one `sessionStorage` entry per room for the `game-events` controller (`onset.game.<code>`: the last status this tab saw and when it saw play start), which never leaves the browser.
+PostHog runs with memory persistence: it sets no cookies and keeps nothing in browser storage, so there is no consent banner. Onset's own browser state is unchanged by telemetry, apart from one `sessionStorage` entry per room for the `game-events` controller (`onset.game.<code>`: the last status this tab saw and when it saw play start), which never leaves the browser. The `theme` cookie (§10, Themes) is Onset's own too: a display preference the player sets, sent only to Onset, with no identity in it, so it needs no consent either.
 
 ---
 
@@ -520,7 +533,7 @@ End of spec.
 
 ## Shared: 8. Views & UX
 
-Colors, type and animations are in §10. Hook ids and Stimulus attributes that must survive markup changes are in §7.
+Colors, type, animations and the two themes are in §10. Hook ids and Stimulus attributes that must survive markup changes are in §7. Every page the app renders carries the settings menu (Settings menu below).
 
 **Width.** The game screens, the big screen and the player screen, use the whole window. A content page, today only How to play (`/how-to-play`, §5), holds its content in a centred 944px box (`mx-auto max-w-[944px]`) with the side gutter on an outer wrapper (`px-5 sm:px-8 lg:px-10`: 20px, 32px from 640px, 40px from 1024px), so the gutter never narrows the box; below 1024px wide the box is the window less the two gutters. This is the width standard shared by joaotorr.es's apps (jt-playbook `LAYOUT.md`), in which a content page takes the 672px reading width: How to play keeps 944px because its card diagrams need the room. Running prose on a content page (the intro under the headline, a section's intro line, the statement under What makes a Set) is capped at `max-w-[65ch]`, so its lines stay readable at any width; headings, the card diagrams and the panels that hold them use the whole box, and text inside a panel, already narrower than 65ch, takes no cap of its own. The byline footer sits in the same box (Byline footer below).
 
@@ -595,11 +608,20 @@ Stimulus: `card-selection` (picks sent to the server, tray, count, Submit), `cou
 
 A small muted footer, the same across all of joaotorr.es's apps, so its look and behaviour follow that shared design rather than this spec's palette. It must stay quiet and never compete with the Onset wordmark.
 
-- **Where**: after `main` on the landing, How to play and the join page, centred in the content-page box (Views & UX, Width: the gutter wrapper and the 944px box) on all three, so on How to play it lines up with the content; on the landing and the join page the centred line looks as it did. On `gray-950`. Nothing between it and `main`; below it 16px or the bottom safe area, whichever is bigger. It fits inside the first screen: the page is a viewport-tall column in which `main` grows and the footer comes last, so when the content fits the screen the footer sits at the bottom edge and the page does not scroll, and when the content is taller the footer follows it. The footer never overlaps content. The landing's centred content and the join page's Join button therefore sit above the footer, not at the bottom of the window. The big screen and the player screen have none: they are full-screen views with no page scroll. Static error pages and emails have none.
+- **Where**: after `main` on the landing, How to play and the join page, centred in the content-page box (Views & UX, Width: the gutter wrapper and the 944px box) on all three, so on How to play it lines up with the content; on the landing and the join page the centred line looks as it did. On the page's own ground, `gray-950` in the dark theme (§10, Themes). Nothing between it and `main`; below it 16px or the bottom safe area, whichever is bigger. It fits inside the first screen: the page is a viewport-tall column in which `main` grows and the footer comes last, so when the content fits the screen the footer sits at the bottom edge and the page does not scroll, and when the content is taller the footer follows it. The footer never overlaps content. The landing's centred content and the join page's Join button therefore sit above the footer, not at the bottom of the window. The big screen and the player screen have none: they are full-screen views with no page scroll. Static error pages and emails have none.
 - **What**: "by joaotorr.es", one link to https://joaotorr.es that opens in a new tab, so the player keeps their place. A hidden "(Opens in a new tab)" completes the accessible name; the coloured copies of the domain are hidden from screen readers so it is read once. English only, like the rest of the app.
 - **At rest**: `gray-400`, 14px, weight 500, the body font, with one continuous 1px red underline under the whole phrase. The link is 44px tall for touch.
 - **Hover (devices with hover) or keyboard focus**: "by" and the underline stay as they are. Over 1s the dot hops up and lands with a small bounce, turning gold, while "joaotorr" fades to a green to blue gradient and "es" to a red, gold, red stripe. It stays coloured until the next page load; hovering again replays the hop. Reduced motion: no hop, the colours still fade in. Keyboard focus adds a 2px `blue-500` outline.
-- **Logo colours**: the dark values, since every Onset screen is dark: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`. The light values (`#009C3B`, `#002776`, `#C60B1E`, `#E08A00`) sit on `:root` for any light ground.
+- **Logo colours**: the dark values in the dark theme: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`. The light values in the light theme: `#009C3B`, `#002776`, `#C60B1E`, `#E08A00`, the ones on `:root`. The at-rest `gray-400` text and the red underline take the light theme's shades from the design pass, at the same contrast.
+
+## 8. Settings menu
+
+One menu for the choices a player makes about how Onset looks on their browser, on every page the app renders: the landing, How to play, the join page, the big screen and the player screen. It holds one option today, **Theme** (§10, Themes): **Match device**, **Light** and **Dark**, the current one marked, Match device until the player picks. Later options join it the same way.
+
+- **Opening it**: a settings button with the accessible name "Settings", always in the same place on a screen. Where it sits on each screen and how the menu opens (a sheet, a popover) comes from the design pass. It never moves SET!, the pill slot or the board, and it keeps the player screen's and the big screen's no-page-scroll rules (§8, Player screen; §10 Component)
+- **Picking** applies the option at once (§10, Themes) and leaves the menu open, so the player sees the result; Escape, a tap outside it or its close button closes it. It is a plain browser control with no request to the server: the settings menu's Stimulus controller writes the cookie
+- **Outside every broadcast target**: the menu and its button sit outside the regions Turbo Streams replace (§7, Hooks), so a room update never closes it or resets it, unlike the QR sheet inside `#controller_status`
+- **Telemetry**: picking a theme sends `theme_changed` (§17, Custom events)
 
 ## 8. Search engines
 
