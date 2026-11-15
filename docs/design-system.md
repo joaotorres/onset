@@ -203,7 +203,12 @@ Two themes, dark and light, on every page the app renders (Themes below). In the
 - `animate-arrive`: green outline that holds 1.5s and fades by 3s. Cards dealt by the last replace (`Game#last_dealt`), on the big screen and the player screen board.
 - `.found-set-flash`: holds 1.5s, fades by 3s. Correct-claim panels on the big screen and the player screen.
 
-Surfaces, dark theme: page `gray-950`, panels `gray-900`, borders `gray-700`/`gray-800`. Secondary text `gray-400`, muted `gray-500` (not `gray-600`, which fails contrast on `gray-950`). The light theme's surfaces, borders and text shades come from the design pass (`docs/design-system.md`), held to the same contrast: body and secondary text at least 4.5:1 on their ground, as the white-on-color rules in the meaning table below are.
+Surfaces, dark theme: page `gray-950`, panels `gray-900`, borders `gray-700`/`gray-800`. Secondary text `gray-400`. The light theme's surfaces, borders and text shades, and the dark muted text and field border shades, come from the design pass (`docs/design-system.md`). Both themes hold the same contrast:
+
+- **Text** at least 4.5:1 on its ground, the page or the panel it sits on, whatever its size: body, secondary and muted text alike (the "Room CODE" footer, the big screen's empty band text, "No one yet" and a locked player's entry on its scoreboard, the "/N" of a No Set vote count, the join page's hint under the colors, the tray slot numbers), and the placeholders in form fields, as the white-on-color rules in the meaning table below are. The labels of disabled controls are exempt, as WCAG makes them, and keep the disabled looks `docs/design-system.md` gives
+- **A form field's border at rest** at least 3:1 against the field's fill and against the surface around it, because a field sits on a surface close to its fill and its border is all that shows it. Today the room code field on the landing and the name field on the join page
+
+History: until ticket 46, dark muted text was `gray-500` (4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest `gray-700` (1.72:1 on `gray-900`); ticket 40 left them so, since it kept dark as built, and deferred them to ticket 46.
 
 Each color means one thing everywhere:
 
@@ -387,7 +392,7 @@ None
 ## Open questions
 
 - The dark Locked out boards (`-wrong`, `-timeup`) still draw the 5-second ring, though lockout is 15 s since ticket 20. The v6 light boards draw it at 15 s (12 s left). Redraw the dark ones in the next brief that touches lockout
-- Answered by triage 40: dark muted text (`gray-500`, 4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest (`gray-700`, 1.72:1 on `gray-900`) stay as built in ticket 40, which keeps dark as it is; raising them is a request of its own, deferred from ticket 40
+- Answered by triage 40: dark muted text (`gray-500`, 4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest (`gray-700`, 1.72:1 on `gray-900`) stay as built in ticket 40, which keeps dark as it is; raising them is ticket 46, whose SPEC §10 Visual system rule (triage 46) now holds every text, muted and placeholders included, to 4.5:1 and field borders at rest to 3:1, and waits for its design pass
 - Answered by triage 41 in SPEC §10 Palette: the Color-blind blue and orange stay at 2.91:1 against the card face, below 3:1 for graphics, as IBM sets them; the color marks keep them apart by form
 - Answered by triage 40: the light field border at rest is `gray-500` (4.84:1 on white), not the boards' `gray-400` (Shared: Themes (v6))
 - Answered by triage 40: the player screen settings button stays 40×28 (40×32 in the computer Waiting and Game over footers), above the WCAG 2.2 AA 24px minimum; the footer does not grow, so the board keeps its size
