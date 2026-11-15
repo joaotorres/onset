@@ -2,6 +2,7 @@
 
 Status: deployed
 Kind: behavioural
+Feature: Countdown timer
 Blocked by:
 Model:
 Effort:

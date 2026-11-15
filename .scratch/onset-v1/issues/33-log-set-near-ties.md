@@ -2,6 +2,7 @@
 
 Status: deployed
 Kind: behavioural
+Feature: Claiming a SET
 Blocked by:
 Model:
 Effort:

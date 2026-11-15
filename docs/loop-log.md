@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  tickets: Feature lines added to 32 to 39, 41, 43 to 45 and 49 (handoff dee73a). Next: none.
 - 2026-11-15  review 20261115-142819: deep, tickets 39, 41, 43, 44, 45, 49, no pending decisions, four follow-ups deferred (Escape on the settings menu, theme across tabs, records drift and tests on 43; one source for palette values on 41). Next: file the follow-ups.
 - 2026-11-15  quick review 20261115-141955: ticket 49 meets its criteria, no pending decisions, no deferred fixes, Changelog 49 corrected. Next: deploy when you like.
 - 2026-11-15  build 49: DESIGN reworded to the per-view `layouts/_settings` partial, menu offsets measured (46px, 48px) and pinned in two system specs, menu size 304×278, three Decided lines. Next: review.

@@ -4,6 +4,7 @@ Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
+Feature: Page layout
 Model:
 Effort:
 Changelog: The How to play page uses its full 944 px for content, with the side padding outside it, and its running text is capped to a comfortable line length.

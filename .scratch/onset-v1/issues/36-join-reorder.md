@@ -2,6 +2,7 @@
 
 Status: deployed
 Kind: behavioural
+Feature: Waiting room
 Blocked by:
 Model:
 Effort:

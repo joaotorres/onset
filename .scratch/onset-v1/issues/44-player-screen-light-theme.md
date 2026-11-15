@@ -4,6 +4,7 @@ Status: done
 Kind: visual
 Blocked by: 43
 Priority: normal
+Feature: Themes
 Model:
 Effort:
 Changelog: The player screen comes in a light theme too, following your device or your pick in the settings menu, which opens from a button by the room code; the greyed-out No Set button is easier to read.

@@ -4,6 +4,7 @@ Status: done
 Kind: visual
 Blocked by: 39
 Priority: normal
+Feature: Themes
 Model:
 Effort:
 Changelog: The landing, the join page and How to play now come in a light theme too, following your device or your pick in a new settings menu.

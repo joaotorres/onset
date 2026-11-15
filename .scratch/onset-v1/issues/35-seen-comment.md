@@ -2,6 +2,7 @@
 
 Status: deployed
 Kind: behavioural
+Feature: Live sync
 Blocked by:
 Model:
 Effort:

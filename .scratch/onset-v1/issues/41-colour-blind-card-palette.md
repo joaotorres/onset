@@ -4,6 +4,7 @@ Status: done
 Kind: visual
 Blocked by: 43, 44, 45
 Priority: normal
+Feature: Card colors
 Model:
 Effort:
 Changelog: Cards now come in Set's classic red, green and purple, and a Color-blind option in Settings switches them to blue, orange and magenta with a small mark in two corners that tells the colors apart.

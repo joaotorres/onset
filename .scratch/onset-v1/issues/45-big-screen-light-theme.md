@@ -4,6 +4,7 @@ Status: done
 Kind: visual
 Blocked by: 43
 Priority: normal
+Feature: Themes
 Model:
 Effort:
 Changelog: The big screen has a settings button in its bottom-right corner and a light theme for every state.
