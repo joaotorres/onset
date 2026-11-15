@@ -4,7 +4,9 @@
 <% mode = local_assigns[:mode] %>
 <% grid = "h-full grid grid-rows-[repeat(3,auto)] grid-flow-col content-center justify-center gap-(--gap)" %>
 <% size = "aspect-[5/7] rounded-lg w-[min(calc((100cqw_-_(var(--cols)_-_1)_*_var(--gap))_/_var(--cols)),calc((100cqh_-_2_*_var(--gap))_*_5_/_21))]" %>
-<% arrive = ->(card) { "outline-3 outline-green-400 animate-arrive" if game.just_dealt?(card.id) } %>
+<% arrive = ->(card) { "outline-3 outline-green-400 animate-arrive light:outline-green-600 light:[--arrive-outline:var(--color-green-600)]" if game.just_dealt?(card.id) } %>
+<%# The card wrapper's light edge (DESIGN v6) sits on a span inside each card's box, so it never meets the selected ring. %>
+<% edged = ->(card) { tag.span(render("cards/card", card: card), class: "card-edge block size-full") } %>
 <div class="<%= local_assigns[:class] %> flex min-h-0 min-w-0 flex-1 flex-col lg:col-start-1 lg:row-span-2 lg:row-start-1">
   <div data-board class="min-h-0 flex-1 [container-type:size] [--gap:5px] lg:[--gap:12px]" style="--cols: <%= [game.board.size / 3, 1].max %>;">
     <% if mode == :tap %>
@@ -13,7 +15,7 @@
           <button type="submit" class="<%= size %> <%= arrive.call(card) %> cursor-pointer"
                   data-card-id="<%= card.id %>"
                   data-action="click->card-tap#tap">
-            <%= render "cards/card", card: card %>
+            <%= edged.call(card) %>
           </button>
         <% end %>
       <% end %>
@@ -23,24 +25,24 @@
       <div class="<%= grid %>">
         <% game.board_cards.each do |card| %>
           <button type="button"
-                  class="<%= size %> <%= arrive.call(card) %> transition <%= "ring-4 ring-blue-400 scale-95" if picked.include?(card.id) %>"
+                  class="<%= size %> <%= arrive.call(card) %> transition <%= "ring-4 ring-blue-400 light:ring-blue-500 scale-95" if picked.include?(card.id) %>"
                   aria-pressed="<%= picked.include?(card.id) %>"
                   data-card-selection-target="card"
                   data-card-id="<%= card.id %>"
                   data-action="click->card-selection#toggle">
-            <%= render "cards/card", card: card %>
+            <%= edged.call(card) %>
           </button>
         <% end %>
       </div>
     <% else %>
       <div class="<%= grid %>">
         <% game.board_cards.each do |card| %>
-          <div class="<%= size %> <%= arrive.call(card) %>" data-card-id="<%= card.id %>"><%= render "cards/card", card: card %></div>
+          <div class="<%= size %> <%= arrive.call(card) %>" data-card-id="<%= card.id %>"><%= edged.call(card) %></div>
         <% end %>
       </div>
     <% end %>
   </div>
-  <p class="flex h-6 shrink-0 items-center justify-center text-xs text-gray-400">
+  <p class="flex h-6 shrink-0 items-center justify-center text-xs text-gray-400 light:text-gray-600">
     <% if game.deck.empty? %>
       <span class="rounded-full bg-orange-700 px-2.5 py-0.5 font-semibold text-white">Deck is empty</span>
     <% else %>

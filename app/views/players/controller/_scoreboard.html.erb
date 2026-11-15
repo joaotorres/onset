@@ -2,13 +2,13 @@
     Portrait: chips across the top, 4 per row, the Locked tag a badge on the corner.
     Landscape: the 132px scores column on the right, one row per player, the Locked tag inline before the score.
     Computer: the same rows in a gray-900 panel at the top of the 248px side column. %>
-<ol data-scoreboard aria-label="Scoreboard" class="<%= local_assigns[:class] %> flex shrink-0 flex-wrap content-start gap-1.5 pt-2 landscape:max-lg:order-last landscape:max-lg:w-[132px] landscape:max-lg:flex-col landscape:max-lg:flex-nowrap landscape:max-lg:gap-[3px] landscape:max-lg:pt-0 lg:col-start-2 lg:row-start-1 lg:flex-col lg:flex-nowrap lg:gap-1 lg:rounded-2xl lg:border lg:border-gray-800 lg:bg-gray-900 lg:p-2.5">
+<ol data-scoreboard aria-label="Scoreboard" class="<%= local_assigns[:class] %> flex shrink-0 flex-wrap content-start gap-1.5 pt-2 landscape:max-lg:order-last landscape:max-lg:w-[132px] landscape:max-lg:flex-col landscape:max-lg:flex-nowrap landscape:max-lg:gap-[3px] landscape:max-lg:pt-0 lg:col-start-2 lg:row-start-1 lg:flex-col lg:flex-nowrap lg:gap-1 lg:rounded-2xl lg:border lg:border-gray-800 lg:bg-gray-900 lg:p-2.5 light:lg:border-gray-200 light:lg:bg-white">
   <% game.standings.each do |p| %>
     <% claiming = game.claim_player_id == p.id %>
     <% locked = !claiming && p.locked? %>
     <% look = if claiming then "border-yellow-400 bg-yellow-400 text-gray-950"
-              elsif p.id == player.id then "border-gray-500 bg-gray-800"
-              else "border-gray-800 bg-gray-900"
+              elsif p.id == player.id then "border-gray-500 bg-gray-800 light:bg-gray-100"
+              else "border-gray-800 bg-gray-900 light:border-gray-200 light:bg-white"
               end %>
     <% fade = "opacity-45" if locked %>
     <li class="relative flex h-[30px] w-[calc((100%-18px)/4)] min-w-0 shrink-0 items-center gap-[5px] rounded-lg border px-[7px] landscape:max-lg:h-7 landscape:max-lg:w-full landscape:max-lg:gap-1.5 landscape:max-lg:px-2 lg:h-7 lg:w-full lg:gap-2 lg:px-2.5 <%= look %>">

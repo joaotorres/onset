@@ -42,7 +42,8 @@
 
   --animate-arrive: arrive 3s ease-out forwards;
   @keyframes arrive {
-    0%, 50% { outline-color: var(--color-green-400); }
+    /* --arrive-outline: a light screen's shade (the player screen's board), green-400 everywhere else */
+    0%, 50% { outline-color: var(--arrive-outline, var(--color-green-400)); }
     100% { outline-color: transparent; }
   }
 }

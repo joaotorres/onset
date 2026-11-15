@@ -1,12 +1,12 @@
 # 44: Light theme and the settings menu on the player screen
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by: 43
 Priority: normal
 Model:
 Effort:
-Changelog:
+Changelog: The player screen has a settings button by the room code, and turns light when you pick the Light theme; the greyed-out No Set button is easier to read.
 
 ## Request
 
@@ -57,3 +57,11 @@ Tests first:
 - The big screen (45)
 
 ## Comments
+
+Decided: the settings button sits out of the flow on the "Room CODE" footer's line at its right end in every layout (8px from the edge on phones, landscape Game over included, where the return says "under Play again"), because the footer stays one centred row and layouts are out of scope. Instead of: moving the Room line into the landscape columns.
+
+Decided: the light card edge goes on a span inside each board card's box, on a filled tray slot and on the found-set banner's card boxes, because the edge and the selected ring are both box-shadows and the unlayered edge would hide the ring. Instead of: the edge on the card's button.
+
+Decided: the outlined purple pills (There's a Set, "You agreed · waiting") take a `purple-600` border and `purple-700` text in light, and Voted to end `orange-800` text, because DESIGN v6 gives them no light row and these follow its tinted-panel and purple-text rows. Instead of: leaving their dark values on the light page.
+
+Decided: the light arrive outline is set through an `--arrive-outline` variable on the player screen's board, which the arrive keyframes read with `green-400` as the fallback, so the big screen (45) keeps its outline. Instead of: changing the keyframes' colour for every screen.

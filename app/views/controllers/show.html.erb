@@ -4,8 +4,13 @@
 <%# Full-screen game view: no byline footer, it would make the page scroll. %>
 <% content_for :hide_byline, "true" %>
 
-<main class="group/main h-dvh overflow-hidden bg-gray-950 text-white border-t-4 p-4 flex flex-col" style="border-color: <%= @player.color %>;">
+<main class="group/main relative h-dvh overflow-hidden bg-gray-950 text-white border-t-4 p-4 flex flex-col light:bg-gray-50 light:text-gray-900" style="border-color: <%= @player.color %>;">
   <%= render "players/controller_status", player: @player, flash_claim: @game.flash_claim %>
   <%# During play on a computer the footer centres on the board, not the screen: it skips the 248px side column and the 32px gap (§8, Deck). %>
   <p class="mt-2 text-center text-xs text-gray-500 lg:group-has-[[data-board]]/main:mr-[280px]">Room <span class="tracking-widest"><%= @game.code %></span></p>
+  <%# The settings button sits on the footer row's line, out of the flow so it adds no height (DESIGN v6, Settings button placement):
+      8px from the right edge on phones; on a computer at the board column's right edge during play, 40px from the right otherwise.
+      Outside #controller_status, so a room update never closes the menu (§7, Hooks). %>
+  <%= render "layouts/settings", player_screen: true,
+        class: "absolute bottom-2.5 right-2 lg:bottom-2 lg:right-10 lg:group-has-[[data-board]]/main:bottom-2.5 lg:group-has-[[data-board]]/main:right-[304px]" %>
 </main>

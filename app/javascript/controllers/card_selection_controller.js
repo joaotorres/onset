@@ -1,8 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 import { takePendingCardTap } from "controllers/card_tap_controller"
 
-const SELECTED = ["ring-4", "ring-blue-400", "scale-95"]
-const EMPTY_SLOT = ["border-2", "border-dashed", "border-gray-700"]
+const SELECTED = ["ring-4", "ring-blue-400", "light:ring-blue-500", "scale-95"]
+const EMPTY_SLOT = ["border-2", "border-dashed", "border-gray-700", "light:border-gray-400"]
+// A filled tray slot is a card's wrapper: it takes the light card edge (DESIGN v6).
+const FILLED_SLOT = ["card-edge"]
 
 // The current claim's picks and its one-at-a-time sending live outside the
 // controller, keyed by the claim URL: a redraw mid-claim replaces the
@@ -177,6 +179,7 @@ export default class extends Controller {
 
     slot.dataset.slotCardId = id
     slot.classList.remove(...EMPTY_SLOT)
+    slot.classList.add(...FILLED_SLOT)
     slot.replaceChildren(this.copyWithFreshIds(svg))
   }
 
@@ -201,6 +204,7 @@ export default class extends Controller {
     if (!slot) return
 
     delete slot.dataset.slotCardId
+    slot.classList.remove(...FILLED_SLOT)
     slot.classList.add(...EMPTY_SLOT)
     slot.replaceChildren(String(this.slotTargets.indexOf(slot) + 1))
   }

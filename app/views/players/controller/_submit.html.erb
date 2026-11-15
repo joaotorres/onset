@@ -1,6 +1,6 @@
 <%# Submit in the pill slot during the player's own claim (§8 Player screen 3, design system v5 _submit).
     Rendered disabled; card-selection sets data-state: disabled below 3 picks, enabled at 3, submitted from the tap. %>
-<% look = "data-[state=disabled]:cursor-not-allowed data-[state=disabled]:bg-blue-600/35 data-[state=disabled]:text-blue-200 " \
+<% look = "data-[state=disabled]:cursor-not-allowed data-[state=disabled]:bg-blue-600/35 data-[state=disabled]:text-blue-200 light:data-[state=disabled]:bg-blue-100 light:data-[state=disabled]:text-blue-700 " \
           "data-[state=enabled]:bg-blue-600 data-[state=enabled]:text-white data-[state=enabled]:shadow-[0_0_24px_rgba(37,99,235,0.55)] data-[state=enabled]:hover:bg-blue-500 data-[state=enabled]:active:scale-95 " \
           "data-[state=submitted]:bg-blue-600 data-[state=submitted]:text-white" %>
 <button type="button" disabled data-state="disabled"

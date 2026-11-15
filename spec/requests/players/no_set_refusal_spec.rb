@@ -125,7 +125,9 @@ RSpec.describe "Players" do
 
         it "disables the No Set pill, counting the block down" do
           show
-          expect(blocked_pill["class"]).to include("bg-purple-700", "opacity-35", "text-purple-200")
+          # DESIGN v6: the fill at 35%, the label at full strength, never the whole pill faded.
+          expect(blocked_pill["class"]).to include("bg-purple-700/35", "text-purple-200")
+          expect(blocked_pill["class"]).not_to include("opacity-35")
           expect(blocked_pill.text.squish).to match(/\ANo Set in \d+ s\z/)
           expect(blocked_pill["data-controller"]).to eq("countdown")
           expect(blocked_pill["data-countdown-started-at-value"]).to eq(game.reload.no_set_refused_at.iso8601)
