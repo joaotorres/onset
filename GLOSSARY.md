@@ -41,7 +41,7 @@ One game, identified by its six-character room code, from waiting through play t
 _Avoid_: Lobby, session, match
 
 **Bot**:
-A player Onset plays itself, added by the host while the room is waiting, at Easy, Medium or Hard. It only claims Sets, after a delay its level sets, and never votes.
+A player Onset plays itself, added (and removed) by the host while the room is waiting, at Easy, Medium or Hard. It only claims Sets, after a delay its level sets, and never votes.
 _Avoid_: AI, computer, CPU
 
 **Board**:
