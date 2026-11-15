@@ -19,12 +19,20 @@ A page people read rather than play on, held in the 944px content box with its p
 _Avoid_: Static page, info page
 
 **Settings menu**:
-The menu on every page where a player chooses how Onset looks on their browser, such as the theme. Stored per browser, never on the player.
+The menu on every page where a player chooses how Onset looks on their browser, such as the theme or the card colors. Stored per browser, never on the player.
 _Avoid_: Preferences, options page
 
 **Theme**:
 Dark or light, the colors every page is drawn in. Each browser picks Match device (the default), Light or Dark in the settings menu.
 _Avoid_: Mode (a game's mode is Standard or First to 5), skin
+
+**Card colors**:
+The palette the cards are drawn in, picked per browser in the settings menu: Classic (red, green, purple; the default) or Color-blind (blue, orange, magenta, with a color mark on each card). A card's color feature is the same under both: only how it is drawn changes.
+_Avoid_: Color-blind mode (a game's mode is Standard or First to 5), accessibility mode
+
+**Color mark**:
+The small mark the Color-blind card colors add to every card, one per color, so the colors can be told apart without seeing color.
+_Avoid_: Color symbol, pattern (shading already means solid, striped, outline)
 
 ### Game
 

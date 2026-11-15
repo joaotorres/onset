@@ -26,7 +26,7 @@ This document is the source of truth for the v1 MVP. It is intentionally tight; 
 
 - **Number**: 1, 2, or 3 shapes per card.
 - **Shape**: oval, squiggle, diamond.
-- **Color**: blue, orange, magenta. (See palette in §10.)
+- **Color**: red, green, purple, or blue, orange, magenta with the color-blind card colors. (See palette in §10.)
 - **Shading**: solid, striped, outline.
 
 A card can be encoded as an integer `0..80`, with each base-3 digit corresponding to one attribute. This makes Set validity checkable by digit-wise sum mod 3 (see §4).
@@ -375,13 +375,20 @@ For v1, **avoid a custom channel**. Turbo Streams over `broadcasts_to` covers al
 
 ### Palette
 
-Colorblind-safe (IBM 3-color palette):
+Two card palettes. Each browser picks one in the settings menu (§8, Settings menu), under **Card colors**:
 
-- **Blue**: `#648FFF`
-- **Orange**: `#FE6100`
-- **Magenta**: `#DC267F`
+- **Classic** (the default): Set's own red, green and purple, far apart in hue so they read at a glance. The exact shades come from the design pass (`docs/design-system.md`). Each stays clearly apart from the other two, reads on the card face, and stays apart from the player colors, which already hold a red, a green and a purple of their own (`PlayersController::PRESET_COLORS`).
+- **Color-blind**: the IBM colorblind-safe palette, the one every card used before Classic: **Blue** `#648FFF`, **Orange** `#FE6100`, **Magenta** `#DC267F`. It also draws a **color mark** on every card: one small mark per color, the same on every card of that color, so the three colors can be told apart without seeing color at all. The mark never changes the shapes, their number or their shading, the card's other three features, and cannot be mistaken for one of them. It sits inside the card's SVG, so card sizes and every layout stay as they are. Its form and place come from the design pass.
 
-Background: near-white (`#FAFAFA`). Card border: subtle, `#E5E5E5`. Selected card on the player screen: `ring-4 ring-blue-400 scale-95`.
+Card color 0, 1 and 2 (§4, Card) are red, green and purple in Classic and blue, orange and magenta in Color-blind, so a Set is the same Set under both.
+
+- **Stored per browser**, as the theme is (Themes below): a `card_colors` cookie, `colorblind`, path `/`, a year long, SameSite Lax, not HttpOnly so the settings menu can write it. Classic deletes it. The layout renders the choice on `<html>`, so the first paint already has the right colors
+- **Never in a broadcast.** Cards render inside Turbo Stream partials shared by every screen in a room (§7), so the `_card` partial draws the same markup for every viewer: the card colors come from CSS keyed on `<html>`, and the color mark is always in the markup, shown only under Color-blind
+- **Picking applies at once** to every card on the page, with no reload, as a theme does. Other open tabs take it on their next page load
+- **Independent of the theme**: each palette, and the color mark, is the same in the dark and light themes
+- **Everywhere a card renders**: the big screen board and announcement band, the player screen board, tray and found-set banner, the landing's fanned cards and the How to play diagrams. Words that name a card color follow the setting the same way, both versions in the markup and CSS showing the one that matches: How to play's color captions (red, green, purple or blue, orange, magenta) and its Not a Set example ("two red, one green" or "two blue, one orange")
+
+Card face, the same under both palettes: near-white (`#FAFAFA`). Card border: subtle, `#E5E5E5`. Selected card on the player screen: `ring-4 ring-blue-400 scale-95`.
 
 ### Component
 
@@ -398,7 +405,7 @@ Single ERB partial: `app/views/cards/_card.html.erb` taking a `card:` local. Ren
   - **Outline**: `fill=none stroke=color stroke-width=5`.
   - **Striped**: `fill="url(#stripes-#{color}-#{suffix})"`, a 40° hatch of 3.5px lines on a 7px pitch. Each SVG defines its own `<pattern>`, with an id unique to that rendered SVG, never to the card alone: the same card can appear twice on one page, and a browser resolves `url(#id)` to the first element with that id, so a duplicate inside a hidden element paints the shape empty. A copy made in the browser (the player screen tray, §11) gets fresh ids too.
 
-The SVG fills its wrapper; wrappers set the size with a 5:7 aspect ratio. The partial is never restyled, only sized.
+The SVG fills its wrapper; wrappers set the size with a 5:7 aspect ratio. The partial is never restyled, only sized; its colors and color mark follow the card colors setting through CSS alone (Palette above).
 
 - **Big screen grid**: 3 rows flowing into columns, centered, no horizontal scroll at 18 cards. Cards are `15rem` tall at 1080px and shrink with the viewport (`min(15rem, (100dvh - 22rem) / 3)`) so the third row never runs under the announcement band.
 - **Player screen, portrait**: in every playing state the grid fits the width (`auto-cols-fr`) and shrinks to the height left, so SET! and its pill never leave the screen.
@@ -430,7 +437,7 @@ Each color means one thing everywhere:
 | green | ready, correct, start, play again (`green-700` for white text; `green-600` is only about 3.3:1) |
 | orange | deck empty and the End game vote (`orange-700` for white text; `orange-600` is only about 3.3:1) |
 
-Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberately apart from the card palette. They show as dots, the player screen's top border strip and podium bars.
+Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberately apart from both card palettes (Palette above). They show as dots, the player screen's top border strip and podium bars.
 
 Countdown rings: `r=45` in a 100 viewBox, gray track, colored progress with round caps, rotated -90° so they drain clockwise from the top. Seconds sit inside the ring, or inside the button the ring surrounds.
 
@@ -444,7 +451,7 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 - **No flash of the other theme.** The layout renders the chosen theme on `<html>` from the cookie, so the first paint is already right, and Match device is pure CSS (the media query), so it needs no script either. The page's `color-scheme` follows the theme, so form fields and scrollbars match it
 - **Picking a theme applies at once**, to the page it is picked on, with no reload. Other open tabs of the same browser take it on their next page load
 - **The theme never reaches a broadcast.** Turbo Stream partials (§7) are rendered once for every screen in a room, so nothing in them depends on the viewer's theme: every themed color comes from CSS keyed on `<html>`, never from markup rendered per theme
-- **Same in both themes:** the cards (the `_card` partial is never restyled, its near-white face and border included; on light surfaces the design pass may give the card's wrapper an edge so it reads), the card palette, the player colors, what each color means (the meaning table above; the light theme may use other shades of the same color for contrast), the QR tile (dark modules on white), the layouts, sizes and animations
+- **Same in both themes:** the cards (the `_card` partial is never restyled, its near-white face and border included; on light surfaces the design pass may give the card's wrapper an edge so it reads), the card palettes (which one shows is the card colors setting, Palette above, not the theme), the player colors, what each color means (the meaning table above; the light theme may use other shades of the same color for contrast), the QR tile (dark modules on white), the layouts, sizes and animations
 - **Every page the app renders** takes the theme: the landing, How to play, the join page, the big screen, the player screen and the byline footer, which uses the light logo colours in the light theme and the dark ones in the dark theme (§8, Byline footer). The static error pages in `public/` stay dark
 
 ---
@@ -510,6 +517,7 @@ Every event goes through `window.jtTrack(name, props)`, which the gem defines in
 | `game_restarted` | `mode`, `player_count` | Status `ended` to `playing`: the big screen's Play again or the ready vote |
 | `game_finished` | `mode`, `player_count`, `end_reason` (`quick_win`, `vote` or `deck_exhausted`), `is_tie` (no sole winner), `duration_seconds` when known | Status `playing` to `ended` |
 | `theme_changed` | `theme`: `device`, `light` or `dark`, the option picked | The settings menu (§8), when the player picks a theme other than the one already chosen |
+| `card_colors_changed` | `card_colors`: `classic` or `colorblind`, the option picked | The settings menu (§8), when the player picks card colors other than the ones already chosen |
 
 **Server actions ride the flash.** `game_created` and `player_joined` happen in an action that redirects, so no page is there to send them. `track_event` (`TracksEvents`, included in `ApplicationController`) appends the event to `flash[:tracked_events]`. The next page's layout renders it into a hidden `track` controller element, which sends each event once on connect and then empties its value, so a Turbo restoration visit to the cached page does not send it again. Nothing calls PostHog from the server.
 
@@ -525,7 +533,7 @@ Every event goes through `window.jtTrack(name, props)`, which the gem defines in
 
 ### Privacy
 
-PostHog runs with memory persistence: it sets no cookies and keeps nothing in browser storage, so there is no consent banner. Onset's own browser state is unchanged by telemetry, apart from one `sessionStorage` entry per room for the `game-events` controller (`onset.game.<code>`: the last status this tab saw and when it saw play start), which never leaves the browser. The `theme` cookie (§10, Themes) is Onset's own too: a display preference the player sets, sent only to Onset, with no identity in it, so it needs no consent either.
+PostHog runs with memory persistence: it sets no cookies and keeps nothing in browser storage, so there is no consent banner. Onset's own browser state is unchanged by telemetry, apart from one `sessionStorage` entry per room for the `game-events` controller (`onset.game.<code>`: the last status this tab saw and when it saw play start), which never leaves the browser. The `theme` and `card_colors` cookies (§10, Themes and Palette) are Onset's own too: each a display preference the player sets, sent only to Onset, with no identity in it, so they need no consent either.
 
 ---
 
@@ -616,12 +624,17 @@ A small muted footer, the same across all of joaotorr.es's apps, so its look and
 
 ## 8. Settings menu
 
-One menu for the choices a player makes about how Onset looks on their browser, on every page the app renders: the landing, How to play, the join page, the big screen and the player screen. It holds one option today, **Theme** (§10, Themes): **Match device**, **Light** and **Dark**, the current one marked, Match device until the player picks. Later options join it the same way.
+One menu for the choices a player makes about how Onset looks on their browser, on every page the app renders: the landing, How to play, the join page, the big screen and the player screen. It holds two options, each with the current choice marked:
+
+- **Theme** (§10, Themes): **Match device**, **Light** and **Dark**, Match device until the player picks
+- **Card colors** (§10, Palette): **Classic** and **Color-blind**, Classic until the player picks
+
+Later options join it the same way.
 
 - **Opening it**: a settings button with the accessible name "Settings", always in the same place on a screen. Where it sits on each screen and how the menu opens (a sheet, a popover) comes from the design pass. It never moves SET!, the pill slot or the board, and it keeps the player screen's and the big screen's no-page-scroll rules (§8, Player screen; §10 Component)
-- **Picking** applies the option at once (§10, Themes) and leaves the menu open, so the player sees the result; Escape, a tap outside it or its close button closes it. It is a plain browser control with no request to the server: the settings menu's Stimulus controller writes the cookie
+- **Picking** applies the option at once (§10, Themes and Palette) and leaves the menu open, so the player sees the result; Escape, a tap outside it or its close button closes it. It is a plain browser control with no request to the server: the settings menu's Stimulus controller writes the cookies
 - **Outside every broadcast target**: the menu and its button sit outside the regions Turbo Streams replace (§7, Hooks), so a room update never closes it or resets it, unlike the QR sheet inside `#controller_status`
-- **Telemetry**: picking a theme sends `theme_changed` (§17, Custom events)
+- **Telemetry**: picking a theme sends `theme_changed`, picking card colors `card_colors_changed` (§17, Custom events)
 
 ## 8. Search engines
 
@@ -845,7 +858,7 @@ without callbacks.
 
 ## 16. Open items to confirm during implementation
 
-- **Color presets for player choice** (8 distinct hex values that don't collide with the card palette).
+- **Color presets for player choice** (8 distinct hex values that don't collide with the card palettes; the Classic card shades are picked apart from them, §10 Palette).
 - **Squiggle SVG path** — the canonical Set squiggle is a specific bezier; pick one and commit to it.
 - **Striped pattern density** — visually tune in browser; aim for clearly distinguishable from solid at TV viewing distance.
 - **Auto-submit timing** — resolved: no auto-submit. An explicit Submit at three picks judges the claim at once, and the picks are judged when the time runs out otherwise (§11).
