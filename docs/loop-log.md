@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-16  request 54: filed the security review's medium finding (security-20261115, F1), enforce the 8-player cap on the server, behavioural. Next: triage, which asks the owner (security).
 - 2026-11-16  request 53: filed the deferred follow-up from 43, the records in line with what is built and specs for the settings menu's untested paths, behavioural. Next: triage.
 - 2026-11-16  request 52: filed the deferred follow-up from 43, a tab that follows a link takes on the theme and card colors picked in another tab, behavioural. Next: triage.
 - 2026-11-16  request 51: filed the deferred follow-up from 43, Escape closes the open settings menu wherever focus is, behavioural. Next: triage.
