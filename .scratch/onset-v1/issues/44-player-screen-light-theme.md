@@ -6,7 +6,7 @@ Blocked by: 43
 Priority: normal
 Model:
 Effort:
-Changelog: The player screen has a settings button by the room code, and turns light when you pick the Light theme; the greyed-out No Set button is easier to read.
+Changelog: The player screen comes in a light theme too, following your device or your pick in the settings menu, which opens from a button by the room code; the greyed-out No Set button is easier to read.
 
 ## Request
 
