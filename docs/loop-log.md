@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  build 39: done, How to play and the byline footer at 944 px content with the gutter outside, prose at 65ch, suite green at 531 examples; finished from jt-playbook after the headless build was refused bin/test-all. Next: build 43.
 - 2026-11-15  triage 48: spec settled, SPEC AI opponent gains Removing a bot (one tap, host only, waiting rooms, bots only) with SPEC 5, 7, 8, 17 and the glossary, blocked by 47, eight Decided lines, waiting for its design pass with 47's. Next: /design-brief 47 48.
 - 2026-11-15  request 48: The host can remove a bot from a waiting room filed, visual, deferred from 47. Next: triage.
 - 2026-11-15  triage 47: spec settled, new SPEC AI opponent section (bots at Easy, Medium, Hard added by the host while waiting, claiming after a delay, never voting) with SPEC 1, 2, 4, 5, 8, 12, 17 and the glossary, blocked by 44, 45, fourteen Decided lines and one Deferred, waiting for its design pass, split after the design entry. Next: /design-brief 47.

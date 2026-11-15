@@ -1,12 +1,12 @@
 # 39: Content pages: width standard (944 px content, 65ch prose)
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Model:
 Effort:
-Changelog:
+Changelog: The How to play page uses its full 944 px for content, with the side padding outside it, and its running text is capped to a comfortable line length.
 
 ## Request
 

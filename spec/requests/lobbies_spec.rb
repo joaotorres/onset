@@ -102,6 +102,49 @@ RSpec.describe "Lobbies", type: :request do
       expect(response.body).not_to include("Back to the game")
     end
 
+    describe "the width standard" do
+      let(:html) do
+        get how_to_play_path
+        response.parsed_body
+      end
+
+      def classes(node) = node["class"].to_s.split
+
+      it "caps the three running prose elements at 65ch" do
+        [
+          "Onset is the card game Set, played live.",
+          "Each feature comes in three versions",
+          "Three cards where each feature is either"
+        ].each do |start|
+          prose = html.css("main p").find { |p| p.text.squish.start_with?(start) }
+          expect(classes(prose)).to include("max-w-[65ch]")
+        end
+      end
+
+      it "gives the headline no max-width" do
+        expect(classes(html.at_css("h1")).grep(/\Amax-w-/)).to be_empty
+      end
+
+      it "holds the content in the 944px box inside the gutter wrapper" do
+        box = html.at_css("main > div > div")
+        expect(classes(box)).to include("mx-auto", "max-w-[944px]")
+        expect(classes(box).grep(/\A(md:)?px-/)).to be_empty
+        expect(classes(box.parent)).to include("px-5", "sm:px-8", "lg:px-10")
+      end
+
+      it "puts the byline footer in the same box" do
+        box = html.at_css("footer.byline-footer > div > div")
+        expect(classes(box)).to include("mx-auto", "max-w-[944px]", "text-center")
+        expect(classes(box.parent)).to include("px-5", "sm:px-8", "lg:px-10")
+      end
+
+      it "uses none of the old caps" do
+        ["max-w-2xl", "max-w-3xl", "max-w-5xl"].each do |cap|
+          expect(html.css("[class~='#{cap}']")).to be_empty
+        end
+      end
+    end
+
     ["https://example.com", "//example.com", "/\\example.com", "example.com/ABC234"].each do |url|
       it "ignores game=#{url} and goes back to the root" do
         get how_to_play_path, params: {game: url}

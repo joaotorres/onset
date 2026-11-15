@@ -2,7 +2,8 @@
 <% content_for :title, "How to play · Onset" %>
 
 <main class="grow bg-gray-950 text-white">
-  <div class="mx-auto max-w-5xl px-5 pt-6 pb-16 md:px-10 md:pt-10 md:pb-24">
+  <div class="px-5 pt-6 pb-16 sm:px-8 md:pt-10 md:pb-24 lg:px-10">
+  <div class="mx-auto max-w-[944px]">
     <nav class="flex items-center justify-between">
       <%= link_to "← Back", @back_path, class: "inline-flex min-h-11 items-center text-sm font-semibold text-gray-300 hover:text-white" %>
       <%= link_to "Onset", root_path, class: "font-display text-xl font-extrabold tracking-tight" %>
@@ -10,13 +11,13 @@
 
     <header class="mt-10 md:mt-16">
       <p class="text-sm uppercase tracking-widest text-gray-400">How to play</p>
-      <h1 class="mt-3 max-w-3xl font-display text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl">Find three cards that make a Set.</h1>
-      <p class="mt-5 max-w-2xl text-lg text-gray-300 md:text-xl">Onset is the card game Set, played live. Everyone plays on their own phone or computer, sees the same cards and races to spot a Set. A big screen the whole table can see is optional.</p>
+      <h1 class="mt-3 font-display text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl">Find three cards that make a Set.</h1>
+      <p class="mt-5 max-w-[65ch] text-lg text-gray-300 md:text-xl">Onset is the card game Set, played live. Everyone plays on their own phone or computer, sees the same cards and races to spot a Set. A big screen the whole table can see is optional.</p>
     </header>
 
     <section class="mt-16 md:mt-24">
       <h2 class="font-display text-3xl font-bold md:text-4xl">Every card has four features</h2>
-      <p class="mt-3 max-w-2xl text-gray-400 md:text-lg">Each feature comes in three versions, which makes 81 different cards.</p>
+      <p class="mt-3 max-w-[65ch] text-gray-400 md:text-lg">Each feature comes in three versions, which makes 81 different cards.</p>
       <div class="mt-8 grid gap-4 md:grid-cols-2 md:gap-6">
         <div class="rounded-3xl bg-gray-900 p-5 md:p-6">
           <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400">Number</h3>
@@ -55,7 +56,7 @@
 
     <section class="mt-16 md:mt-24">
       <h2 class="font-display text-3xl font-bold md:text-4xl">What makes a Set</h2>
-      <p class="mt-4 max-w-3xl font-display text-2xl font-bold leading-snug md:text-3xl">Three cards where each feature is either <span class="text-green-400">all the same</span> or <span class="text-green-400">all different</span>.</p>
+      <p class="mt-4 max-w-[65ch] font-display text-2xl font-bold leading-snug md:text-3xl">Three cards where each feature is either <span class="text-green-400">all the same</span> or <span class="text-green-400">all different</span>.</p>
       <div class="mt-8 grid gap-4 md:grid-cols-2 md:gap-6">
         <article class="rounded-3xl bg-gray-900 p-5 ring-1 ring-inset ring-green-500/40 md:p-6">
           <p class="font-semibold text-green-400">✓ A Set: some features the same</p>
@@ -166,5 +167,6 @@
         <% end %>
       </div>
     </section>
+  </div>
   </div>
 </main>
