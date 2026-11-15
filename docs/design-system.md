@@ -4,7 +4,7 @@ The tokens, components and visual rules the views use, and the devices-first scr
 
 Boards for every screen and state are on the canvas named in `docs/design-handoff.md`. Where this file and a board differ, this file wins; tell the design tool in the next brief.
 
-## Tokens
+## Shared: Tokens
 
 From `app/assets/tailwind/application.css` (`@theme`), on top of the Tailwind default palette:
 
@@ -23,92 +23,7 @@ Byline logo colours (v3, `--wm-*`): light on `:root` green `#009C3B`, blue `#002
 
 v2 adds no tokens: every new color is from the Tailwind default palette.
 
-## Components
-
-ERB partials, no component library.
-
-- `cards/_card`: the card SVG, 200×280 viewBox, sized only by its 5:7 wrapper
-- `games/_ring`: big screen countdown ring, size-24, seconds inside
-- `games/_scoreboard`: big screen score rows, sorted by score
-- `games/_start_button`: Start game with "n of m ready", or disabled with the reason
-- `games/_announcement`: the 9rem announcement band and its tinted panels. Refused (v4): the No Set panel's tint, ring and type; the ring counts the block down (`purple-400` progress, `purple-300` seconds), "Alex says there's a Set" in 48px display bold with the name in `purple-400`, "No Set is back when the ring runs out" in 24px `gray-300`, nothing on the right. At 1280px wide the headline wraps onto two balanced lines inside the band, as "Alex called No Set" does
-- `players/controller/_header`: header with dot, name and score, on Waiting and Game over
-- `players/controller/_board_strip`: the play card grid with the deck line, sized by the card size rule in portrait and landscape
-- `players/controller/_button_ring`: thin ring around the round SET! button
-- `players/controller/_small_ring`: countdown ring with seconds, any size
-- `players/controller/_secondary_action`: the pill under SET!: No Set, the End game vote, or during a No Set countdown I agree, no Set (filled purple) or the waiting text (outlined purple). v4 variants:
-  - refusal pair, while the player may refuse: two equal pills side by side, There's a Set on the left (outlined, 2px `purple-400` border, no fill, white bold text), I agree, no Set on the right (filled `purple-700`, white text). The pair fills its column: portrait the status slot's width (351px at 375, 8px gap, 16px labels), landscape the 9rem column (two 69×44 pills, 6px gap, 13px labels on two lines), computer 248×46 (two 120px pills, 8px gap, 15px labels). SET! does not move. Once this board's refusal is used, the lone I agree, no Set sits as before (220×44 in portrait, centered)
-  - blocked No Set, after a refusal: the No Set pill at its usual size (portrait 220×44, landscape 144×44, computer 248×46), disabled, `purple-700` at 35% with `purple-200` text, "No Set in 12 s" with the seconds in display type. The block's seconds show only here, not in the status panel
-- `players/controller/_submit` (v5): the Submit pill in the pill slot during the player's own claim, at the slot's usual size (portrait 220×44, landscape 144×44, computer 248×46), body font 16px/700 (15px in landscape). States:
-  - disabled, fewer than 3 picks: `blue-600` at 35% with `blue-200` text, "Submit"
-  - enabled, exactly 3 picks: `blue-600`, white text, "Submit", glow `0 0 24px rgba(37, 99, 235, 0.55)` (SET!'s glow without the 8px ring)
-  - submitted, from the tap until the resolving broadcast: `blue-600`, white text, disabled, an inline check icon (18px, stroke 3) then "Submitted", `aria-label` "Submitted, waiting for the result". Full strength, not the disabled look, so a frozen screen reads as sent, not as not yet allowed
-- `players/controller/_scoreboard` (v2): the play scoreboard, every player in score order. Portrait: chips, 4 per row, at most 2 rows, the Locked tag a red badge on the chip's top-right corner. Landscape and computer: one row per player, the Locked tag inline before the score. Own entry `gray-800` with a `gray-500` border; claiming entry solid `yellow-400` with `gray-950` text; locked entry content at 45% opacity
-- `players/controller/_status_panel` (v2): one fixed slot above SET!, portrait 64px tall, landscape 144×104, computer 248×76. Variants:
-  - claim bar: `yellow-400`, ring, "Your SET!", "Tap 3 cards", n/3
-  - someone else claiming: `gray-900` with a `yellow-400` border, "Alex is calling SET!"
-  - No Set: `purple-950` with a `purple-500` border, ring, "No Set called by Alex", "n/m agreed"
-  - locked out: `red-950` with a `red-600` border, "Wrong! −1" or "Time's up! −1", `animate-shake`
-  - refused (v4): `gray-900` with a `purple-500` border, laid out as someone else claiming in each layout: the refuser's dot, the name bold and "says there's a Set" in `gray-300`. No ring. `gray-900`, not `purple-950`, so it does not read as a call still running
-  - idle: empty, the slot keeps its size
-- `players/controller/_found_banner` (v2): `green-950` panel with a `green-500` border, the 3 cards small, the caller's dot, "Alex found a Set" and "+1" in `green-400`. Absolutely positioned over the top of the board area, over the scoreboard in portrait. `pointer-events: none`, `.found-set-flash`
-- `players/controller/_roster` (v2): the Waiting roster, two columns, each a dot, the name, "you" for the player and a `green-400` ✓ once ready
-- `players/controller/_invite` (v2): the room code in display type, "or open onset.joaotorr.es and enter the code" (`join_host`), the link button (Copy link, Copied ✓, Couldn't copy, Share link), a Show QR button and the "Show on a big screen →" text link
-- `players/controller/_qr_sheet` (v2): overlay `gray-950` at 85%. Portrait: a bottom sheet. Landscape: a centered card, QR on the left, code and Done on the right. Computer: a centered 352px modal. QR on a white tile, 288px in portrait and computer, 300px in landscape, the code under it, Done in `blue-600`
-- `players/controller/_standings` (v2): game over rows, each rank, dot, truncated name, "you" for the player, score. Own row `gray-800` with a `gray-600` border, other rows transparent. Rows 32px portrait, 34px landscape, 44px computer (computer list in a `gray-900` panel)
-- Landing mode toggle (v2): two radios styled as a segmented control inside the Start a game form, on a `gray-950` (desktop) or `gray-900` (phone) track with a `gray-700` border. Selected Standard `gray-700`, selected First to 5 `violet-600`, unselected `gray-400` text on transparent
-- `layouts/_byline_footer` (v3): "by joaotorr.es" after `main` on the landing, How to play and the join page, never on the big screen or player screen. `gray-400` 14px weight 500 with a 1px red underline; on hover or keyboard focus the dot hops and the domain fades into the logo colours (`--wm-*`), held until the next page load. Styles in `app/assets/tailwind/application.css` (`.byline`, `.wm-*`), fixed across joaotorr.es apps
-- Stimulus: `card-selection` (picks sent to the server, tray, count, Submit and the freeze after it), `countdown` (rings and seconds)
-
-## Screens
-
-Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, computer 1024×640, landing desktop 1280×800.
-
-### Landing (ticket 08)
-
-- Desktop: brand on the left (wordmark 136px, tagline 24px `gray-300`, three fanned cards with the caption in `gray-400`), actions on the right in a 448px `gray-900` card with a `gray-800` border: the mode toggle, Start a game (`blue-600`, 60px, display type), its sub-line in `gray-400`, a divider, then "Have a room code?", the code field and a `gray-800` Join button
-- Phone, top to bottom: wordmark and tagline, the join form, a divider, the mode toggle and Start a game, then the fanned cards and caption at the bottom
-- Room not found: "Room not found" in `red-400` under the code field, the field empty with a `red-500` border
-
-### Join page (ticket 08)
-
-- "Joining room" in `gray-400`, the code at 60px in display type
-- Base error (game already started): a `red-950` box with a `red-700` border and `red-200` text, under the code
-- Field errors in `red-400` under their field, the field with a `red-500` border
-- Color grid 4×2, 56px swatches. Selected: a white ring offset by `gray-950`, with a white ✓. Taken: the preset blended 30% over `gray-950`, the taker's initial in `gray-300` in display type
-- Join at the bottom (`blue-600`, 56px). For the creating browser, "Use this screen as the big screen instead" under it as a `blue-300` text link
-- Full room (every color taken, triage 08): "This room is full" in the base error box, no swatch selected, Join disabled as `gray-800` with `gray-500` text, as the big screen's disabled Start game. Wins over the join-full board, which shows no message
-
-### Player screen, Waiting (ticket 10)
-
-- Header, then "You're in", the roster, the invite and I'm ready (`green-700`). Once voted: "Ready ✓ · waiting for n more" as outlined `green-700` text on a 12% `green-700` tint, `green-300` text
-- Landscape and computer put the roster and the invite side by side
-- The link button's feedback states (Copied ✓, Couldn't copy) stay neutral gray
-- The QR sheet is `_qr_sheet`; the "Room CODE" footer stays
-
-### Player screen, during play (ticket 09)
-
-- Portrait, top to bottom: the scoreboard, the board at full width, the status slot (64px, empty in idle), the 128×128 SET! slot and its pill
-- Landscape: the board on the left, a 9rem action column (status panel, SET!, pill), a scores column
-- Computer: the board on the left; a 248px side column with the scoreboard stacked above the status panel, SET! and its pill
-- Deck: "N cards left in the deck" with the board, or an orange "Deck is empty" pill
-- Claiming (mine): portrait, the claim bar takes the status slot and the 3-slot tray and Submit replace SET! and its pill. Landscape and computer: one yellow block replaces the panel and SET!, and Submit takes the pill slot (v5)
-- Portrait tray (v5): a 128px row of three 72×101 slots, 14px apart, above the 44px pill slot holding Submit, 4px between, 176px in all, the height SET! and its pill take, so nothing else moves. An empty slot is a dashed `gray-700` box with its number (1, 2, 3) centred in display type, 22px/700, `gray-500`; a filled slot shows the picked card. Slots fill in pick order
-- Submitted (v5): the board's cards are disabled, the three picks keep the selected ring, the tray and the n/3 count stay as at 3/3, the countdown ring keeps draining and Submit shows its submitted state. The board never dims, at 3 picks or after the tap
-- Someone else claiming: the disabled SET! shows the seconds large with a small "SET!" label under them, inside the yellow ring
-- Read-only boards (someone else claiming, No Set, locked out) are not dimmed
-- No Set countdown, may refuse (v4): the No Set status panel, SET!, and the refusal pair in the pill slot. Locked out at the same time: the No Set panel keeps the status slot, since the call is the news; SET! shows the lockout ring with the seconds and "Locked", as in Locked out, and the chip shows the Locked tag
-- No Set blocked after a refusal (v4): idle with the refused status panel and the blocked No Set pill; SET! stays round blue and enabled
-- Found-set banner: in portrait it covers the scoreboard for its 3s; the board under it shows the replaced cards with the arrive outline
-
-### Player screen, Game over (ticket 07)
-
-- Header, the rank in display type (64px portrait, 60px landscape, 120px computer), "of N players · P points" in `gray-400`, the winner line, the standings, Play again (`green-700`) or "Ready ✓ · waiting for n more" as on Waiting
-- Landscape: rank, winner line and Play again in a 250px left column, the standings on the right
-- Computer: a 360px left column, the standings in a `gray-900` panel on the right
-- The standings scroll inside themselves when they do not fit; the page never does
-
-## Rules added in v2
+## Shared: Rules added in v2
 
 - White text on green uses `green-700` (`#15803D`); `green-600` is about 3.3:1, as with `orange-700`. I'm ready and Play again on the player screen
 - Filled purple pills (No Set, I agree, no Set) use `purple-700` with white text. The waiting text after agreeing is outlined `purple-500` with `purple-200` text
@@ -119,11 +34,11 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Portrait keeps the status slot at 64px in every state, so the board never resizes on a state change
 - Copy link feedback stays neutral gray: green and red are reserved by the meaning table
 
-## Rules added in v5
+## Shared: Rules added in v5
 
 - A disabled filled pill keeps its label legible: the fill at 35% with the light tint of its color as text at full opacity (blocked No Set: `purple-700` at 35%, `purple-200`; disabled Submit: `blue-600` at 35%, `blue-200`), never the whole button faded
 
-## Visual rules
+## Shared: Visual rules
 
 Quoted from `SPEC.md`.
 
@@ -193,6 +108,112 @@ Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberat
 Countdown rings: `r=45` in a 100 viewBox, gray track, colored progress with round caps, rotated -90° so they drain clockwise from the top. Seconds sit inside the ring, or inside the button the ring surrounds.
 
 QR codes: dark modules on a white tile. Inverted codes fail on some phone cameras.
+
+## Components
+
+ERB partials, no component library.
+
+### cards/_card
+- `cards/_card`: the card SVG, 200×280 viewBox, sized only by its 5:7 wrapper
+### games/_ring
+- `games/_ring`: big screen countdown ring, size-24, seconds inside
+### games/_scoreboard
+- `games/_scoreboard`: big screen score rows, sorted by score
+### games/_start_button
+- `games/_start_button`: Start game with "n of m ready", or disabled with the reason
+### games/_announcement
+- `games/_announcement`: the 9rem announcement band and its tinted panels. Refused (v4): the No Set panel's tint, ring and type; the ring counts the block down (`purple-400` progress, `purple-300` seconds), "Alex says there's a Set" in 48px display bold with the name in `purple-400`, "No Set is back when the ring runs out" in 24px `gray-300`, nothing on the right. At 1280px wide the headline wraps onto two balanced lines inside the band, as "Alex called No Set" does
+### players/controller/_header
+- `players/controller/_header`: header with dot, name and score, on Waiting and Game over
+### players/controller/_board_strip
+- `players/controller/_board_strip`: the play card grid with the deck line, sized by the card size rule in portrait and landscape
+### players/controller/_button_ring
+- `players/controller/_button_ring`: thin ring around the round SET! button
+### players/controller/_small_ring
+- `players/controller/_small_ring`: countdown ring with seconds, any size
+### players/controller/_secondary_action
+- `players/controller/_secondary_action`: the pill under SET!: No Set, the End game vote, or during a No Set countdown I agree, no Set (filled purple) or the waiting text (outlined purple). v4 variants:
+  - refusal pair, while the player may refuse: two equal pills side by side, There's a Set on the left (outlined, 2px `purple-400` border, no fill, white bold text), I agree, no Set on the right (filled `purple-700`, white text). The pair fills its column: portrait the status slot's width (351px at 375, 8px gap, 16px labels), landscape the 9rem column (two 69×44 pills, 6px gap, 13px labels on two lines), computer 248×46 (two 120px pills, 8px gap, 15px labels). SET! does not move. Once this board's refusal is used, the lone I agree, no Set sits as before (220×44 in portrait, centered)
+  - blocked No Set, after a refusal: the No Set pill at its usual size (portrait 220×44, landscape 144×44, computer 248×46), disabled, `purple-700` at 35% with `purple-200` text, "No Set in 12 s" with the seconds in display type. The block's seconds show only here, not in the status panel
+### players/controller/_submit
+- `players/controller/_submit` (v5): the Submit pill in the pill slot during the player's own claim, at the slot's usual size (portrait 220×44, landscape 144×44, computer 248×46), body font 16px/700 (15px in landscape). States:
+  - disabled, fewer than 3 picks: `blue-600` at 35% with `blue-200` text, "Submit"
+  - enabled, exactly 3 picks: `blue-600`, white text, "Submit", glow `0 0 24px rgba(37, 99, 235, 0.55)` (SET!'s glow without the 8px ring)
+  - submitted, from the tap until the resolving broadcast: `blue-600`, white text, disabled, an inline check icon (18px, stroke 3) then "Submitted", `aria-label` "Submitted, waiting for the result". Full strength, not the disabled look, so a frozen screen reads as sent, not as not yet allowed
+### players/controller/_scoreboard
+- `players/controller/_scoreboard` (v2): the play scoreboard, every player in score order. Portrait: chips, 4 per row, at most 2 rows, the Locked tag a red badge on the chip's top-right corner. Landscape and computer: one row per player, the Locked tag inline before the score. Own entry `gray-800` with a `gray-500` border; claiming entry solid `yellow-400` with `gray-950` text; locked entry content at 45% opacity
+### players/controller/_status_panel
+- `players/controller/_status_panel` (v2): one fixed slot above SET!, portrait 64px tall, landscape 144×104, computer 248×76. Variants:
+  - claim bar: `yellow-400`, ring, "Your SET!", "Tap 3 cards", n/3
+  - someone else claiming: `gray-900` with a `yellow-400` border, "Alex is calling SET!"
+  - No Set: `purple-950` with a `purple-500` border, ring, "No Set called by Alex", "n/m agreed"
+  - locked out: `red-950` with a `red-600` border, "Wrong! −1" or "Time's up! −1", `animate-shake`
+  - refused (v4): `gray-900` with a `purple-500` border, laid out as someone else claiming in each layout: the refuser's dot, the name bold and "says there's a Set" in `gray-300`. No ring. `gray-900`, not `purple-950`, so it does not read as a call still running
+  - idle: empty, the slot keeps its size
+### players/controller/_found_banner
+- `players/controller/_found_banner` (v2): `green-950` panel with a `green-500` border, the 3 cards small, the caller's dot, "Alex found a Set" and "+1" in `green-400`. Absolutely positioned over the top of the board area, over the scoreboard in portrait. `pointer-events: none`, `.found-set-flash`
+### players/controller/_roster
+- `players/controller/_roster` (v2): the Waiting roster, two columns, each a dot, the name, "you" for the player and a `green-400` ✓ once ready
+### players/controller/_invite
+- `players/controller/_invite` (v2): the room code in display type, "or open onset.joaotorr.es and enter the code" (`join_host`), the link button (Copy link, Copied ✓, Couldn't copy, Share link), a Show QR button and the "Show on a big screen →" text link
+### players/controller/_qr_sheet
+- `players/controller/_qr_sheet` (v2): overlay `gray-950` at 85%. Portrait: a bottom sheet. Landscape: a centered card, QR on the left, code and Done on the right. Computer: a centered 352px modal. QR on a white tile, 288px in portrait and computer, 300px in landscape, the code under it, Done in `blue-600`
+### players/controller/_standings
+- `players/controller/_standings` (v2): game over rows, each rank, dot, truncated name, "you" for the player, score. Own row `gray-800` with a `gray-600` border, other rows transparent. Rows 32px portrait, 34px landscape, 44px computer (computer list in a `gray-900` panel)
+### Landing mode toggle
+- Landing mode toggle (v2): two radios styled as a segmented control inside the Start a game form, on a `gray-950` (desktop) or `gray-900` (phone) track with a `gray-700` border. Selected Standard `gray-700`, selected First to 5 `violet-600`, unselected `gray-400` text on transparent
+### layouts/_byline_footer
+- `layouts/_byline_footer` (v3): "by joaotorr.es" after `main` on the landing, How to play and the join page, never on the big screen or player screen. `gray-400` 14px weight 500 with a 1px red underline; on hover or keyboard focus the dot hops and the domain fades into the logo colours (`--wm-*`), held until the next page load. Styles in `app/assets/tailwind/application.css` (`.byline`, `.wm-*`), fixed across joaotorr.es apps
+### Stimulus controllers
+- Stimulus: `card-selection` (picks sent to the server, tray, count, Submit and the freeze after it), `countdown` (rings and seconds)
+
+## Screens
+
+Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, computer 1024×640, landing desktop 1280×800.
+
+### Landing (ticket 08)
+
+- Desktop: brand on the left (wordmark 136px, tagline 24px `gray-300`, three fanned cards with the caption in `gray-400`), actions on the right in a 448px `gray-900` card with a `gray-800` border: the mode toggle, Start a game (`blue-600`, 60px, display type), its sub-line in `gray-400`, a divider, then "Have a room code?", the code field and a `gray-800` Join button
+- Phone, top to bottom: wordmark and tagline, the join form, a divider, the mode toggle and Start a game, then the fanned cards and caption at the bottom
+- Room not found: "Room not found" in `red-400` under the code field, the field empty with a `red-500` border
+
+### Join page (ticket 08)
+
+- "Joining room" in `gray-400`, the code at 60px in display type
+- Base error (game already started): a `red-950` box with a `red-700` border and `red-200` text, under the code
+- Field errors in `red-400` under their field, the field with a `red-500` border
+- Color grid 4×2, 56px swatches. Selected: a white ring offset by `gray-950`, with a white ✓. Taken: the preset blended 30% over `gray-950`, the taker's initial in `gray-300` in display type
+- Join at the bottom (`blue-600`, 56px). For the creating browser, "Use this screen as the big screen instead" under it as a `blue-300` text link
+- Full room (every color taken, triage 08): "This room is full" in the base error box, no swatch selected, Join disabled as `gray-800` with `gray-500` text, as the big screen's disabled Start game. Wins over the join-full board, which shows no message
+
+### Player screen, Waiting (ticket 10)
+
+- Header, then "You're in", the roster, the invite and I'm ready (`green-700`). Once voted: "Ready ✓ · waiting for n more" as outlined `green-700` text on a 12% `green-700` tint, `green-300` text
+- Landscape and computer put the roster and the invite side by side
+- The link button's feedback states (Copied ✓, Couldn't copy) stay neutral gray
+- The QR sheet is `_qr_sheet`; the "Room CODE" footer stays
+
+### Player screen, during play (ticket 09)
+
+- Portrait, top to bottom: the scoreboard, the board at full width, the status slot (64px, empty in idle), the 128×128 SET! slot and its pill
+- Landscape: the board on the left, a 9rem action column (status panel, SET!, pill), a scores column
+- Computer: the board on the left; a 248px side column with the scoreboard stacked above the status panel, SET! and its pill
+- Deck: "N cards left in the deck" with the board, or an orange "Deck is empty" pill
+- Claiming (mine): portrait, the claim bar takes the status slot and the 3-slot tray and Submit replace SET! and its pill. Landscape and computer: one yellow block replaces the panel and SET!, and Submit takes the pill slot (v5)
+- Portrait tray (v5): a 128px row of three 72×101 slots, 14px apart, above the 44px pill slot holding Submit, 4px between, 176px in all, the height SET! and its pill take, so nothing else moves. An empty slot is a dashed `gray-700` box with its number (1, 2, 3) centred in display type, 22px/700, `gray-500`; a filled slot shows the picked card. Slots fill in pick order
+- Submitted (v5): the board's cards are disabled, the three picks keep the selected ring, the tray and the n/3 count stay as at 3/3, the countdown ring keeps draining and Submit shows its submitted state. The board never dims, at 3 picks or after the tap
+- Someone else claiming: the disabled SET! shows the seconds large with a small "SET!" label under them, inside the yellow ring
+- Read-only boards (someone else claiming, No Set, locked out) are not dimmed
+- No Set countdown, may refuse (v4): the No Set status panel, SET!, and the refusal pair in the pill slot. Locked out at the same time: the No Set panel keeps the status slot, since the call is the news; SET! shows the lockout ring with the seconds and "Locked", as in Locked out, and the chip shows the Locked tag
+- No Set blocked after a refusal (v4): idle with the refused status panel and the blocked No Set pill; SET! stays round blue and enabled
+- Found-set banner: in portrait it covers the scoreboard for its 3s; the board under it shows the replaced cards with the arrive outline
+
+### Player screen, Game over (ticket 07)
+
+- Header, the rank in display type (64px portrait, 60px landscape, 120px computer), "of N players · P points" in `gray-400`, the winner line, the standings, Play again (`green-700`) or "Ready ✓ · waiting for n more" as on Waiting
+- Landscape: rank, winner line and Play again in a 250px left column, the standings on the right
+- Computer: a 360px left column, the standings in a `gray-900` panel on the right
+- The standings scroll inside themselves when they do not fit; the page never does
 
 ## Known gaps
 

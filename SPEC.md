@@ -6,7 +6,7 @@ This document is the source of truth for the v1 MVP. It is intentionally tight; 
 
 ---
 
-## 1. Overview
+## Shared: 1. Overview
 
 **What it is.** Real-time multiplayer Set. Each player plays on their own **player screen** (`/games/:code/controller`), on a phone or a computer, from which they call SET!, pick the three cards and vote. A **big screen** (`/games/:code`) is an optional shared display of the same room: the board, the scores and the announcements, for everyone at the table. Any room can open it at any time, before or during play; it is a URL, not a mode stored on the game, so every game is the same. Since the big screen is optional, the player screen is meant to stand alone; §8 says what each screen shows.
 
@@ -18,7 +18,7 @@ This document is the source of truth for the v1 MVP. It is intentionally tight; 
 
 ---
 
-## 2. Game Rules
+## Shared: 2. Game Rules
 
 ### The deck
 
@@ -61,7 +61,7 @@ Three cards form a Set if, for **each** of the four attributes, the three values
 
 ---
 
-## 3. Architecture
+## Shared: 3. Architecture
 
 ### High-level
 
@@ -81,7 +81,7 @@ Solid Cable removes the Redis dependency. SQLite removes the managed Postgres de
 
 ---
 
-## 4. Data Model
+## Shared: 4. Data Model
 
 All models are top-level (no namespacing). Use Rails 8 defaults: `id` as primary key, `created_at`/`updated_at` on every table.
 
@@ -185,7 +185,7 @@ The board and deck columns store integer ids; instantiate `Card` objects in the 
 
 ---
 
-## 5. Routes
+## Shared: 5. Routes
 
 ```ruby
 Rails.application.routes.draw do
@@ -245,7 +245,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 
 ---
 
-## 6. Round State Machine
+## Shared: 6. Round State Machine
 
 A round is the period between deals. Transitions are owned by the `Game` model and **always run inside a transaction with `game.lock!`** to serialize concurrent claim attempts.
 
@@ -297,7 +297,7 @@ Use Solid Queue jobs scheduled with `set(wait: ...)` to enforce timeouts: `Expir
 
 ---
 
-## 7. Realtime: Action Cable + Turbo Streams
+## Shared: 7. Realtime: Action Cable + Turbo Streams
 
 Use Turbo Streams via `broadcasts_to` for almost all updates. Drop down to a custom Action Cable channel only if needed for player-specific signals.
 
@@ -364,101 +364,13 @@ The server is the single source of truth. Every state change flows through model
 
 ---
 
-## 8. Views & UX
-
-Colors, type and animations are in §10. Hook ids and Stimulus attributes that must survive markup changes are in §7.
-
-### Landing (`/`)
-
-One page for phones and desktops, split at `lg:` (1024px and up): the actions card is 448px wide, and the brand column needs that much room for the wordmark and the fanned cards. Below `lg:` the phone layout stacks, tablets included. Side by side, nothing in the brand column runs past its own width into the actions card: the fanned cards and the wordmark shrink with the column at narrow desktop widths and are full size from 1280px. Brand on the left: the **Onset** wordmark, a one-line tagline and three fanned cards that form a Set, with a caption saying why. The tagline says each player plays on their own screen and a big screen is optional, in the §1 terms. Actions on the right:
-
-- A two-option toggle, **Standard** (selected by default) and **First to 5**, above one **Start a game** button with the sub-line "Play from this screen, then invite the others". Both sit in one form, with no JS: the toggle submits `mode` (`quick` for First to 5). Start a game creates the room in that mode, gives this browser the `host_game` cookie and opens the creator's join page (Join page below). Every room is the same: nothing about a big screen is stored on it.
-- **Have a room code?** field plus **Join**. `GET /join?code=` upcases the code and redirects to the room's join page, or back to the landing with "Room not found" under the field, which comes back empty with a red border.
-
-On phones the join form comes first, since joining is what phones come here for.
-
-### Big screen (`/games/:code`)
-
-Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wide. Two columns: the play area (`#board` over `#announcement`) and a 26rem right rail with the room tile (room code and the site address to open, `join_host`, no QR) and the **Players** scoreboard. The room tile is hidden while waiting, since the join hero carries the code, and appears once the game starts without a reload. The join hero holds the only QR on the screen: once play starts, late joining is blocked, so nothing needs one.
-
-- **Scoreboard**: rows sorted by score, dot, name, big score. The claiming player's row turns solid yellow. A locked-out player is greyed with a red **Locked** tag.
-- **Waiting**: a join hero with a 288px QR and, under it, a **Join from this computer →** link that opens the join page in a new tab, for someone playing on the same computer as the big screen. A browser holds one player (one `player_token` cookie), so a second player on that computer needs a private window or another browser. Beside the QR, "Scan to join, or open HOST and enter" and the room code at up to 10rem, shrinking with the viewport so it never runs past the play area into the rail. The hero's text wraps or shrinks the same way. Player pills with a ✓ once ready. `#start_button`: **Start game** with "n of m ready" beside it, or disabled with "Need at least 2 players".
-- **Playing**: "N cards left in the deck" top right, or an orange "Deck is empty" pill. The card grid (§10). Cards dealt by the last replace get a green outline that fades over 3s.
-- **Announcement band**: always 9rem tall so the grid never jumps. Empty while playing: "Spot a Set? Hit SET! on your screen." Otherwise one tinted panel:
-  - Claiming (yellow): countdown ring, "Alex is calling SET!".
-  - No Set (purple): ring, "Alex called No Set", "Agree on your screen, or find one first", and "n/m agreed".
-  - Refused (purple): ring counting the block down, "Alex says there's a Set", "No Set is back when the ring runs out". The name is truncated with an ellipsis so the headline stays within two lines at 1280px wide. Shown for the `NO_SET_TIMEOUT` block after a refusal (§2) while no claim runs (a claim shows the Claiming panel instead), then the empty-band text returns.
-  - Correct (green): the three cards, "Alex found a Set", "+1". Fades after 3s.
-  - Wrong / Time's up (red): the cards for a wrong claim, the reason with the lockout length, "−1".
-- **Ended**: "Game over", then "Alex wins" or "It's a tie". Podium in 2-1-3 order; bars carry the real rank, so a tie reads #1 #1, and only a sole winner gets the ★. **Play again**, which restarts the room at once whatever the player screens have voted.
-
-### Join page (`/games/:code/players/join`)
-
-Portrait. "Joining room" with the code in large type, since the code is what people check. The creator sees the same page after **Start a game**. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken the room is full: none is selected, the red base error box says "This room is full" and **Join** is disabled. The page does not update live as others join. **Join** sits at the bottom, under the thumb. In the browser that created the room (its `host_game` cookie matches), a **Use this screen as the big screen instead** text link sits under Join and opens the room's big screen `/games/:code` in the same tab; other browsers do not show it. Joining does not make the creator `host_player_id`: hosting stays with the browser, which gets the big screen's **Start game** and **Play again**, and on player screens everyone starts and plays again by the ready vote. Field errors show under their field; base errors (game already started) in a red box.
-
-### Player screen (`/games/:code/controller`)
-
-Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. The player screen stands alone (§1): in every playing state it shows the board, the scoreboard and the deck count, so a room needs no big screen. Waiting and game over keep a header with dot, name and score, since their bodies already list every player. Three layouts, chosen by the viewport alone, whatever the input:
-
-- **Portrait** (narrower than tall, under 1024px wide): the scoreboard across the top, the board under it at the full width, then the state's panel, SET! and its pill at the bottom, under the thumb.
-- **Landscape** (wider than tall, under 1024px wide): three columns, the board on the left, a 9rem action column, a scores column.
-- **Computer** (1024px wide and up, Tailwind `lg:`): a board-sized card grid on the left and a side column with the scoreboard stacked above the state's panel, SET! and its pill, so the board keeps the width.
-
-Shared by all three during play:
-
-- **Scoreboard**: every player in score order, ties in join order, each a dot, the name (truncated) and the score. The claiming player's entry turns solid yellow and a locked-out player's is greyed with a red **Locked** tag, as on the big screen. The player's own entry has a surface tint, as in the game over standings. Portrait fits 8 players in at most two rows.
-- **Deck**: "N cards left in the deck" under the board, centred on it, or an orange "Deck is empty" pill once it runs out. In the computer layout the "Room CODE" footer sits directly under that line, centred on the board as well, so the two lines share one centre and nothing sits under the side column. Portrait and landscape keep the footer centred on the screen, and so do waiting and game over in every layout, since they show no board.
-- **Board**: cards dealt by the last replace get the green outline that fades over 3s (§10 `animate-arrive`), in every state that shows the board. The board is read-only in every state but idle and claiming (mine).
-- Other players' wrong claims and time's ups show only on the scoreboard (their Locked tag and score), with no banner.
-- With 8 players and 18 cards there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer, in every state: the cards shrink to fit.
-
-SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**, with **There's a Set** (the refusal) beside it while the player may refuse.
-
-1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more". Alone in the room, a player cannot vote: "Waiting for more players to join…" takes the place of I'm ready, so the voted line never reads "waiting for 0 more".
-
-   Every player's waiting screen also carries the **invite**, so anyone in the room can bring in the next player; it goes once play starts, since late joining stays blocked, remote players included:
-   - The room code in large type, with "or open HOST and enter the code" (`join_host`), as on the big screen.
-   - **Copy link**: copies the join page URL (`/games/:code/players/join`, the URL the big screen QR encodes) and reads "Copied ✓" for 2s. Where the browser has the Web Share API and a touch screen (`pointer: coarse`), it reads **Share link** and opens the native share sheet with that URL and "Room CODE" instead. A cancelled share changes nothing; a failed copy reads "Couldn't copy" for 2s, the code and host staying on screen to share by hand.
-   - **Show QR**: opens a sheet over the player screen with the join URL's QR on a white tile, as large as fits up to 18rem, the room code under it and **Done** to close it. The QR stays behind this tap so the waiting screen fits without it. Any room update (someone joins or votes) re-renders `#controller_status` and closes the sheet; one tap reopens it.
-   - **Show on a big screen →**: a text link that opens the room's big screen `/games/:code` in a new tab, as **Join from this computer →** does, so the player screen stays open.
-
-   With 8 players and the invite there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640. The exact layout comes from the design pass.
-2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. During the block after a refusal (§2), No Set is disabled and shows the seconds left ("No Set in 12 s"), the status slot reads "Alex says there's a Set" ("You say there's a Set" on the refuser's own screen, with their own dot) and SET! stays as it is; the pill comes back on its own when the block ends. Once the block ends the refusal stays used until the board changes: No Set works again, but a call on this board cannot be refused. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
-3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", a hint line and an n/3 count, and the **Submit** pill in the pill slot, in every layout. Portrait puts the bar in the status slot above a tray of three slots, which fill as cards are tapped, in place of SET!; landscape and computer show the bar as one block in place of the panel and SET!. The hint follows the picks: "Tap 3 cards" at 0, 1 and 2 picks, "Tap Submit" at 3, "Judging…" from the Submit tap until the claim resolves. It says "Tap" in every layout, since the layout is chosen by the viewport, not the input. No Set is not offered during the player's own claim. A claim started by tapping a card opens with that card picked (1/3) if it is still on the board. Tap a card to pick it, tap again to unpick, up to three; three picks stay changeable until Submit is tapped or the time runs out. Submit is shown disabled below three picks and enabled at exactly three, whatever pick request is still in flight, in its fixed slot as SET! keeps its own. Tapping it sends the three picks and the server judges them at once (§11): correct or wrong, announced on every screen exactly as a claim judged at expiry (the found-set banner, or state 6). From the tap the screen is frozen, Submit reading "Submitted", until the broadcast that resolves the claim replaces it; a request that never reaches the server gives the screen back at 3/3 with no further cue, and the player taps again (§11). A redraw of the screen during the claim (any room update, §7) shows the picks again, tray and count included, the latest ones even with a pick still on its way to the server (§11).
-4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
-5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed in every layout) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. A player who may refuse (§4 `can_refuse_no_set?`: not the caller, has not agreed, and no refusal used on this board) also gets **There's a Set**, the refusal, in the pill slot; how the two pills share it comes from the design pass. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, the No Set panel keeps the status slot and SET! shows the lockout countdown as in state 6 (ring, seconds, "Locked"); the refusal stays available. A refusal returns every screen to idle with No Set blocked (state 2).
-6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the lockout countdown with "Locked": `Game::CLAIM_TIMEOUT` seconds, the same length as the claim ring. The pill slot keeps the idle secondary action, **No Set** or the **End game** vote, enabled: lockout only blocks SET! (§2 Edge cases). Locked out during the block after a refusal, the refused panel takes the status slot (state 2), SET! keeps its lockout countdown and the pill is the blocked No Set.
-7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
-8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9", "★ You win with 9" when the player is the sole winner, or "★ Tied for first at 9"), the standings, then a green **Play again** button, the ready vote (§5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more", n being the active players who have not voted. The room restarts with the same mode, fresh deck and zero scores once every active player has voted, straight into play. Accepted risk: active means seen in the last 30s and only a player's own requests refresh it, so after 30s on this screen the first tap may restart the room alone.
-
-   The standings list every player in the room, as many as "of N players" counts, one compact row each: rank, dot, name and score. Rows run by score, ties in join order, and tied players share a rank ("1, 1, 3"), as on the big screen podium. No ★, Locked tag or ready marks in the rows: the winner line carries the ★. Names truncate with an ellipsis. The player's own row is highlighted with a surface tint, not a color from the §10 meaning table, and says "you" after the name, as the waiting roster does. The rank is the shared one on a tie, a plain ordinal ("1st", never "=1st"): the winner line and the standings already say who tied. Portrait stacks everything; landscape and computer put the rank, the winner line and Play again in a left column and the standings on the right. With 8 players, one per preset color, the screen keeps no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer. On a shorter screen the list scrolls inside itself, never the page.
-
-Stimulus: `card-selection` (picks sent to the server, tray, count, Submit), `countdown` (every ring and seconds display) and `invite` (shares or copies the invite link, opens the QR sheet), its attributes listed in §7.
-
-### Byline footer
-
-A small muted footer, the same across all of joaotorr.es's apps, so its look and behaviour follow that shared design rather than this spec's palette. It must stay quiet and never compete with the Onset wordmark.
-
-- **Where**: after `main` on the landing, How to play and the join page, centred in the How to play container (`max-w-5xl`, `px-5`, `md:px-10`), on `gray-950`. Nothing between it and `main`; below it 16px or the bottom safe area, whichever is bigger. It fits inside the first screen: the page is a viewport-tall column in which `main` grows and the footer comes last, so when the content fits the screen the footer sits at the bottom edge and the page does not scroll, and when the content is taller the footer follows it. The footer never overlaps content. The landing's centred content and the join page's Join button therefore sit above the footer, not at the bottom of the window. The big screen and the player screen have none: they are full-screen views with no page scroll. Static error pages and emails have none.
-- **What**: "by joaotorr.es", one link to https://joaotorr.es that opens in a new tab, so the player keeps their place. A hidden "(Opens in a new tab)" completes the accessible name; the coloured copies of the domain are hidden from screen readers so it is read once. English only, like the rest of the app.
-- **At rest**: `gray-400`, 14px, weight 500, the body font, with one continuous 1px red underline under the whole phrase. The link is 44px tall for touch.
-- **Hover (devices with hover) or keyboard focus**: "by" and the underline stay as they are. Over 1s the dot hops up and lands with a small bounce, turning gold, while "joaotorr" fades to a green to blue gradient and "es" to a red, gold, red stripe. It stays coloured until the next page load; hovering again replays the hop. Reduced motion: no hop, the colours still fade in. Keyboard focus adds a 2px `blue-500` outline.
-- **Logo colours**: the dark values, since every Onset screen is dark: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`. The light values (`#009C3B`, `#002776`, `#C60B1E`, `#E08A00`) sit on `:root` for any light ground.
-
-### Search engines
-
-- **Public**: the landing (`/`) and How to play (`/how-to-play`), the pages meant to be found in search. Each carries a canonical link to its production URL without a query, so `/how-to-play?game=` folds into `/how-to-play`. English only, so no hreflang. `/sitemap.xml` lists the two, and `/robots.txt` allows everything and points to it, because a crawler cannot see the noindex on a page robots.txt blocks.
-- **Everything else is noindex by default**, through an `X-Robots-Tag` header: the big screen, the join and player screens, `/join` and anything added later. A new public page has to opt out explicitly and be added to the sitemap.
-
----
-
-## 9. Action Cable channel (optional, only if Turbo Streams is insufficient)
+### 9. Action Cable channel (optional, only if Turbo Streams is insufficient)
 
 For v1, **avoid a custom channel**. Turbo Streams over `broadcasts_to` covers all state changes. Only introduce `GameChannel` if we hit a use case Turbo can't express (likely: smooth countdown animations driven by ticks rather than re-renders — but those should be CSS animations triggered by data attributes, not server-driven).
 
 ---
 
-## 10. Cards and visual system
+## Shared: 10. Cards and visual system
 
 ### Palette
 
@@ -525,19 +437,7 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 
 ---
 
-## 11. Selection submission UX (decision)
-
-A claim is judged when the claiming player submits exactly three picks, or when its 15 seconds run out, whichever comes first. Every tap on the board picks or unpicks a card, up to three, and sends the current picks to the server at once (`PATCH /games/:code/claims/:id`, §5): one request at a time, each carrying the whole selection, so a quick sequence of taps arrives in order. The server stores them on the pending claim (`Claim#card_ids`) and broadcasts nothing: the picks are private to the claiming player.
-
-**Submit** (`POST /games/:code/claims/:id/submit`, §5) is an explicit tap, enabled only at three picks. Its request carries the whole selection, and the server judges that selection, not the picks it stored earlier: it validates three distinct board cards, writes them to `Claim#card_ids` and resolves the claim under the game lock, correct or wrong (§2, Round flow), with the same broadcasts as at expiry. The submit therefore never waits for an earlier pick request to land, which is what made the v1 auto-submit race a mid-claim redraw. A submit that arrives once the claim is no longer pending (the timer got there first, or a second tap) changes nothing and answers 204 (§7); a pick that lands after the claim resolved is ignored the same way, as today. **The timer stays as the fallback**: `ExpireClaimJob` judges the picks it finds when the claim is still pending (§2, Round flow): three that form a Set score as a correct Set, three that do not as a wrong Set, fewer than three as time's up. A tap still in flight at expiry is lost. Client timers stay display-only (§6).
-
-On the player screen each tap also copies the card into the portrait tray's next free slot and updates the n/3 count. The board never dims and three picks stay changeable until Submit is tapped or the time runs out. Submit is rendered disabled and the controller enables it at exactly three picks; on the tap it sends the submit at once, whatever pick request is in flight, and freezes the screen (no pick, no second submit) until the resolving broadcast replaces it. The freeze is lifted only when the request fails to reach the server, so the player can tap again; a response of any kind leaves the screen to the broadcast, or to the timer. The picks are server state, so a redraw of the player screen mid-claim (a room update, §7) renders the picked cards picked and the controller continues from them, refilling the tray and the count. A pick can still be on its way when the redraw lands, so the page also keeps the latest picks of the current claim in memory, and the one-at-a-time sending with them: a redrawn screen shows those latest picks rather than the rendered ones, and the pick that is sent next is the selection the screen shows. After a page reload the memory is gone and the rendered picks are the picks. The pick and submit requests are `fetch` calls carrying the page's CSRF token, not form submits, so they do not depend on `form.requestSubmit`.
-
-History: v1 auto-submitted 250 ms after the third tap, the board dimmed during the delay. Dropped (ticket 19): the third tap was seen not to submit on a phone, and judging only at the timeout removed the submit step and its race with a mid-claim redraw. That left every claim, a correct one included, waiting out the full 15 seconds, so ticket 37 brought a submit back as an explicit button whose request carries the whole selection: it cannot miss like the third tap did, and it does not depend on the pick requests, so the race is gone too.
-
----
-
-## 12. Background Jobs
+## Shared: 12. Background Jobs
 
 - **`CleanupIdleGamesJob`** — runs hourly via `recurring.yml`. Deletes Games with `updated_at < 24.hours.ago` (every gameplay action goes through `Game#update!`). Cascades to Players and Claims.
 - **`ExpireClaimJob`** — enqueued with `wait: Game::CLAIM_TIMEOUT` when a claim is acquired. The fallback for a claim never submitted (§11): if the claim is still `pending`, judge the picks it holds: `correct`, `wrong` or `expired` with fewer than three. Clear the lock, broadcast. A submitted claim is already resolved, so the job no-ops.
@@ -549,7 +449,7 @@ All jobs are idempotent: they re-check the relevant state inside a transaction a
 
 ---
 
-## 13. Deployment (Kamal to the Hostinger VPS)
+## Shared: 13. Deployment (Kamal to the Hostinger VPS)
 
 The app deploys with Kamal to the Hostinger VPS shared with the other joaotorr.es apps, as `onset.joaotorr.es`. The runbook is `docs/deploy.md`.
 
@@ -571,6 +471,150 @@ Reads the registry token and the Sentry DSN from the macOS Keychain (items `onse
 - The container runs Thruster in front of Puma. Solid Queue runs inside Puma, so one container serves HTML, WebSockets and jobs.
 - No Redis, no Postgres, no separate worker service. All four storage concerns share one volume.
 - Always on: no cold starts, unlike the Render free tier this app started on.
+
+---
+
+## Shared: 17. Telemetry
+
+Analytics go to PostHog and errors to Sentry through the [`jt_telemetry`](https://github.com/joaotorres/jt-telemetry) gem, shared by the joaotorr.es apps. How it works, its settings and its defaults are in its [README](https://github.com/joaotorres/jt-telemetry#readme); this section covers only what Onset adds.
+
+### Setup
+
+- The layout calls `jt_telemetry_tags` in `<head>`, before the importmap tags. Telemetry is on in production only.
+- `APP_NAME` is `onset` (clear env, §13): the `app` property on every PostHog event and the `app` tag in Sentry.
+- `SENTRY_DSN` is a secret: `.kamal/secrets` reads it from the Keychain item `onset-sentry-dsn` (§13, `docs/deploy.md`).
+- The image build's `assets:precompile` needs no telemetry setting: the gem turns itself off under `SECRET_KEY_BASE_DUMMY`.
+
+### Custom events
+
+Every event goes through `window.jtTrack(name, props)`, which the gem defines in every environment, so app code calls it as `window.jtTrack?.(...)`. Names and properties are snake_case.
+
+| Event | Properties | Fires |
+|---|---|---|
+| `game_created` | `mode` (`standard` or `quick`) | `GamesController#create`, sent from the creator's join page |
+| `player_joined` | `player_count` (the room's players, the new one included), `is_creator` (this browser holds the room's `host_game` cookie), `mode` | `PlayersController#create`, sent from the new player's player screen |
+| `invite_shared` | `method`: `web_share` (the share sheet completed), `copy` (the link was copied) or `qr` (Show QR opened) | The waiting invite (`invite` controller, §8 Player screen) |
+| `game_started` | `mode`, `player_count` | Status `waiting` to `playing`: the host's Start game or the ready vote |
+| `game_restarted` | `mode`, `player_count` | Status `ended` to `playing`: the big screen's Play again or the ready vote |
+| `game_finished` | `mode`, `player_count`, `end_reason` (`quick_win`, `vote` or `deck_exhausted`), `is_tie` (no sole winner), `duration_seconds` when known | Status `playing` to `ended` |
+
+**Server actions ride the flash.** `game_created` and `player_joined` happen in an action that redirects, so no page is there to send them. `track_event` (`TracksEvents`, included in `ApplicationController`) appends the event to `flash[:tracked_events]`. The next page's layout renders it into a hidden `track` controller element, which sends each event once on connect and then empties its value, so a Turbo restoration visit to the cached page does not send it again. Nothing calls PostHog from the server.
+
+**Game state events come from one player screen.** The status reaches every screen by broadcast (§7), so no request marks a game starting, restarting or finishing. `#controller_status` carries a hidden `game-events` element (`TrackingHelper#game_events_tag`) with the room code, the status, the event properties and whether this player is the reporter. On each render the `game-events` controller compares the status with the last one this tab saw for the room; an event is a change it saw. Every player screen keeps track, and only the reporter sends: the player at the top of the standings (`Game#standings.first`, ties in join order), so each event is counted once. If the reporter's screen is not open at that moment, the event is not sent. The big screen sends no game events.
+
+**`duration_seconds` is measured on the screen.** Each player screen notes when it saw play start, and `game_finished` carries the seconds from then to the finish. A reporter screen opened fresh mid-game (a closed and reopened tab, another browser) did not see play start, so its `game_finished` leaves `duration_seconds` out. `Game` has no `started_at` column; adding one would make the duration exact, from the server, for every game.
+
+**Not tracked, on purpose.**
+
+- `start_method` on `game_started`: the screen sees only the change of status, so it cannot tell whether the host pressed Start game or everyone voted ready.
+- `set_found`: it fires many times per game.
+- `claim_submitted`: a Submit tap (§11) happens once per claim, many times per game, for the same reason. Whether claims are submitted or left to the timer can be read from the `Claim` records (`resolved_at` well before `started_at` plus the timeout) without an event.
+
+### Privacy
+
+PostHog runs with memory persistence: it sets no cookies and keeps nothing in browser storage, so there is no consent banner. Onset's own browser state is unchanged by telemetry, apart from one `sessionStorage` entry per room for the `game-events` controller (`onset.game.<code>`: the last status this tab saw and when it saw play start), which never leaves the browser.
+
+---
+
+End of spec.
+
+## Shared: 8. Views & UX
+
+Colors, type and animations are in §10. Hook ids and Stimulus attributes that must survive markup changes are in §7.
+
+## 8. Landing (`/`)
+
+One page for phones and desktops, split at `lg:` (1024px and up): the actions card is 448px wide, and the brand column needs that much room for the wordmark and the fanned cards. Below `lg:` the phone layout stacks, tablets included. Side by side, nothing in the brand column runs past its own width into the actions card: the fanned cards and the wordmark shrink with the column at narrow desktop widths and are full size from 1280px. Brand on the left: the **Onset** wordmark, a one-line tagline and three fanned cards that form a Set, with a caption saying why. The tagline says each player plays on their own screen and a big screen is optional, in the §1 terms. Actions on the right:
+
+- A two-option toggle, **Standard** (selected by default) and **First to 5**, above one **Start a game** button with the sub-line "Play from this screen, then invite the others". Both sit in one form, with no JS: the toggle submits `mode` (`quick` for First to 5). Start a game creates the room in that mode, gives this browser the `host_game` cookie and opens the creator's join page (Join page below). Every room is the same: nothing about a big screen is stored on it.
+- **Have a room code?** field plus **Join**. `GET /join?code=` upcases the code and redirects to the room's join page, or back to the landing with "Room not found" under the field, which comes back empty with a red border.
+
+On phones the join form comes first, since joining is what phones come here for.
+
+## 8. Big screen (`/games/:code`)
+
+Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wide. Two columns: the play area (`#board` over `#announcement`) and a 26rem right rail with the room tile (room code and the site address to open, `join_host`, no QR) and the **Players** scoreboard. The room tile is hidden while waiting, since the join hero carries the code, and appears once the game starts without a reload. The join hero holds the only QR on the screen: once play starts, late joining is blocked, so nothing needs one.
+
+- **Scoreboard**: rows sorted by score, dot, name, big score. The claiming player's row turns solid yellow. A locked-out player is greyed with a red **Locked** tag.
+- **Waiting**: a join hero with a 288px QR and, under it, a **Join from this computer →** link that opens the join page in a new tab, for someone playing on the same computer as the big screen. A browser holds one player (one `player_token` cookie), so a second player on that computer needs a private window or another browser. Beside the QR, "Scan to join, or open HOST and enter" and the room code at up to 10rem, shrinking with the viewport so it never runs past the play area into the rail. The hero's text wraps or shrinks the same way. Player pills with a ✓ once ready. `#start_button`: **Start game** with "n of m ready" beside it, or disabled with "Need at least 2 players".
+- **Playing**: "N cards left in the deck" top right, or an orange "Deck is empty" pill. The card grid (§10). Cards dealt by the last replace get a green outline that fades over 3s.
+- **Announcement band**: always 9rem tall so the grid never jumps. Empty while playing: "Spot a Set? Hit SET! on your screen." Otherwise one tinted panel:
+  - Claiming (yellow): countdown ring, "Alex is calling SET!".
+  - No Set (purple): ring, "Alex called No Set", "Agree on your screen, or find one first", and "n/m agreed".
+  - Refused (purple): ring counting the block down, "Alex says there's a Set", "No Set is back when the ring runs out". The name is truncated with an ellipsis so the headline stays within two lines at 1280px wide. Shown for the `NO_SET_TIMEOUT` block after a refusal (§2) while no claim runs (a claim shows the Claiming panel instead), then the empty-band text returns.
+  - Correct (green): the three cards, "Alex found a Set", "+1". Fades after 3s.
+  - Wrong / Time's up (red): the cards for a wrong claim, the reason with the lockout length, "−1".
+- **Ended**: "Game over", then "Alex wins" or "It's a tie". Podium in 2-1-3 order; bars carry the real rank, so a tie reads #1 #1, and only a sole winner gets the ★. **Play again**, which restarts the room at once whatever the player screens have voted.
+
+## 8. Join page (`/games/:code/players/join`)
+
+Portrait. "Joining room" with the code in large type, since the code is what people check. The creator sees the same page after **Start a game**. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a white ring and ✓, no JS. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken the room is full: none is selected, the red base error box says "This room is full" and **Join** is disabled. The page does not update live as others join. **Join** sits at the bottom, under the thumb. In the browser that created the room (its `host_game` cookie matches), a **Use this screen as the big screen instead** text link sits under Join and opens the room's big screen `/games/:code` in the same tab; other browsers do not show it. Joining does not make the creator `host_player_id`: hosting stays with the browser, which gets the big screen's **Start game** and **Play again**, and on player screens everyone starts and plays again by the ready vote. Field errors show under their field; base errors (game already started) in a red box.
+
+## 8. Player screen (`/games/:code/controller`)
+
+Full height, no page scroll. A strip of the player's color across the top, "Room CODE" footer. The player screen stands alone (§1): in every playing state it shows the board, the scoreboard and the deck count, so a room needs no big screen. Waiting and game over keep a header with dot, name and score, since their bodies already list every player. Three layouts, chosen by the viewport alone, whatever the input:
+
+- **Portrait** (narrower than tall, under 1024px wide): the scoreboard across the top, the board under it at the full width, then the state's panel, SET! and its pill at the bottom, under the thumb.
+- **Landscape** (wider than tall, under 1024px wide): three columns, the board on the left, a 9rem action column, a scores column.
+- **Computer** (1024px wide and up, Tailwind `lg:`): a board-sized card grid on the left and a side column with the scoreboard stacked above the state's panel, SET! and its pill, so the board keeps the width.
+
+Shared by all three during play:
+
+- **Scoreboard**: every player in score order, ties in join order, each a dot, the name (truncated) and the score. The claiming player's entry turns solid yellow and a locked-out player's is greyed with a red **Locked** tag, as on the big screen. The player's own entry has a surface tint, as in the game over standings. Portrait fits 8 players in at most two rows.
+- **Deck**: "N cards left in the deck" under the board, centred on it, or an orange "Deck is empty" pill once it runs out. In the computer layout the "Room CODE" footer sits directly under that line, centred on the board as well, so the two lines share one centre and nothing sits under the side column. Portrait and landscape keep the footer centred on the screen, and so do waiting and game over in every layout, since they show no board.
+- **Board**: cards dealt by the last replace get the green outline that fades over 3s (§10 `animate-arrive`), in every state that shows the board. The board is read-only in every state but idle and claiming (mine).
+- Other players' wrong claims and time's ups show only on the scoreboard (their Locked tag and score), with no banner.
+- With 8 players and 18 cards there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer, in every state: the cards shrink to fit.
+
+SET! sits in the same fixed slot across idle, locked out, someone else claiming and the No Set countdown, so the thumb never has to move. The pill slot under it holds the state's secondary action: **No Set**, the **End game** vote or **I agree, no Set**, with **There's a Set** (the refusal) beside it while the player may refuse.
+
+1. **Waiting**: "You're in", a two-column roster with "you" and ✓ marks, then **I'm ready** (the ready vote, §5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more". Alone in the room, a player cannot vote: "Waiting for more players to join…" takes the place of I'm ready, so the voted line never reads "waiting for 0 more".
+
+   Every player's waiting screen also carries the **invite**, so anyone in the room can bring in the next player; it goes once play starts, since late joining stays blocked, remote players included:
+   - The room code in large type, with "or open HOST and enter the code" (`join_host`), as on the big screen.
+   - **Copy link**: copies the join page URL (`/games/:code/players/join`, the URL the big screen QR encodes) and reads "Copied ✓" for 2s. Where the browser has the Web Share API and a touch screen (`pointer: coarse`), it reads **Share link** and opens the native share sheet with that URL and "Room CODE" instead. A cancelled share changes nothing; a failed copy reads "Couldn't copy" for 2s, the code and host staying on screen to share by hand.
+   - **Show QR**: opens a sheet over the player screen with the join URL's QR on a white tile, as large as fits up to 18rem, the room code under it and **Done** to close it. The QR stays behind this tap so the waiting screen fits without it. Any room update (someone joins or votes) re-renders `#controller_status` and closes the sheet; one tap reopens it.
+   - **Show on a big screen →**: a text link that opens the room's big screen `/games/:code` in a new tab, as **Join from this computer →** does, so the player screen stays open.
+
+   With 8 players and the invite there is no page scroll at 375×667 portrait, 667×375 landscape and 1024×640. The exact layout comes from the design pass.
+2. **Idle**: round blue **SET!** with a halo, a purple **No Set** pill under it. During the block after a refusal (§2), No Set is disabled and shows the seconds left ("No Set in 12 s"), the status slot reads "Alex says there's a Set" ("You say there's a Set" on the refuser's own screen, with their own dot) and SET! stays as it is; the pill comes back on its own when the block ends. Once the block ends the refusal stays used until the board changes: No Set works again, but a call on this board cannot be refused. Deck empty: an orange **End game** vote with "Deck empty · n/m voted". Tapping a card on the board, in every layout, calls SET! and, once the claim is this player's, starts it with that card selected. Only the first tap counts until the screen changes. If someone else wins the race the tap does nothing, and it never selects a card in a later claim. Accepted risk: a stray tap starts a 15-second claim and can cost −1, the same as a stray SET!.
+3. **Claiming (mine)**: a solid yellow bar with the countdown ring, "Your SET!", a hint line and an n/3 count, and the **Submit** pill in the pill slot, in every layout. Portrait puts the bar in the status slot above a tray of three slots, which fill as cards are tapped, in place of SET!; landscape and computer show the bar as one block in place of the panel and SET!. The hint follows the picks: "Tap 3 cards" at 0, 1 and 2 picks, "Tap Submit" at 3, "Judging…" from the Submit tap until the claim resolves. It says "Tap" in every layout, since the layout is chosen by the viewport, not the input. No Set is not offered during the player's own claim. A claim started by tapping a card opens with that card picked (1/3) if it is still on the board. Tap a card to pick it, tap again to unpick, up to three; three picks stay changeable until Submit is tapped or the time runs out. Submit is shown disabled below three picks and enabled at exactly three, whatever pick request is still in flight, in its fixed slot as SET! keeps its own. Tapping it sends the three picks and the server judges them at once (§11): correct or wrong, announced on every screen exactly as a claim judged at expiry (the found-set banner, or state 6). From the tap the screen is frozen, Submit reading "Submitted", until the broadcast that resolves the claim replaces it; a request that never reaches the server gives the screen back at 3/3 with no further cue, and the player taps again (§11). A redraw of the screen during the claim (any room update, §7) shows the picks again, tray and count included, the latest ones even with a pick still on its way to the server (§11).
+4. **Someone else claiming**: caller's dot and name, "is calling SET!", a yellow ring around the disabled SET! with the seconds inside. No Set disabled.
+5. **No Set countdown**: a purple status panel (ring, "No Set called by Alex", n/m agreed in every layout) above the round blue **SET!**, which cancels the call, and a purple **I agree, no Set** pill under SET!. A player who may refuse (§4 `can_refuse_no_set?`: not the caller, has not agreed, and no refusal used on this board) also gets **There's a Set**, the refusal, in the pill slot; how the two pills share it comes from the design pass. After agreeing, or for the caller, the pill slot shows "You agreed · waiting for n more". Locked out, the No Set panel keeps the status slot and SET! shows the lockout countdown as in state 6 (ring, seconds, "Locked"); the refusal stays available. A refusal returns every screen to idle with No Set blocked (state 2).
+6. **Locked out** (after a wrong claim or a timeout): the panel tints red and shakes once. "Wrong! −1" or "Time's up! −1". SET! becomes the lockout countdown with "Locked": `Game::CLAIM_TIMEOUT` seconds, the same length as the claim ring. The pill slot keeps the idle secondary action, **No Set** or the **End game** vote, enabled: lockout only blocks SET! (§2 Edge cases). Locked out during the block after a refusal, the refused panel takes the status slot (state 2), SET! keeps its lockout countdown and the pill is the blocked No Set.
+7. **Found-set banner**: when anyone finds a Set, a banner across the top shows the cards, "Alex found a Set" and "+1", then fades. It ignores taps.
+8. **Game over**: the player's rank ("2nd"), "of N players · P points", the winner line ("★ Alex wins with 9", "★ You win with 9" when the player is the sole winner, or "★ Tied for first at 9"), the standings, then a green **Play again** button, the ready vote (§5 `POST /games/:code/ready`). Once voted: "Ready ✓ · waiting for n more", n being the active players who have not voted. The room restarts with the same mode, fresh deck and zero scores once every active player has voted, straight into play. Accepted risk: active means seen in the last 30s and only a player's own requests refresh it, so after 30s on this screen the first tap may restart the room alone.
+
+   The standings list every player in the room, as many as "of N players" counts, one compact row each: rank, dot, name and score. Rows run by score, ties in join order, and tied players share a rank ("1, 1, 3"), as on the big screen podium. No ★, Locked tag or ready marks in the rows: the winner line carries the ★. Names truncate with an ellipsis. The player's own row is highlighted with a surface tint, not a color from the §10 meaning table, and says "you" after the name, as the waiting roster does. The rank is the shared one on a tie, a plain ordinal ("1st", never "=1st"): the winner line and the standings already say who tied. Portrait stacks everything; landscape and computer put the rank, the winner line and Play again in a left column and the standings on the right. With 8 players, one per preset color, the screen keeps no page scroll at 375×667 portrait, 667×375 landscape and 1024×640 computer. On a shorter screen the list scrolls inside itself, never the page.
+
+Stimulus: `card-selection` (picks sent to the server, tray, count, Submit), `countdown` (every ring and seconds display) and `invite` (shares or copies the invite link, opens the QR sheet), its attributes listed in §7.
+
+## 8. Byline footer
+
+A small muted footer, the same across all of joaotorr.es's apps, so its look and behaviour follow that shared design rather than this spec's palette. It must stay quiet and never compete with the Onset wordmark.
+
+- **Where**: after `main` on the landing, How to play and the join page, centred in the How to play container (`max-w-5xl`, `px-5`, `md:px-10`), on `gray-950`. Nothing between it and `main`; below it 16px or the bottom safe area, whichever is bigger. It fits inside the first screen: the page is a viewport-tall column in which `main` grows and the footer comes last, so when the content fits the screen the footer sits at the bottom edge and the page does not scroll, and when the content is taller the footer follows it. The footer never overlaps content. The landing's centred content and the join page's Join button therefore sit above the footer, not at the bottom of the window. The big screen and the player screen have none: they are full-screen views with no page scroll. Static error pages and emails have none.
+- **What**: "by joaotorr.es", one link to https://joaotorr.es that opens in a new tab, so the player keeps their place. A hidden "(Opens in a new tab)" completes the accessible name; the coloured copies of the domain are hidden from screen readers so it is read once. English only, like the rest of the app.
+- **At rest**: `gray-400`, 14px, weight 500, the body font, with one continuous 1px red underline under the whole phrase. The link is 44px tall for touch.
+- **Hover (devices with hover) or keyboard focus**: "by" and the underline stay as they are. Over 1s the dot hops up and lands with a small bounce, turning gold, while "joaotorr" fades to a green to blue gradient and "es" to a red, gold, red stripe. It stays coloured until the next page load; hovering again replays the hop. Reduced motion: no hop, the colours still fade in. Keyboard focus adds a 2px `blue-500` outline.
+- **Logo colours**: the dark values, since every Onset screen is dark: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`. The light values (`#009C3B`, `#002776`, `#C60B1E`, `#E08A00`) sit on `:root` for any light ground.
+
+## 8. Search engines
+
+- **Public**: the landing (`/`) and How to play (`/how-to-play`), the pages meant to be found in search. Each carries a canonical link to its production URL without a query, so `/how-to-play?game=` folds into `/how-to-play`. English only, so no hreflang. `/sitemap.xml` lists the two, and `/robots.txt` allows everything and points to it, because a crawler cannot see the noindex on a page robots.txt blocks.
+- **Everything else is noindex by default**, through an `X-Robots-Tag` header: the big screen, the join and player screens, `/join` and anything added later. A new public page has to opt out explicitly and be added to the sitemap.
+
+---
+
+## 11. Selection submission UX (decision)
+
+A claim is judged when the claiming player submits exactly three picks, or when its 15 seconds run out, whichever comes first. Every tap on the board picks or unpicks a card, up to three, and sends the current picks to the server at once (`PATCH /games/:code/claims/:id`, §5): one request at a time, each carrying the whole selection, so a quick sequence of taps arrives in order. The server stores them on the pending claim (`Claim#card_ids`) and broadcasts nothing: the picks are private to the claiming player.
+
+**Submit** (`POST /games/:code/claims/:id/submit`, §5) is an explicit tap, enabled only at three picks. Its request carries the whole selection, and the server judges that selection, not the picks it stored earlier: it validates three distinct board cards, writes them to `Claim#card_ids` and resolves the claim under the game lock, correct or wrong (§2, Round flow), with the same broadcasts as at expiry. The submit therefore never waits for an earlier pick request to land, which is what made the v1 auto-submit race a mid-claim redraw. A submit that arrives once the claim is no longer pending (the timer got there first, or a second tap) changes nothing and answers 204 (§7); a pick that lands after the claim resolved is ignored the same way, as today. **The timer stays as the fallback**: `ExpireClaimJob` judges the picks it finds when the claim is still pending (§2, Round flow): three that form a Set score as a correct Set, three that do not as a wrong Set, fewer than three as time's up. A tap still in flight at expiry is lost. Client timers stay display-only (§6).
+
+On the player screen each tap also copies the card into the portrait tray's next free slot and updates the n/3 count. The board never dims and three picks stay changeable until Submit is tapped or the time runs out. Submit is rendered disabled and the controller enables it at exactly three picks; on the tap it sends the submit at once, whatever pick request is in flight, and freezes the screen (no pick, no second submit) until the resolving broadcast replaces it. The freeze is lifted only when the request fails to reach the server, so the player can tap again; a response of any kind leaves the screen to the broadcast, or to the timer. The picks are server state, so a redraw of the player screen mid-claim (a room update, §7) renders the picked cards picked and the controller continues from them, refilling the tray and the count. A pick can still be on its way when the redraw lands, so the page also keeps the latest picks of the current claim in memory, and the one-at-a-time sending with them: a redrawn screen shows those latest picks rather than the rendered ones, and the pick that is sent next is the selection the screen shows. After a page reload the memory is gone and the rendered picks are the picks. The pick and submit requests are `fetch` calls carrying the page's CSRF token, not form submits, so they do not depend on `form.requestSubmit`.
+
+History: v1 auto-submitted 250 ms after the third tap, the board dimmed during the delay. Dropped (ticket 19): the third tap was seen not to submit on a phone, and judging only at the timeout removed the submit step and its race with a mid-claim redraw. That left every claim, a correct one included, waiting out the full 15 seconds, so ticket 37 brought a submit back as an explicit button whose request carries the whole selection: it cannot miss like the third tap did, and it does not depend on the pick requests, so the race is gone too.
 
 ---
 
@@ -785,46 +829,3 @@ without callbacks.
 
 ---
 
-## 17. Telemetry
-
-Analytics go to PostHog and errors to Sentry through the [`jt_telemetry`](https://github.com/joaotorres/jt-telemetry) gem, shared by the joaotorr.es apps. How it works, its settings and its defaults are in its [README](https://github.com/joaotorres/jt-telemetry#readme); this section covers only what Onset adds.
-
-### Setup
-
-- The layout calls `jt_telemetry_tags` in `<head>`, before the importmap tags. Telemetry is on in production only.
-- `APP_NAME` is `onset` (clear env, §13): the `app` property on every PostHog event and the `app` tag in Sentry.
-- `SENTRY_DSN` is a secret: `.kamal/secrets` reads it from the Keychain item `onset-sentry-dsn` (§13, `docs/deploy.md`).
-- The image build's `assets:precompile` needs no telemetry setting: the gem turns itself off under `SECRET_KEY_BASE_DUMMY`.
-
-### Custom events
-
-Every event goes through `window.jtTrack(name, props)`, which the gem defines in every environment, so app code calls it as `window.jtTrack?.(...)`. Names and properties are snake_case.
-
-| Event | Properties | Fires |
-|---|---|---|
-| `game_created` | `mode` (`standard` or `quick`) | `GamesController#create`, sent from the creator's join page |
-| `player_joined` | `player_count` (the room's players, the new one included), `is_creator` (this browser holds the room's `host_game` cookie), `mode` | `PlayersController#create`, sent from the new player's player screen |
-| `invite_shared` | `method`: `web_share` (the share sheet completed), `copy` (the link was copied) or `qr` (Show QR opened) | The waiting invite (`invite` controller, §8 Player screen) |
-| `game_started` | `mode`, `player_count` | Status `waiting` to `playing`: the host's Start game or the ready vote |
-| `game_restarted` | `mode`, `player_count` | Status `ended` to `playing`: the big screen's Play again or the ready vote |
-| `game_finished` | `mode`, `player_count`, `end_reason` (`quick_win`, `vote` or `deck_exhausted`), `is_tie` (no sole winner), `duration_seconds` when known | Status `playing` to `ended` |
-
-**Server actions ride the flash.** `game_created` and `player_joined` happen in an action that redirects, so no page is there to send them. `track_event` (`TracksEvents`, included in `ApplicationController`) appends the event to `flash[:tracked_events]`. The next page's layout renders it into a hidden `track` controller element, which sends each event once on connect and then empties its value, so a Turbo restoration visit to the cached page does not send it again. Nothing calls PostHog from the server.
-
-**Game state events come from one player screen.** The status reaches every screen by broadcast (§7), so no request marks a game starting, restarting or finishing. `#controller_status` carries a hidden `game-events` element (`TrackingHelper#game_events_tag`) with the room code, the status, the event properties and whether this player is the reporter. On each render the `game-events` controller compares the status with the last one this tab saw for the room; an event is a change it saw. Every player screen keeps track, and only the reporter sends: the player at the top of the standings (`Game#standings.first`, ties in join order), so each event is counted once. If the reporter's screen is not open at that moment, the event is not sent. The big screen sends no game events.
-
-**`duration_seconds` is measured on the screen.** Each player screen notes when it saw play start, and `game_finished` carries the seconds from then to the finish. A reporter screen opened fresh mid-game (a closed and reopened tab, another browser) did not see play start, so its `game_finished` leaves `duration_seconds` out. `Game` has no `started_at` column; adding one would make the duration exact, from the server, for every game.
-
-**Not tracked, on purpose.**
-
-- `start_method` on `game_started`: the screen sees only the change of status, so it cannot tell whether the host pressed Start game or everyone voted ready.
-- `set_found`: it fires many times per game.
-- `claim_submitted`: a Submit tap (§11) happens once per claim, many times per game, for the same reason. Whether claims are submitted or left to the timer can be read from the `Claim` records (`resolved_at` well before `started_at` plus the timeout) without an event.
-
-### Privacy
-
-PostHog runs with memory persistence: it sets no cookies and keeps nothing in browser storage, so there is no consent banner. Onset's own browser state is unchanged by telemetry, apart from one `sessionStorage` entry per room for the `game-events` controller (`onset.game.<code>`: the last status this tab saw and when it saw play start), which never leaves the browser.
-
----
-
-End of spec.
