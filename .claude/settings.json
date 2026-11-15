@@ -21,6 +21,7 @@
       "mcp__claude-artifacts__publish_files",
       "Bash(bundle exec rspec:*)",
       "Bash(bundle exec standardrb:*)",
+      "Bash(bin/test-all:*)",
       "Bash(bin/rails tailwindcss:build)",
       "Bash(bin/rails db:test:prepare:*)"
     ],
