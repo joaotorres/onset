@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-15  build 45: done, the big screen settings button in the bottom-right corner and the light theme of every big screen state, two Decided lines, suite green at 599 examples. Next: auto.
 - 2026-11-15  build 44: done, the player screen settings button in the Room footer and the light theme of every player screen state, both disabled No Set pills on the v5 rule, four Decided lines, suite green at 578 examples (bin/rubocop refused by permissions, `bundle exec rubocop` clean with the same config). Next: auto.
 - 2026-11-15  build 43: done, light theme and the settings menu with its Theme option on the landing, join page and How to play, theme cookie on `<html>`, four Decided lines, suite green at 559 examples. Next: auto.
 - 2026-11-15  build 39: done, How to play and the byline footer at 944 px content with the gutter outside, prose at 65ch, suite green at 531 examples; finished from jt-playbook after the headless build was refused bin/test-all. Next: build 43.

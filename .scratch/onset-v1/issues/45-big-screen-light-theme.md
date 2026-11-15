@@ -1,12 +1,12 @@
 # 45: Light theme and the settings menu on the big screen
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by: 43
 Priority: normal
 Model:
 Effort:
-Changelog:
+Changelog: The big screen has a settings button in its bottom-right corner and a light theme for every state.
 
 ## Request
 
@@ -55,3 +55,7 @@ Tests first:
 - The player screen (44)
 
 ## Comments
+
+Decided: the menu opens 12px above the big screen button, because the placement gives 108px from the bottom for a 56px button 40px in (96px), which wins over the generic 8px gap. Instead of: 8px, leaving it 104px from the bottom.
+
+Decided: the podium bars' rank, Start game and Play again keep white text in light, because they sit on player-color and green fills, which keep white text in both themes (DESIGN v6, meaning fills). Instead of: inheriting the light page's `gray-900` text.

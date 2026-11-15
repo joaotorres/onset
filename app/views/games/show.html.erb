@@ -3,7 +3,7 @@
 <%# Full-screen game view: no byline footer, it would make the page scroll. %>
 <% content_for :hide_byline, "true" %>
 
-<main class="h-dvh overflow-hidden bg-gray-950 text-white p-10 grid grid-cols-[minmax(0,1fr)_26rem] gap-10">
+<main class="relative h-dvh overflow-hidden bg-gray-950 text-white p-10 grid grid-cols-[minmax(0,1fr)_26rem] gap-10 light:bg-gray-50 light:text-gray-900">
   <div class="min-h-0 flex flex-col gap-6">
     <%= render "board", game: @game %>
     <%= render "announcement", game: @game, flash_claim: @game.flash_claim %>
@@ -12,8 +12,12 @@
   <aside class="min-h-0 flex flex-col gap-8">
     <%= render "room_tile", game: @game %>
     <div class="min-h-0">
-      <p class="mb-3 px-5 text-lg uppercase tracking-widest text-gray-400">Players</p>
+      <p class="mb-3 px-5 text-lg uppercase tracking-widest text-gray-400 light:text-gray-600">Players</p>
       <%= render "scoreboard", game: @game %>
     </div>
   </aside>
+
+  <%# Bottom-right, 40px in from both edges, under the rail, out of the grid so it adds no height (DESIGN v6, Settings button placement).
+      Outside every broadcast target, so a room update never closes the menu (§7, Hooks). %>
+  <%= render "layouts/settings", big_screen: true, class: "absolute bottom-10 right-10" %>
 </main>

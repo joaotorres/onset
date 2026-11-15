@@ -1,64 +1,65 @@
 <% flash_claim = local_assigns[:flash_claim] %>
 <% empty = !flash_claim && !(game.playing? && (game.claim_active? || game.no_set_active? || game.no_set_blocked?)) %>
+<%# Light panels (DESIGN v6, Shared: Themes): the 50 tint, a 600 ring (yellow 500), names in 700 or 800. %>
+<% purple_panel = "h-full flex items-center gap-6 rounded-3xl bg-purple-500/10 px-8 ring-2 ring-inset ring-purple-500 light:bg-purple-50 light:ring-purple-600" %>
+<% purple_ring = {stroke: "stroke-purple-400 light:stroke-purple-600", digits: "text-purple-300 light:text-purple-800"} %>
 <div id="announcement" data-version="<%= stream_version(game) %>" class="h-36 shrink-0 <%= "grid place-items-center" if empty %>">
   <% if flash_claim %>
     <% flash_cards = flash_claim.card_ids&.map { |cid| Card.new(cid) } || [] %>
-    <div class="h-full flex items-center gap-8 rounded-3xl px-8 ring-2 ring-inset <%= flash_claim.correct? ? "bg-green-500/10 ring-green-500 found-set-flash" : "bg-red-500/10 ring-red-500" %>">
+    <div class="h-full flex items-center gap-8 rounded-3xl px-8 ring-2 ring-inset <%= flash_claim.correct? ? "bg-green-500/10 ring-green-500 found-set-flash light:bg-green-50 light:ring-green-600" : "bg-red-500/10 ring-red-500 light:bg-red-50 light:ring-red-600" %>">
       <% if flash_cards.any? %>
         <div class="flex shrink-0 gap-3">
           <% flash_cards.each do |card| %>
-            <div class="h-28 aspect-[5/7]"><%= render "cards/card", card: card %></div>
+            <div class="card-edge h-28 aspect-[5/7]"><%= render "cards/card", card: card %></div>
           <% end %>
         </div>
       <% end %>
       <% if flash_claim.correct? %>
-        <p class="font-display text-6xl font-bold"><span class="text-green-400"><%= flash_claim.player.name %></span> found a Set</p>
-        <p class="ml-auto font-display text-7xl font-extrabold text-green-400">+1</p>
+        <p class="font-display text-6xl font-bold"><span class="text-green-400 light:text-green-700"><%= flash_claim.player.name %></span> found a Set</p>
+        <p class="ml-auto font-display text-7xl font-extrabold text-green-400 light:text-green-700">+1</p>
       <% else %>
         <div class="min-w-0">
           <% if flash_claim.expired? %>
-            <p class="font-display text-6xl font-bold"><span class="text-red-400"><%= flash_claim.player.name %></span> · Time's up!</p>
-            <p class="mt-1 text-2xl text-gray-300">The <%= Game::CLAIM_TIMEOUT %> seconds ran out · locked out for <%= Game::CLAIM_TIMEOUT %> seconds</p>
+            <p class="font-display text-6xl font-bold"><span class="text-red-400 light:text-red-700"><%= flash_claim.player.name %></span> · Time's up!</p>
+            <p class="mt-1 text-2xl text-gray-300 light:text-gray-700">The <%= Game::CLAIM_TIMEOUT %> seconds ran out · locked out for <%= Game::CLAIM_TIMEOUT %> seconds</p>
           <% else %>
-            <p class="font-display text-6xl font-bold"><span class="text-red-400"><%= flash_claim.player.name %></span> · Wrong!</p>
-            <p class="mt-1 text-2xl text-gray-300">Not a Set · locked out for <%= Game::CLAIM_TIMEOUT %> seconds</p>
+            <p class="font-display text-6xl font-bold"><span class="text-red-400 light:text-red-700"><%= flash_claim.player.name %></span> · Wrong!</p>
+            <p class="mt-1 text-2xl text-gray-300 light:text-gray-700">Not a Set · locked out for <%= Game::CLAIM_TIMEOUT %> seconds</p>
           <% end %>
         </div>
         <% if flash_claim.penalized? %>
-          <p class="ml-auto font-display text-7xl font-extrabold text-red-400">−1</p>
+          <p class="ml-auto font-display text-7xl font-extrabold text-red-400 light:text-red-700">−1</p>
         <% end %>
       <% end %>
     </div>
 
   <% elsif game.playing? && game.claim_active? %>
-    <div class="h-full flex items-center gap-6 rounded-3xl bg-yellow-400/10 px-8 ring-2 ring-inset ring-yellow-400">
+    <div class="h-full flex items-center gap-6 rounded-3xl bg-yellow-400/10 px-8 ring-2 ring-inset ring-yellow-400 light:bg-yellow-50 light:ring-yellow-500">
       <%= render "games/ring", started_at: game.claim_started_at, duration: Game::CLAIM_TIMEOUT,
-            stroke: "stroke-yellow-400", digits: "text-yellow-400" %>
-      <p class="font-display text-6xl font-bold"><span class="text-yellow-400"><%= game.claiming_player.name %></span> is calling SET!</p>
+            stroke: "stroke-yellow-400 light:stroke-yellow-600", digits: "text-yellow-400 light:text-yellow-800" %>
+      <p class="font-display text-6xl font-bold"><span class="text-yellow-400 light:text-yellow-800"><%= game.claiming_player.name %></span> is calling SET!</p>
     </div>
 
   <% elsif game.playing? && game.no_set_active? %>
-    <div class="h-full flex items-center gap-6 rounded-3xl bg-purple-500/10 px-8 ring-2 ring-inset ring-purple-500">
-      <%= render "games/ring", started_at: game.no_set_started_at, duration: Game::NO_SET_TIMEOUT,
-            stroke: "stroke-purple-400", digits: "text-purple-300" %>
+    <div class="<%= purple_panel %>">
+      <%= render "games/ring", started_at: game.no_set_started_at, duration: Game::NO_SET_TIMEOUT, **purple_ring %>
       <div class="min-w-0 flex-1">
-        <p class="font-display text-5xl font-bold"><span class="text-purple-400"><%= game.no_set_caller.name %></span> called No Set</p>
-        <p class="mt-2 text-2xl text-gray-300">Agree on your screen, or find one first</p>
+        <p class="font-display text-5xl font-bold"><span class="text-purple-400 light:text-purple-700"><%= game.no_set_caller.name %></span> called No Set</p>
+        <p class="mt-2 text-2xl text-gray-300 light:text-gray-700">Agree on your screen, or find one first</p>
       </div>
       <div class="shrink-0 text-right">
         <p class="font-display text-6xl font-bold leading-none tabular-nums"><%= game.no_set_voters.size %><span class="text-gray-500">/<%= game.players.select(&:active?).size %></span></p>
-        <p class="mt-1 text-xl text-gray-400">agreed</p>
+        <p class="mt-1 text-xl text-gray-400 light:text-gray-600">agreed</p>
       </div>
     </div>
 
   <% elsif game.playing? && game.no_set_blocked? %>
     <%# Refused: the No Set panel's tint, the ring counting the block down, nothing on the right. %>
-    <div class="h-full flex items-center gap-6 rounded-3xl bg-purple-500/10 px-8 ring-2 ring-inset ring-purple-500">
-      <%= render "games/ring", started_at: game.no_set_refused_at, duration: Game::NO_SET_TIMEOUT,
-            stroke: "stroke-purple-400", digits: "text-purple-300" %>
+    <div class="<%= purple_panel %>">
+      <%= render "games/ring", started_at: game.no_set_refused_at, duration: Game::NO_SET_TIMEOUT, **purple_ring %>
       <div class="min-w-0 flex-1">
-        <p class="font-display text-5xl font-bold text-balance"><span class="inline-block max-w-full truncate align-bottom text-purple-400"><%= game.no_set_refuser.name %></span> says there's a Set</p>
-        <p class="mt-2 text-2xl text-gray-300">No Set is back when the ring runs out</p>
+        <p class="font-display text-5xl font-bold text-balance"><span class="inline-block max-w-full truncate align-bottom text-purple-400 light:text-purple-700"><%= game.no_set_refuser.name %></span> says there's a Set</p>
+        <p class="mt-2 text-2xl text-gray-300 light:text-gray-700">No Set is back when the ring runs out</p>
       </div>
     </div>
 

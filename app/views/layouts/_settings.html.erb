@@ -1,25 +1,45 @@
 <%# SPEC.md §8, Settings menu. Never inside a broadcast target (§7, Hooks), so a room update never closes or resets it. %>
 <%# player_screen: true gives the player screen's footer button (DESIGN v6, Settings button), 40x28 with no border and the
-    icon in muted text, 40x32 in the computer Waiting and Game over footers, the menu opening above it. %>
+    icon in muted text, 40x32 in the computer Waiting and Game over footers, the menu opening above it.
+    big_screen: true gives the big screen's corner button, 56x56, radius 16, 26px icon, the menu opening above it. %>
 <% theme = chosen_theme || "device" %>
 <% player_screen = local_assigns[:player_screen] %>
+<% big_screen = local_assigns[:big_screen] %>
+<% bordered = "border border-gray-800 text-gray-400 aria-expanded:bg-gray-800 light:border-gray-200 light:text-gray-600 light:aria-expanded:bg-gray-100" %>
 <% button_look = if player_screen
      "h-7 w-10 rounded-lg text-gray-500 lg:h-8 lg:group-has-[[data-board]]/main:h-7 aria-expanded:bg-gray-800 light:aria-expanded:bg-gray-200"
+   elsif big_screen
+     "size-14 rounded-2xl #{bordered}"
    else
-     "size-11 rounded-xl border border-gray-800 text-gray-400 aria-expanded:bg-gray-800 light:border-gray-200 light:text-gray-600 light:aria-expanded:bg-gray-100"
+     "size-11 rounded-xl #{bordered}"
+   end %>
+<% icon_size = if player_screen
+     "size-4 lg:size-[18px]"
+   elsif big_screen
+     "size-[26px]"
+   else
+     "size-5"
+   end %>
+<%# The big screen's menu sits 108px from the bottom (DESIGN v6, Settings button placement): 12px above its 96px-high corner button. %>
+<% menu_place = if player_screen
+     "bottom-full mb-2"
+   elsif big_screen
+     "bottom-full mb-3"
+   else
+     "top-full mt-2"
    end %>
 <div data-controller="settings" data-action="keydown.esc->settings#escape turbo:before-cache@document->settings#dismiss" class="<%= local_assigns[:class] || "relative" %>">
   <button type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings_menu" aria-haspopup="dialog"
           data-settings-target="button" data-action="settings#toggle"
           class="grid cursor-pointer place-items-center transition hover:text-gray-50 aria-expanded:text-gray-50 light:hover:text-gray-900 light:aria-expanded:text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 <%= button_look %>">
-    <svg class="<%= player_screen ? "size-4 lg:size-[18px]" : "size-5" %>" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+    <svg class="<%= icon_size %>" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
   </button>
 
   <%# A tap outside lands here: it closes the menu and reaches nothing under it. Transparent, so no dimming. %>
   <div hidden data-settings-target="shield" data-action="click->settings#dismiss" class="fixed inset-0 z-40"></div>
 
   <div id="settings_menu" role="dialog" aria-label="Settings" hidden data-settings-target="menu"
-       class="absolute right-0 z-50 <%= player_screen ? "bottom-full mb-2" : "top-full mt-2" %> flex w-[304px] max-w-[calc(100vw-2rem)] flex-col gap-3.5 rounded-2xl border border-gray-700 bg-gray-900 p-4 text-left text-gray-50 shadow-[0_12px_32px_rgba(0,0,0,0.6)] light:border-gray-300 light:bg-white light:text-gray-900 light:shadow-[0_12px_32px_rgba(3,7,18,0.18)]">
+       class="absolute right-0 z-50 <%= menu_place %> flex w-[304px] max-w-[calc(100vw-2rem)] flex-col gap-3.5 rounded-2xl border border-gray-700 bg-gray-900 p-4 text-left text-gray-50 shadow-[0_12px_32px_rgba(0,0,0,0.6)] light:border-gray-300 light:bg-white light:text-gray-900 light:shadow-[0_12px_32px_rgba(3,7,18,0.18)]">
     <div class="flex items-center justify-between">
       <p class="text-[17px] font-bold">Settings</p>
       <button type="button" aria-label="Close settings" data-action="settings#closeButton"
