@@ -76,7 +76,7 @@ Decided: the five Design proposes go into SPEC 8 Settings menu as proposed (a ta
 
 Decided: dark muted text (`gray-500`) and the dark field border at rest (`gray-700`) stay as built, because the user chose that dark stays as it is today apart from the disabled No Set pills, and SPEC 10 names `gray-500` for dark muted text; raising them is deferred below. Instead of: moving dark muted text to `gray-400` and the dark field border up in this ticket.
 
-Deferred: In the dark theme, muted text (the "Room CODE" footer, the big screen's empty band text, the tray slot numbers) reads at 4.5:1 or more on its ground, and field borders at rest at 3:1 or more, as the light theme's do.
+Deferred: In the dark theme, muted text (the "Room CODE" footer, the big screen's empty band text, the tray slot numbers) reads at 4.5:1 or more on its ground, and field borders at rest at 3:1 or more, as the light theme's do. Filed as 46.
 
 Decided: the dark contrast fix above is deferred to a request of its own, because it changes how every dark screen looks and this ticket keeps dark as it is. Instead of: dropping it, or folding it in here.
 

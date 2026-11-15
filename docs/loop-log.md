@@ -3,6 +3,7 @@
 What the skills-loop steps did, newest first.
 
 - 2026-11-15  triage 40: split into 43, 44, 45 by screen, five Design proposes into SPEC 8 Settings menu, three Design questions settled (light field border `gray-500` in the design system, player screen settings button kept 40×28, dark contrast deferred), 41 and 42 re-blocked on the children, eight Decided lines and one Deferred. Next: file the deferral, then triage 41.
+- 2026-11-15  request 46: filed the deferral from 40, dark muted text and field borders meet contrast, visual. Next: triage 41.
 - 2026-11-15  request 42: filed the deferral from 40, static error pages follow the device's light or dark setting, visual, blocked by 40. Next: triage 40.
 - 2026-11-15  design-entry 40, 41: docs/design-system.md v6, the light theme tokens, settings button and menu, Classic shades and the color mark, 100 boards added and none changed, five Design proposes, four Design questions, no conflicts, six Decided lines. Next: triage 40.
 - 2026-11-15  design-brief 40, 41: brief 20261115-40-41 against docs/design-system.md v5, the light theme of every screen, the settings menu and the Classic and Color-blind card colors with the color mark, every existing board left as drawn, two Decided lines. Next: draw.
