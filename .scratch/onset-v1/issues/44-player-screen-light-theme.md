@@ -1,6 +1,6 @@
 # 44: Light theme and the settings menu on the player screen
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by: 43
 Priority: normal

@@ -1,6 +1,6 @@
 # 45: Light theme and the settings menu on the big screen
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by: 43
 Priority: normal

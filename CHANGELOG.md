@@ -2,6 +2,15 @@
 
 What each deploy shipped, newest first, from the tickets' Changelog: lines.
 
+## 2026-11-16, deploy-20261116-1720
+
+- The How to play page uses its full 944 px for content, with the side padding outside it, and its running text is capped to a comfortable line length. (39)
+- Cards now come in Set's classic red, green and purple, and a Color-blind option in Settings switches them to blue, orange and magenta with a small mark in two corners that tells the colors apart. (41)
+- The landing, the join page and How to play now come in a light theme too, following your device or your pick in a new settings menu. (43)
+- The player screen comes in a light theme too, following your device or your pick in the settings menu, which opens from a button by the room code; the greyed-out No Set button is easier to read. (44)
+- The big screen has a settings button in its bottom-right corner and a light theme for every state. (45)
+- Behind the scenes: the design records now match where the built settings menu opens and its size, and system specs pin where it opens. (49)
+
 ## 2026-10-25, deploy-20261025-1730
 
 - Starting a game no longer leaves the big screen or a player screen stuck on the waiting state when two updates arrive out of order. (34)

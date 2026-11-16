@@ -1,6 +1,6 @@
 # 39: Content pages: width standard (944 px content, 65ch prose)
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

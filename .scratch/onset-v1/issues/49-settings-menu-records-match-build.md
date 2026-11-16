@@ -1,6 +1,6 @@
 # 49: Bring the records in line with the built settings menu
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

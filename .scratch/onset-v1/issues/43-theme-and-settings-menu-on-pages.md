@@ -1,6 +1,6 @@
 # 43: Light theme and the settings menu on the landing, join page and How to play
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by: 39
 Priority: normal

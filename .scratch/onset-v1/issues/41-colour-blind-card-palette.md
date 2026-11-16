@@ -1,6 +1,6 @@
 # 41: Colour-blind friendly card palette, toggled in settings
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by: 43, 44, 45
 Priority: normal

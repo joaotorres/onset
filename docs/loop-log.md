@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-16  deploy deploy-20261116-1720: 39, 41, 43, 44, 45, 49 deployed. Next: new requests.
 - 2026-11-16  review 20261116-041057-deep-fable: deep on Fable, records only (Feature lines, the security report, tickets 50 to 54), no ticket closed, four pending decisions (the security review's findings F2, F3, F4 and F6, in no ticket), one follow-up deferred on 11 (the host's Start game and Play again run in any state, F5). Next: file the follow-up.
 - 2026-11-16  request 54: filed the security review's medium finding (security-20261115, F1), enforce the 8-player cap on the server, behavioural. Next: triage, which asks the owner (security).
 - 2026-11-16  request 53: filed the deferred follow-up from 43, the records in line with what is built and specs for the settings menu's untested paths, behavioural. Next: triage.
