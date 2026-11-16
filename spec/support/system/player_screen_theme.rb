@@ -67,3 +67,12 @@ RSpec.shared_context "player screen theme" do
     game.update!(status: :ended, board: [], deck: [], discard: [])
   end
 end
+
+# Shared by the disabled_pills_*_spec.rb files in spec/system/player_screen_theme/.
+RSpec.shared_context "disabled pills" do
+  include_context "player screen theme"
+  include_context "player screen with 8 players and 18 cards", 375, 667
+
+  let(:panel) { "[data-status-slot] [role=status]" }
+  let(:pill) { "[data-pill-slot] button[disabled]" }
+end
