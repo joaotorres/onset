@@ -34,6 +34,7 @@ RSpec.describe "Light theme values", type: :system do
   end
 
   it "keeps the landing as built in dark, with no card edge" do
+    emulate_color_scheme("dark")
     resize(1280, 860)
     visit root_path
     expect(page_background).to eq(color("gray-950"))

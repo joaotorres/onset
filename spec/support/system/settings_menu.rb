@@ -1,8 +1,8 @@
 # Theme and settings menu helpers (SPEC §8 Settings menu, §10 Themes).
 RSpec.shared_context "settings menu" do
   before { driven_by :selenium, using: :headless_chrome }
-  # Leave the next spec on the browser's default media.
-  after { emulate_color_scheme("") }
+  # Leave the next spec on the suite's default, light (chrome_driver.rb).
+  after { emulate_color_scheme("light") }
 
   # "light", "dark" or "" (no preference stated).
   def emulate_color_scheme(value)

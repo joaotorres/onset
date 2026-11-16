@@ -24,6 +24,7 @@ RSpec.describe "Disabled No Set pills on the player screen", type: :system do
   end
 
   it "draws them at 35% fill with full-strength purple-200 text in dark" do
+    emulate_color_scheme("dark")
     ["someone else claiming", "No Set blocked"].each do |name|
       play_state!(name)
       visit game_controller_path(game.code)

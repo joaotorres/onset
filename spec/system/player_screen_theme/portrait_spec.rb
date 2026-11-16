@@ -20,6 +20,7 @@ RSpec.describe "Settings button on the player screen, portrait", type: :system d
   end
 
   it "opens the menu above the button and turns the screen light with no reload" do
+    emulate_color_scheme("dark")
     visit game_controller_path(game.code)
     expect(page_background).to eq(color("gray-950"))
     page.execute_script("window.sameDocument = true")
