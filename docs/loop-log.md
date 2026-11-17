@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  triage 46: still waiting for its design pass, no DESIGN entry covers dark muted text or field borders, blockers 43 to 45 deployed, the player screen's muted settings icon added to what the brief settles, no conflict with 42, 47, 48 or 50 to 55. Next: /design-brief 46.
 - 2026-11-17  triage 42: still waiting for its design pass, no DESIGN entry covers the static error pages, blocker 43 deployed, no conflict with 46 to 55. Next: /design-brief 42.
 - 2026-11-17  triage 52: ready, SPEC 10 Themes and Palette say a page load is every page Onset shows (link, form, Back and Forward) taking the cookie as it is then, `<html>` set from the cookies on every Turbo render, six Decided lines. Next: triage 53.
 - 2026-11-17  triage 51: ready, no spec change, Escape bound on the document, five Decided lines. Next: triage 52.
