@@ -19,7 +19,7 @@ A page people read rather than play on, held in the 944px content box with its p
 _Avoid_: Static page, info page
 
 **Settings menu**:
-The menu on every page where a player chooses how Onset looks on their browser, such as the theme or the card colors. Stored per browser, never on the player.
+The menu on every page Onset renders, all but the static error pages, where a player chooses how Onset looks on their browser, such as the theme or the card colors. Stored per browser, never on the player.
 _Avoid_: Preferences, options page
 
 **Theme**:
