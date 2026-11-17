@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  triage 56: ready, End game vote ignored while a claim runs and every claim path acts only on the room's current claim, SPEC §2, §5, §6 and §12 updated, nine Decided lines. Next: build.
 - 2026-11-17  request 56: filed from 55's Deferred, a claim still pending when the room ends is judged after the game is over, behavioural. Next: triage.
 - 2026-11-17  triage 55: ready, start and restart ignored outside waiting and ended under the game lock, SPEC §5 and §6 updated, six Decided lines and one Deferred (a claim pending when the room ends). Next: build.
 - 2026-11-17  triage 54: parked needs-info, the request asks the owner before a security fix: whether to build the server-side 8-player cap as scoped, and whether the gameplay tap limit is its own ticket, part of this one or dropped. Next: the owner answers under Comments and sets needs-triage.
