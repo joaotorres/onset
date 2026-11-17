@@ -26,7 +26,7 @@ The Classic shades sit darker than the player presets and apart in hue: red `#C1
 
 Player colors (`PlayersController::PRESET_COLORS`): `#E74C3C #2ECC71 #F1C40F #9B59B6 #1ABC9C #E91E63 #00BCD4 #8BC34A`.
 
-Byline logo colours (v3, `--wm-*`): light on `:root` green `#009C3B`, blue `#002776`, red `#C60B1E`, gold `#E08A00`; dark on `.byline-footer`, the values every Onset screen uses: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`.
+Byline logo colours (v3, `--wm-*`): light on `:root` green `#009C3B`, blue `#002776`, red `#C60B1E`, gold `#E08A00`; dark on `.byline-footer` in the dark theme: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`; under the light theme (`@variant light`) `.byline-footer` takes the light values again (SPEC §8 Byline footer, Logo colours).
 
 v2 adds no tokens: every new color is from the Tailwind default palette.
 
@@ -162,11 +162,11 @@ Card color 0, 1 and 2 (§4, Card) are red, green and purple in Classic and blue,
 
 - **Stored per browser**, as the theme is (Themes below): a `card_colors` cookie, `colorblind`, path `/`, a year long, SameSite Lax, not HttpOnly so the settings menu can write it. Classic deletes it. The layout renders the choice on `<html>`, so the first paint already has the right colors
 - **Never in a broadcast.** Cards render inside Turbo Stream partials shared by every screen in a room (§7), so the `_card` partial draws the same markup for every viewer: the card colors come from CSS keyed on `<html>`, and the color mark is always in the markup, shown only under Color-blind
-- **Picking applies at once** to every card on the page, with no reload, as a theme does. Other open tabs take it on their next page load
+- **Picking applies at once** to every card on the page, with no reload, as a theme does. Other open tabs take it on their next page load, every kind of page load the theme names (Themes below), from the cookie as it is then
 - **Independent of the theme**: each palette, and the color mark, is the same in the dark and light themes
 - **Everywhere a card renders**: the big screen board and announcement band, the player screen board, tray and found-set banner, the landing's fanned cards and the How to play diagrams. Words that name a card color follow the setting the same way, both versions in the markup and CSS showing the one that matches: How to play's color captions (red, green, purple or blue, orange, magenta) and its Not a Set example ("two red, one green" or "two blue, one orange")
 
-Card face, the same under both palettes: near-white (`#FAFAFA`). Card border: subtle, `#E5E5E5`. Selected card on the player screen: `ring-4 ring-blue-400 scale-95`.
+Card face, the same under both palettes: near-white (`#FAFAFA`). Card border: subtle, `#E5E5E5`. Selected card on the player screen: `ring-4 ring-blue-400 scale-95`, the ring `blue-500` in the light theme (`light:ring-blue-500`).
 
 #### Component
 
@@ -311,7 +311,7 @@ ERB partials, no component library.
   - Fieldset "Theme": legend 12px/600 uppercase, 0.08em tracking, secondary text. A segmented control like the landing mode toggle (track, strong border, radius 14, 4px padding and gap) of three 56px segments, each an 18px icon over a 12px/600 label: Match device (a half-filled circle), Light (a sun), Dark (a moon)
   - Fieldset "Card colors": the same control with two segments, Classic and Color-blind, each a 54×16 chip on the card face (`#FAFAFA`) over a 13px/600 label. Classic shows three 9px dots in the Classic red, green and purple; Color-blind shows the three color marks in blue, orange and magenta
   - Each option is a radio. The current choice is the selected segment (dark `gray-700`, light `gray-800`, white text), its radio checked. Keyboard focus: a 2px `blue-500` outline, offset 2px, on the focused segment (board `s-play-p-picked-light`)
-  - Placement: it opens away from its button, right-aligned to it, 8px from it: below a top-right button (landing, join page, How to play), above a footer or corner button (Screens below). It covers SET! and part of the board while open on the player screen
+  - Placement: it opens away from its button, right-aligned to it, 8px from it, 12px on the big screen (`mb-3`, 108px from the bottom over the 96px-high corner button, as Screens > Settings button placement gives): below a top-right button (landing, join page, How to play), above a footer or corner button (Screens below). It covers SET! and part of the board while open on the player screen
 ### Stimulus controllers
 - Stimulus: `card-selection` (picks sent to the server, tray, count, Submit and the freeze after it), `countdown` (rings and seconds), `settings` (v6: the settings button and menu, writes the `theme` and `card_colors` cookies)
 
@@ -347,7 +347,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 
 ### How to play (tickets 39, 40, 41)
 
-- First drawn in v6, as the code renders it, but in the 944px content box with prose at 65ch that ticket 39 builds (SPEC §8 Views & UX, Width; the code still holds `max-w-5xl`): phone and desktop, light and dark (`l-htp-p`, `s-htp-p-dark`, `HowToPlayTh`, `d-htp-d`)
+- First drawn in v6, as the code renders it, in the 944px content box with prose at 65ch that ticket 39 built (SPEC §8 Views & UX, Width): phone and desktop, light and dark (`l-htp-p`, `s-htp-p-dark`, `HowToPlayTh`, `d-htp-d`)
 - Top to bottom: the nav row ("← Back", the "Onset" wordmark, the settings button), the header, Every card has four features (four panels), What makes a Set (two green-ringed panels), Almost, but not a Set (a red-ringed panel, then Quick check and Tip on blue tints), Playing Onset (four numbered panels, then No Set on the table? and End of the game), Ready to play?, the byline footer
 - Color captions and the Not a Set row name the card colors of the current setting (Shared: Rules added in v6); `cb-htp-d-dark` and `cb-htp-d-light` draw the Color-blind words
 
@@ -403,6 +403,7 @@ None
 
 ## Changelog
 
+- v6, 2026-11-17: ticket 53, the records corrected to the build, nothing new designed: `.byline-footer` holds the dark logo colours in the dark theme and the light ones under the light theme, How to play's 944px box is built, the settings menu opens 12px from the big screen's corner button, and the quoted SPEC §10 Palette matches SPEC again.
 - v6, 2026-11-15: ticket 49, the records corrected to the build, nothing new designed: the settings button and menu sit in the `layouts/_settings` partial each page's own view renders, the menu measures 304×278, and on the player screen it opens 46px from the bottom in portrait and computer play, 48px in the computer Waiting and Game over footers.
 - v6, 2026-11-15: ticket 40, a light theme and the settings menu: the light value of every surface, border, text and meaning color (Shared: Themes (v6)), the card wrapper's edge and inset panel edges in light, the settings button on every screen and the settings menu with its Theme option, light boards of every screen, the readable disabled No Set pills in both themes.
 - v6, 2026-11-15: ticket 41, card colors: the Classic red, green and purple as the default card palette, the Color-blind palette with the color mark in `cards/_card`, the Card colors option in the settings menu, and Color-blind boards of every place a card renders in both themes.

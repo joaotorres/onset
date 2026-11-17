@@ -1,13 +1,13 @@
 # 53: Bring the records in line with what is built and cover the settings menu's untested paths
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the design system matches what is built, and tests cover the browser color after a theme pick, the settings menu closed after Back and the tray slot's card edge.
 
 ## Request
 

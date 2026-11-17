@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  build 53: done, DESIGN v6 corrected to the build (byline colours, How to play width, menu placement, Palette quote), three system specs for theme-color after a pick, the menu closed on the page cache and the tray slot's card edge, each shown red first. Next: review.
 - 2026-11-17  build 52: done, the settings controller sets `<html data-theme>` and `data-card-colors` from the cookies on every `turbo:before-render` and refreshes the `theme-color` metas on connect, four other-tab system specs added. Next: review.
 - 2026-11-17  build 51: done, the settings menu's Escape listens on the document (`keydown.esc@document`) so it closes the menu wherever focus is, three closing system specs added. Next: review.
 - 2026-11-17  build 56: done, the End game vote is ignored while a claim runs and pick, submit, expiry and the player screen's claim lookup act only on the room's current claim (`Game#current_claim`, `Claim#current?`), model, job and request specs added. Next: review.
