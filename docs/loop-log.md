@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  quick review 20261117-210140: ticket 57 clean on both axes, no pending decisions, nothing deferred. Next: none.
 - 2026-11-17  triage 57: done in triage, glossary adds Current claim and qualifies Claim, six Decided lines. Next: none for this ticket.
 - 2026-11-17  triage 48: still waiting for its design pass, the removal's waiting check placed inside the game lock, one Decided line. Next: /design-brief 47 48.
 - 2026-11-17  triage 47: still waiting for its design pass, Start route row names the person rule, one Decided line. Next: /design-brief 47 48.
