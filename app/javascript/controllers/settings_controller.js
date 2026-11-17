@@ -12,6 +12,25 @@ export default class extends Controller {
 
   connect() {
     this.syncRadios()
+    this.applyThemeColor(this.theme)
+  }
+
+  // §10 Themes: every Turbo render (a link or form visit, its preview, Back
+  // or Forward from the cache) takes <html>'s picks from the cookies as they
+  // are now, with ThemesHelper's rule, so a pick made in another tab shows.
+  // Turbo keeps the old <html>, and a cached snapshot holds stale values.
+  syncFromCookies() {
+    const root = document.documentElement
+    const theme = this.cookie("theme")
+    if (theme === "light" || theme === "dark") root.dataset.theme = theme
+    else delete root.dataset.theme
+    if (this.cookie("card_colors") === "colorblind") root.dataset.cardColors = "colorblind"
+    else delete root.dataset.cardColors
+  }
+
+  cookie(name) {
+    const pair = document.cookie.split("; ").find((c) => c.startsWith(`${name}=`))
+    return pair?.slice(name.length + 1)
   }
 
   get open() {

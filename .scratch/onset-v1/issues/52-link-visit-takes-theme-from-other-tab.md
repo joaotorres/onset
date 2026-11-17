@@ -1,13 +1,13 @@
 # 52: A tab that follows a link takes on the theme and card colors picked in another tab
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: normal
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: A theme or card colors picked in another tab now show on the next page you open by a link or Back, not only after a reload.
 
 ## Request
 
