@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  build 55: done, `start!` acts only from waiting and `restart!` only from ended, both under the game lock, model and request specs added. Next: build 56.
 - 2026-11-17  triage 56: ready, End game vote ignored while a claim runs and every claim path acts only on the room's current claim, SPEC §2, §5, §6 and §12 updated, nine Decided lines. Next: build.
 - 2026-11-17  request 56: filed from 55's Deferred, a claim still pending when the room ends is judged after the game is over, behavioural. Next: triage.
 - 2026-11-17  triage 55: ready, start and restart ignored outside waiting and ended under the game lock, SPEC §5 and §6 updated, six Decided lines and one Deferred (a claim pending when the room ends). Next: build.

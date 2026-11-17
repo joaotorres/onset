@@ -1,13 +1,13 @@
 # 55: Start game and Play again act only in their state
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: high
 Feature: Game lifecycle
 Model:
 Effort:
-Changelog:
+Changelog: A late or repeated Start game or Play again tap no longer reshuffles a running game or wipes the scores.
 
 ## Request
 

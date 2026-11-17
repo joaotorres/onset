@@ -99,6 +99,42 @@ RSpec.describe Game do
       game2.start!
       expect(game2.board).not_to eq(first_board)
     end
+
+    it "returns a truthy value when it starts the game" do
+      expect(game.start!).to be_truthy
+    end
+
+    context "while playing" do
+      let(:alice) { game.players.create!(name: "Alice", color: "#648FFF") }
+
+      before do
+        game.start!
+        game.update!(discard: [game.deck.first])
+        alice.update!(score: 4)
+      end
+
+      it "leaves the board, deck, discard and scores unchanged and returns nil" do
+        before = game.reload.attributes.slice("board", "deck", "discard")
+        expect(game.start!).to be_nil
+        expect(game.reload.attributes.slice("board", "deck", "discard")).to eq(before)
+        expect(alice.reload.score).to eq(4)
+        expect(game).to be_playing
+      end
+    end
+
+    context "while ended" do
+      before do
+        game.start!
+        game.update!(status: :ended)
+      end
+
+      it "does nothing and returns nil" do
+        board = game.reload.board
+        expect(game.start!).to be_nil
+        expect(game.reload).to be_ended
+        expect(game.board).to eq(board)
+      end
+    end
   end
 
   describe "#board_cards" do
@@ -395,6 +431,35 @@ RSpec.describe Game do
       expect(game.no_set_started_at).to be_nil
       expect(game.no_set_voters).to be_empty
     end
+
+    it "returns a truthy value when it restarts the game" do
+      expect(game.restart!).to be_truthy
+    end
+
+    context "while playing" do
+      before { game.update!(status: :playing) }
+
+      it "leaves the board, deck and scores unchanged and returns nil" do
+        before = game.reload.attributes.slice("board", "deck")
+        expect(game.restart!).to be_nil
+        expect(game.reload.attributes.slice("board", "deck")).to eq(before)
+        expect(alice.reload.score).to eq(3)
+        expect(bob.reload.score).to eq(-1)
+        expect(game).to be_playing
+      end
+    end
+
+    context "while waiting" do
+      before { game.update!(status: :waiting, board: [], deck: [], start_voters: [alice.id]) }
+
+      it "leaves it waiting with its board and start_voters unchanged and returns nil" do
+        expect(game.restart!).to be_nil
+        game.reload
+        expect(game).to be_waiting
+        expect(game.board).to be_empty
+        expect(game.start_voters).to eq([alice.id])
+      end
+    end
   end
 
   describe "#vote_play_again!" do
@@ -626,6 +691,7 @@ RSpec.describe Game do
       end
 
       it "clears the refusal on start!" do
+        game.update!(status: :waiting)
         game.start!
         expect_cleared_and_refusable
       end

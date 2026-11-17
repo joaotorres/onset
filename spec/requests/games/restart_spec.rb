@@ -36,6 +36,23 @@ RSpec.describe "Games" do
         post restart_game_path(@game.code)
         expect(player.reload.score).to eq(0)
       end
+
+      it "ignores a restart while playing, still 204, board and scores unchanged" do
+        player = @game.players.create!(name: "Alice", color: "#648FFF", score: 5)
+        @game.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a)
+        post restart_game_path(@game.code)
+        expect(response).to have_http_status(:no_content)
+        expect(@game.reload.board).to eq((0..11).to_a)
+        expect(player.reload.score).to eq(5)
+      end
+
+      it "ignores a restart while waiting with 1 player, still 204" do
+        @game.players.create!(name: "Alice", color: "#648FFF")
+        @game.update!(status: :waiting)
+        post restart_game_path(@game.code)
+        expect(response).to have_http_status(:no_content)
+        expect(@game.reload).to be_waiting
+      end
     end
 
     context "as a non-host" do

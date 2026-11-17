@@ -26,6 +26,16 @@ RSpec.describe "Games" do
         post start_game_path(@game.code)
         expect(response).to have_http_status(:no_content)
       end
+
+      it "ignores a start while playing, still 204, board and scores unchanged" do
+        @game.start!
+        @game.players.first.update!(score: 2)
+        board = @game.reload.board
+        post start_game_path(@game.code)
+        expect(response).to have_http_status(:no_content)
+        expect(@game.reload.board).to eq(board)
+        expect(@game.players.first.score).to eq(2)
+      end
     end
 
     context "as a non-host" do

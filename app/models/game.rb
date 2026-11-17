@@ -26,13 +26,21 @@ class Game < ApplicationRecord
   before_validation :generate_code, on: :create
   after_update_commit :broadcast_game_state
 
+  # Acts only from waiting, under the lock (§6 Key invariants); nil when ignored.
   def start!
-    shuffled = (0..80).to_a.shuffle
-    update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [], start_voters: [], last_dealt: [], **CLEAR_REFUSAL)
+    with_lock do
+      return nil unless waiting?
+
+      shuffled = (0..80).to_a.shuffle
+      update!(status: :playing, board: shuffled.first(12), deck: shuffled.drop(12), discard: [], start_voters: [], last_dealt: [], **CLEAR_REFUSAL)
+    end
   end
 
+  # Acts only from ended, under the lock (§6 Key invariants); nil when ignored.
   def restart!
     with_lock do
+      return nil unless ended?
+
       shuffled = (0..80).to_a.shuffle
       players.each { |p| p.update!(score: 0, locked_until: nil) }
       update!(
