@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  triage 50: ready, no spec change, blocked by 53, eight Decided lines. Next: triage 51.
 - 2026-11-17  triage 47: still waiting for its design pass, no DESIGN entry covers bots (build 49's v6 records edit made the board count it as one), blockers 44 and 45 deployed, no conflict with 50 to 55. Next: /design-brief 47 48.
 - 2026-11-17  request 55: filed from 11's Deferred paragraph (security review F5), behavioural. Next: triage.
 - 2026-11-16  deploy deploy-20261116-1720: 39, 41, 43, 44, 45, 49 deployed. Next: new requests.
