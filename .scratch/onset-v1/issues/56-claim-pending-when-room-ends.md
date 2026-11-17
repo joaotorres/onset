@@ -7,7 +7,7 @@ Priority: high
 Feature: Claiming a SET
 Model: fable
 Effort:
-Changelog: A SET! call still running when the game ends can no longer reopen the game or change the scores, and an End game vote during a call is ignored until the call is judged.
+Changelog: A SET! call still running when the game ends can no longer reopen the game or change the scores; an End game tap during a call does nothing, so tap it again once the call is judged.
 
 ## Request
 
@@ -81,3 +81,9 @@ Decided: Model fable, because the current-claim check is logic every claim path 
 Decided: Feature "Claiming a SET", because the fix guards the claim paths. Instead of: "Game lifecycle", 55's.
 
 Decided: no conflict with tickets 47, 54 or 55 nor the spec changes since the last deploy (tickets 52, 53, 55): 55 guards `start!` and `restart!` and leaves the claim paths to this ticket, and 47's `BotSubmitJob` takes the same check. Instead of: blocking on 55, which touches neither the claim paths nor the End game vote.
+
+Decided: quick review 20261117-203012 corrected the Changelog line, which read as if an End game vote during a call is held and counted later; it is dropped and the player taps again (SPEC §2). Instead of: the original wording.
+
+Decided: the glossary gap the quick review found is a follow-up, because it is a plain record fix with no choice in it. Instead of: a pending decision.
+
+Deferred: GLOSSARY.md's Claim entry still says without condition that "a claim never submitted is judged on its picks when the window closes", and has no entry for "current claim", which SPEC now uses as a defined term (§5 PATCH and submit rows, §6 Key invariants, §12 ExpireClaimJob and BotSubmitJob). Add a Current claim entry matching §6 Key invariants (the room is playing, the claim is pending, held by `claim_player_id` and the room's newest claim; a claim left pending by an earlier game is never judged), and qualify the Claim entry so only the room's current claim is ever judged. Check every other glossary entry that mentions a claim being judged, expiring or submitted for the same unconditioned wording.
