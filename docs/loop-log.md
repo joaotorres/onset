@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  triage 54: parked needs-info, the request asks the owner before a security fix: whether to build the server-side 8-player cap as scoped, and whether the gameplay tap limit is its own ticket, part of this one or dropped. Next: the owner answers under Comments and sets needs-triage.
 - 2026-11-17  triage 53: ready, SPEC 10 Palette, 8 Join page and 8 Settings menu and the glossary's Settings menu reworded to the build, DESIGN fixes and three system specs left to the build, seven Decided lines. Next: build.
 - 2026-11-17  triage 46: still waiting for its design pass, no DESIGN entry covers dark muted text or field borders, blockers 43 to 45 deployed, the player screen's muted settings icon added to what the brief settles, no conflict with 42, 47, 48 or 50 to 55. Next: /design-brief 46.
 - 2026-11-17  triage 42: still waiting for its design pass, no DESIGN entry covers the static error pages, blocker 43 deployed, no conflict with 46 to 55. Next: /design-brief 42.
