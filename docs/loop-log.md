@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  triage 48: still waiting for its design pass, the removal's waiting check placed inside the game lock, one Decided line. Next: /design-brief 47 48.
 - 2026-11-17  triage 47: still waiting for its design pass, Start route row names the person rule, one Decided line. Next: /design-brief 47 48.
 - 2026-11-17  triage 46: still waiting for its design pass, no conflict with the work since. Next: /design-brief 46.
 - 2026-11-17  triage 42: still waiting for its design pass, no conflict with the work since. Next: /design-brief 42.
