@@ -9,6 +9,7 @@ RSpec.describe "Settings menu on the big screen", type: :system do
   before { resize(1280, 800) }
 
   it "opens above the button and turns the screen light with no reload" do
+    emulate_color_scheme("dark")
     add_players(2)
     visit_big_screen
     expect(page_background).to eq(color("gray-950"))

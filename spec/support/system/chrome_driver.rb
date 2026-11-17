@@ -21,4 +21,6 @@ module ChromeDriverDefaults
   end
 end
 
-RSpec.configure { |config| config.include ChromeDriverDefaults, type: :system }
+# rspec-rails defines driven_by on each example group itself, so the module is
+# prepended: an included one would sit behind it and never run.
+RSpec.configure { |config| config.prepend ChromeDriverDefaults, type: :system }
