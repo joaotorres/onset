@@ -1,13 +1,13 @@
 # 51: Escape closes the open settings menu wherever focus is
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: normal
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Escape now closes the open settings menu even after a click on its blank space.
 
 ## Request
 

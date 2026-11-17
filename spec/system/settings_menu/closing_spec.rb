@@ -39,6 +39,32 @@ RSpec.describe "Closing the settings menu", type: :system do
     expect(focused_label).to eq("Settings")
   end
 
+  it "closes on Escape after a click on blank space in the menu drops focus to the page" do
+    visit root_path
+    open_settings
+    find('[role="dialog"][aria-label="Settings"] p', text: "Settings").click
+    expect(page.evaluate_script("document.activeElement === document.body")).to be(true)
+    page.driver.browser.action.send_keys(:escape).perform
+    expect(page).to have_no_css('[role="dialog"]', visible: true)
+    expect(settings_button["aria-expanded"]).to eq("false")
+    expect(focused_label).to eq("Settings")
+  end
+
+  it "does nothing on Escape with the menu closed" do
+    visit root_path
+    find_field("room_code").send_keys(:escape)
+    expect(page).to have_no_css('[role="dialog"]', visible: true)
+    expect(settings_button["aria-expanded"]).to eq("false")
+    expect(page.evaluate_script("document.activeElement.id")).to eq("room_code")
+  end
+
+  it "binds Escape on the document only, never on an element" do
+    visit root_path
+    actions = all("[data-action]", visible: :all).map { |el| el["data-action"] }
+    expect(actions.join(" ")).to include("keydown.esc@document->settings#escape")
+    expect(actions.flat_map(&:split).grep(/\Akeydown\.esc(?!@document)/)).to be_empty
+  end
+
   it "closes on a tap outside without pressing what it lands on" do
     visit root_path
     open_settings
