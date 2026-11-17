@@ -24,6 +24,8 @@ for arg in "$@"; do case "$arg" in spec | spec/*) target= ;; esac; done
 # A partial run would rewrite the runtime log with its files alone: keep the full run's.
 log=tmp/parallel_runtime_rspec.log
 [ -z "$target" ] && [ -f "$log" ] && cp "$log" "$log.full"
+# The last full run's times, for the slow-file rule below.
+[ -n "$target" ] && [ -f "$log" ] && cp "$log" "$log.prev"
 
 bundle exec parallel_rspec $target -n 8 --serialize-stdout --combine-stderr \
   --runtime-log "$log" "$@" | tee "$out"
@@ -31,9 +33,12 @@ status=$?
 
 [ -z "$target" ] && [ -f "$log.full" ] && mv "$log.full" "$log"
 
-# A file over the limit sets the floor for the whole run: split it by describe group.
-[ -n "$target" ] && awk -F: -v limit=8 '$2 > limit { printf "Slow spec file: %s took %.1f s, over the %d s limit. Split it by describe group.\n", $1, $2, limit }' \
-  "$log" 2>/dev/null
+# Named only when over it in this full run and the one before: one run's time swings with load.
+# A file it names sets the floor for the whole run: split it by describe group.
+[ -n "$target" ] && [ -f "$log.prev" ] && awk -F: -v limit=8 '
+  NR == FNR { if ($2 > limit) prev[$1] = $2; next }
+  $2 > limit && ($1 in prev) { printf "Slow spec file: %s took %.1f s and %.1f s in the last two full runs, over the %d s limit. Split it by describe group.\n", $1, prev[$1], $2, limit }' \
+  "$log.prev" "$log" 2>/dev/null
 
 summary=$(grep -E '^[0-9]+ examples?, [0-9]+ failures?' "$out" | tail -1)
 echo "${summary:-no combined summary: the run did not finish}"
