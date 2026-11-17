@@ -26,6 +26,11 @@ log=tmp/parallel_runtime_rspec.log
 [ -z "$target" ] && [ -f "$log" ] && cp "$log" "$log.full"
 # The last full run's times, for the slow-file rule below.
 [ -n "$target" ] && [ -f "$log" ] && cp "$log" "$log.prev"
+# Busy: under half the CPU idle in a 1 s sample before the run. Not the load average, which counts idle VM threads. CI never checks.
+if [ -n "$CI" ]; then busy=1; idle=CI; else
+  idle=$(top -l 2 -s 1 -n 0 | awk '/CPU usage/ { i = $7 } END { sub("%", "", i); print int(i) }')
+  busy=$([ "${idle:-0}" -lt 50 ] && echo 1 || echo 0)
+fi
 
 bundle exec parallel_rspec $target -n 8 --serialize-stdout --combine-stderr \
   --runtime-log "$log" "$@" | tee "$out"
@@ -35,7 +40,8 @@ status=$?
 
 # Named only when over it in this full run and the one before: one run's time swings with load.
 # A file it names sets the floor for the whole run: split it by describe group.
-[ -n "$target" ] && [ -f "$log.prev" ] && awk -F: -v limit=8 '
+[ -n "$target" ] && [ "$busy" = 1 ] && echo "Machine busy (CPU ${idle}% idle): spec file times not checked."
+[ -n "$target" ] && [ "$busy" = 0 ] && [ -f "$log.prev" ] && awk -F: -v limit=8 '
   NR == FNR { if ($2 > limit) prev[$1] = $2; next }
   $2 > limit && ($1 in prev) { printf "Slow spec file: %s took %.1f s and %.1f s in the last two full runs, over the %d s limit. Split it by describe group.\n", $1, prev[$1], $2, limit }' \
   "$log.prev" "$log" 2>/dev/null
