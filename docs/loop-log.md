@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  triage 46: still waiting for its design pass, no conflict with the work since. Next: /design-brief 46.
 - 2026-11-17  triage 42: still waiting for its design pass, no conflict with the work since. Next: /design-brief 42.
 - 2026-11-17  request 57: filed from 56's Deferred paragraph, glossary Current claim entry, behavioural. Next: triage.
 - 2026-11-17  quick review 20261117-203012: tickets 50 to 56 clean on both axes, no pending decisions, 56's Changelog line corrected, one glossary follow-up deferred on 56. Next: file the follow-up.
