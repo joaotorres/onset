@@ -76,3 +76,7 @@ Decided: blocked by 53, because 53 adds the system spec for the `theme-color` me
 Decided: Priority low, Feature Card colors (the ticket it came from), Model left empty, because nothing a user notices changes and the work is view, CSS and a small controller refactor the existing suite guards. Instead of: normal, or Model: fable.
 
 Decided: no split, because it is six mechanical moves across the CSS, two partials, two callers, one helper and one controller, guarded by existing specs, which fit one session. Instead of: splitting the palette, the theme colors and the partial's variant map.
+
+Decided: deep review 20261117-211428 found SPEC §7 Hooks behind the settings controller and makes the fix a follow-up, because it is a plain record fix with no choice in it. Instead of: a pending decision.
+
+Deferred: SPEC §7 Hooks' Settings menu line names everything the settings controller relies on, as the other hook entries do. It names only `data-controller="settings"`, but the controller now also needs `data-settings-theme-colors-value` (this ticket; without it `connect()` throws) and three document actions: `keydown.esc@document->settings#escape` (51), `turbo:before-cache@document->settings#dismiss` (53) and `turbo:before-render@document->settings#syncFromCookies` (52). Check the other §7 hook entries against their partials for the same gap.
