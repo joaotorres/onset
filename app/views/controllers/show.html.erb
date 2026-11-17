@@ -11,6 +11,6 @@
   <%# The settings button sits on the footer row's line, out of the flow so it adds no height (DESIGN v6, Settings button placement):
       8px from the right edge on phones; on a computer at the board column's right edge during play, 40px from the right otherwise.
       Outside #controller_status, so a room update never closes the menu (§7, Hooks). %>
-  <%= render "layouts/settings", player_screen: true,
+  <%= render "layouts/settings", variant: :player_screen,
         class: "absolute bottom-2.5 right-2 lg:bottom-2 lg:right-10 lg:group-has-[[data-board]]/main:bottom-2.5 lg:group-has-[[data-board]]/main:right-[304px]" %>
 </main>

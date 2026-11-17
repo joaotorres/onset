@@ -1,13 +1,13 @@
 # 50: One source each for the card palette, the color marks and the theme colors
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by: 53
 Priority: low
 Feature: Card colors
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the card palette, the color marks and the theme colors are each written in one place, which the cards and the settings menu read.
 
 ## Request
 

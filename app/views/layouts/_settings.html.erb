@@ -1,34 +1,19 @@
 <%# SPEC.md §8, Settings menu. Never inside a broadcast target (§7, Hooks), so a room update never closes or resets it. %>
-<%# player_screen: true gives the player screen's footer button (DESIGN v6, Settings button), 40x28 with no border and the
+<%# variant: (DESIGN v6, Settings button) the default 44x44 bordered button on the landing, join page and How to play,
+    the menu opening below it. :player_screen gives the player screen's footer button, 40x28 with no border and the
     icon in muted text, 40x32 in the computer Waiting and Game over footers, the menu opening above it.
-    big_screen: true gives the big screen's corner button, 56x56, radius 16, 26px icon, the menu opening above it. %>
+    :big_screen gives the big screen's corner button, 56x56, radius 16, 26px icon, the menu opening above it;
+    its menu sits 108px from the bottom (Settings button placement): 12px above its 96px-high corner button. %>
 <% theme = chosen_theme || "device" %>
-<% player_screen = local_assigns[:player_screen] %>
-<% big_screen = local_assigns[:big_screen] %>
 <% bordered = "border border-gray-800 text-gray-400 aria-expanded:bg-gray-800 light:border-gray-200 light:text-gray-600 light:aria-expanded:bg-gray-100" %>
-<% button_look = if player_screen
-     "h-7 w-10 rounded-lg text-gray-500 lg:h-8 lg:group-has-[[data-board]]/main:h-7 aria-expanded:bg-gray-800 light:aria-expanded:bg-gray-200"
-   elsif big_screen
-     "size-14 rounded-2xl #{bordered}"
-   else
-     "size-11 rounded-xl #{bordered}"
-   end %>
-<% icon_size = if player_screen
-     "size-4 lg:size-[18px]"
-   elsif big_screen
-     "size-[26px]"
-   else
-     "size-5"
-   end %>
-<%# The big screen's menu sits 108px from the bottom (DESIGN v6, Settings button placement): 12px above its 96px-high corner button. %>
-<% menu_place = if player_screen
-     "bottom-full mb-2"
-   elsif big_screen
-     "bottom-full mb-3"
-   else
-     "top-full mt-2"
-   end %>
-<div data-controller="settings" data-action="keydown.esc@document->settings#escape turbo:before-cache@document->settings#dismiss turbo:before-render@document->settings#syncFromCookies" class="<%= local_assigns[:class] || "relative" %>">
+<% look = {
+     default: {button: "size-11 rounded-xl #{bordered}", icon: "size-5", menu: "top-full mt-2"},
+     player_screen: {button: "h-7 w-10 rounded-lg text-gray-500 lg:h-8 lg:group-has-[[data-board]]/main:h-7 aria-expanded:bg-gray-800 light:aria-expanded:bg-gray-200",
+                     icon: "size-4 lg:size-[18px]", menu: "bottom-full mb-2"},
+     big_screen: {button: "size-14 rounded-2xl #{bordered}", icon: "size-[26px]", menu: "bottom-full mb-3"}
+   }.fetch(local_assigns.fetch(:variant, :default)) %>
+<% button_look, icon_size, menu_place = look.values_at(:button, :icon, :menu) %>
+<div data-controller="settings" data-settings-theme-colors-value="<%= theme_color_values %>" data-action="keydown.esc@document->settings#escape turbo:before-cache@document->settings#dismiss turbo:before-render@document->settings#syncFromCookies" class="<%= local_assigns[:class] || "relative" %>">
   <button type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings_menu" aria-haspopup="dialog"
           data-settings-target="button" data-action="settings#toggle"
           class="grid cursor-pointer place-items-center transition hover:text-gray-50 aria-expanded:text-gray-50 light:hover:text-gray-900 light:aria-expanded:text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 <%= button_look %>">
@@ -63,23 +48,22 @@
       </div>
     </fieldset>
 
-    <%# §10 Palette. The chips show each option's own colors whatever is picked, so they carry fixed hex values. %>
+    <%# §10 Palette. The chips show each option's own colors whatever is picked, so they read the per-palette
+        custom properties (application.css), never the switching --card-color-*. %>
     <fieldset>
       <legend class="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-gray-400 light:text-gray-600">Card colors</legend>
       <div class="grid grid-cols-2 gap-1 rounded-[14px] border border-gray-700 bg-gray-950 p-1 light:border-gray-300 light:bg-gray-100">
         <% [["classic", "Classic"], ["colorblind", "Color-blind"]].each do |value, label| %>
           <label class="flex h-14 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[10px] text-[13px] font-semibold text-gray-400 has-checked:bg-gray-700 has-checked:text-white has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-blue-500 light:text-gray-600 light:has-checked:bg-gray-800 light:has-checked:text-white">
             <input type="radio" name="card_colors" value="<%= value %>" <%= "checked" if value == (chosen_card_colors || "classic") %> class="sr-only" data-action="settings#pickCardColors">
-            <span class="flex h-4 w-[54px] items-center justify-center gap-2 rounded bg-[#FAFAFA]" aria-hidden="true">
+            <span class="flex h-4 w-[54px] items-center justify-center gap-2 rounded bg-(--card-face)" aria-hidden="true">
               <% if value == "classic" %>
-                <% %w[#C1121F #198A1E #5E2CA5].each do |hex| %>
-                  <span class="size-[9px] rounded-full" style="background-color: <%= hex %>;"></span>
+                <% 3.times do |color| %>
+                  <span class="size-[9px] rounded-full" style="background-color: var(--card-classic-<%= color %>);"></span>
                 <% end %>
               <% else %>
-                <% [["#648FFF", "0,-14 14,12 -14,12"],
-                    ["#FE6100", "-4.5,-14 4.5,-14 4.5,-4.5 14,-4.5 14,4.5 4.5,4.5 4.5,14 -4.5,14 -4.5,4.5 -14,4.5 -14,-4.5 -4.5,-4.5"],
-                    ["#DC267F", "0,-13.5 3.64,-3.52 14.27,-3.14 5.9,3.42 8.82,13.64 0,7.7 -8.82,13.64 -5.9,3.42 -14.27,-3.14 -3.64,-3.52"]].each do |hex, points| %>
-                  <svg class="size-2.5" viewBox="-15 -15 30 30"><polygon fill="<%= hex %>" points="<%= points %>"/></svg>
+                <% CardsHelper::COLOR_MARKS.each_with_index do |points, color| %>
+                  <svg class="size-2.5" viewBox="-15 -15 30 30"><polygon style="fill: var(--card-colorblind-<%= color %>);" points="<%= points %>"/></svg>
                 <% end %>
               <% end %>
             </span>

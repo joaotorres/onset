@@ -26,16 +26,26 @@
    under data-card-colors="colorblind" on <html>, the same in both themes. The
    _card partial never carries a hex: card-c0..2 picks the color, card-shape
    strokes and card-ink fills with it, and the color mark shows under
-   Color-blind only. cc-classic and cc-colorblind words show under their own */
+   Color-blind only. cc-classic and cc-colorblind words show under their own.
+   Each palette is written once, in --card-classic-* and --card-colorblind-*,
+   which the settings menu's chips read whatever is picked; --card-color-*
+   switch with the pick. --card-face is the card's near-white face */
 :root {
-  --card-color-0: #C1121F;
-  --card-color-1: #198A1E;
-  --card-color-2: #5E2CA5;
+  --card-face: #FAFAFA;
+  --card-classic-0: #C1121F;
+  --card-classic-1: #198A1E;
+  --card-classic-2: #5E2CA5;
+  --card-colorblind-0: #648FFF;
+  --card-colorblind-1: #FE6100;
+  --card-colorblind-2: #DC267F;
+  --card-color-0: var(--card-classic-0);
+  --card-color-1: var(--card-classic-1);
+  --card-color-2: var(--card-classic-2);
 }
 :root[data-card-colors="colorblind"] {
-  --card-color-0: #648FFF;
-  --card-color-1: #FE6100;
-  --card-color-2: #DC267F;
+  --card-color-0: var(--card-colorblind-0);
+  --card-color-1: var(--card-colorblind-1);
+  --card-color-2: var(--card-colorblind-2);
 }
 .card-c0 { --card: var(--card-color-0); }
 .card-c1 { --card: var(--card-color-1); }

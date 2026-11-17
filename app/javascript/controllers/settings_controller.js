@@ -3,12 +3,13 @@ import { Controller } from "@hotwired/stimulus"
 // SPEC.md §8, Settings menu, and §10, Themes. The theme lives in the `theme`
 // cookie and on <html data-theme>; Match device deletes both and leaves the
 // page to the media query. Card colors works the same way (pickCardColors).
-// Picking never reaches the server.
-const THEME_COLORS = { light: "#F9FAFB", dark: "#030712" }
+// Picking never reaches the server. The theme-color metas for each choice come
+// from ThemesHelper#theme_color_values.
 const YEAR = 60 * 60 * 24 * 365
 
 export default class extends Controller {
   static targets = ["button", "menu", "shield"]
+  static values = { themeColors: Object }
 
   connect() {
     this.syncRadios()
@@ -92,37 +93,33 @@ export default class extends Controller {
     const cardColors = event.target.value
     if (cardColors === this.cardColors) return
 
-    const root = document.documentElement
-    if (cardColors === "colorblind") {
-      root.dataset.cardColors = cardColors
-      document.cookie = `card_colors=${cardColors}; path=/; max-age=${YEAR}; samesite=lax`
-    } else {
-      delete root.dataset.cardColors
-      document.cookie = "card_colors=; path=/; max-age=0; samesite=lax"
-    }
+    this.store("card_colors", "cardColors", cardColors, "classic")
     window.jtTrack?.("card_colors_changed", { card_colors: cardColors })
   }
 
   applyTheme(theme) {
-    const root = document.documentElement
-    if (theme === "device") {
-      delete root.dataset.theme
-      document.cookie = "theme=; path=/; max-age=0; samesite=lax"
-    } else {
-      root.dataset.theme = theme
-      document.cookie = `theme=${theme}; path=/; max-age=${YEAR}; samesite=lax`
-    }
+    this.store("theme", "theme", theme, "device")
     this.applyThemeColor(theme)
   }
 
-  // Mirrors ThemesHelper#theme_color_tags.
+  // A pick lives in its cookie and on <html>'s dataset; the default deletes both.
+  store(cookie, key, value, fallback) {
+    const root = document.documentElement
+    if (value === fallback) {
+      delete root.dataset[key]
+      document.cookie = `${cookie}=; path=/; max-age=0; samesite=lax`
+    } else {
+      root.dataset[key] = value
+      document.cookie = `${cookie}=${value}; path=/; max-age=${YEAR}; samesite=lax`
+    }
+  }
+
+  // The metas ThemesHelper#theme_color_tags renders for this choice.
   applyThemeColor(theme) {
     document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => meta.remove())
-    const metas = theme === "device"
-      ? [[THEME_COLORS.light, "(prefers-color-scheme: light)"], [THEME_COLORS.dark, null]]
-      : [[THEME_COLORS[theme], null]]
+    const metas = [...this.themeColorsValue[theme]]
     const anchor = document.querySelector('meta[name="viewport"]')
-    metas.reverse().forEach(([content, media]) => {
+    metas.reverse().forEach(({ content, media }) => {
       const meta = document.createElement("meta")
       meta.name = "theme-color"
       meta.content = content

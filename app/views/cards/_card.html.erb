@@ -14,12 +14,7 @@
           else        'class="card-shape" fill="none"'
           end.html_safe
   sw = [0, 2, 5][card.shading]  # stroke-width per shading
-  # Color mark (DESIGN v6 cards/_card): triangle, plus, five-point star, shown under Color-blind only.
-  mark = [
-    "0,-14 14,12 -14,12",
-    "-4.5,-14 4.5,-14 4.5,-4.5 14,-4.5 14,4.5 4.5,4.5 4.5,14 -4.5,14 -4.5,4.5 -14,4.5 -14,-4.5 -4.5,-4.5",
-    "0,-13.5 3.64,-3.52 14.27,-3.14 5.9,3.42 8.82,13.64 0,7.7 -8.82,13.64 -5.9,3.42 -14.27,-3.14 -3.64,-3.52"
-  ][card.color]
+  mark = CardsHelper::COLOR_MARKS[card.color]
 %>
 <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" class="card-c<%= card.color %> w-full h-full drop-shadow-sm">
   <defs>
@@ -28,7 +23,7 @@
     </pattern>
   </defs>
 
-  <rect width="200" height="280" rx="12" ry="12" fill="#FAFAFA" stroke="#E5E5E5" stroke-width="2"/>
+  <rect width="200" height="280" rx="12" ry="12" style="fill: var(--card-face)" stroke="#E5E5E5" stroke-width="2"/>
 
   <polygon class="color-mark card-ink" transform="translate(22 20)" points="<%= mark %>"/>
   <polygon class="color-mark card-ink" transform="translate(178 260) rotate(180)" points="<%= mark %>"/>

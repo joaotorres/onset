@@ -15,16 +15,22 @@ module ThemesHelper
     cookies[:card_colors].presence_in(%w[colorblind])
   end
 
-  # With a theme, its one color; with none, the light one under the media
-  # query and dark for every other device, no preference included.
+  # The theme-color metas for a choice ("device", "light", "dark"): with a
+  # theme, its one color; with none, the light one under the media query and
+  # dark for every other device, no preference included.
+  def self.theme_color_metas(choice)
+    return [{content: THEME_COLORS[choice]}] if THEMES.include?(choice)
+
+    [{content: THEME_COLORS["light"], media: "(prefers-color-scheme: light)"}, {content: THEME_COLORS["dark"]}]
+  end
+
   def theme_color_tags
-    if chosen_theme
-      tag.meta(name: "theme-color", content: THEME_COLORS[chosen_theme])
-    else
-      safe_join([
-        tag.meta(name: "theme-color", content: THEME_COLORS["light"], media: "(prefers-color-scheme: light)"),
-        tag.meta(name: "theme-color", content: THEME_COLORS["dark"])
-      ], "\n    ")
-    end
+    metas = ThemesHelper.theme_color_metas(chosen_theme || "device")
+    safe_join(metas.map { |meta| tag.meta(name: "theme-color", **meta) }, "\n    ")
+  end
+
+  # Every choice's metas, for the settings controller to apply on a pick.
+  def theme_color_values
+    %w[device light dark].index_with { |choice| ThemesHelper.theme_color_metas(choice) }.to_json
   end
 end
