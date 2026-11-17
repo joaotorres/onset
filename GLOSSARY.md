@@ -52,8 +52,11 @@ _Avoid_: Table, grid
 Three cards whose four attributes are each all the same or all different.
 
 **Claim**:
-A player's call of SET!, which gives them the sole right to pick three cards and submit them before the claim window closes; a claim never submitted is judged on its picks when the window closes.
+A player's call of SET!, which gives them the sole right to pick three cards and submit them before the claim window closes. Only the room's current claim is ever judged: if it is never submitted, it is judged on its picks when the window closes.
 _Avoid_: Call, turn
+
+**Current claim**:
+The claim a room is running: the room is playing, the claim is pending, its player holds the claim lock and it is the room's newest claim. Only the current claim takes picks, a submit (a bot's too) or its expiry; a claim left pending by an earlier game is never judged, scores nothing and costs nothing.
 
 **Lockout**:
 The 15 seconds after a wrong or timed-out claim during which that player cannot claim again.
