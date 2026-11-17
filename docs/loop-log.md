@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  triage 47: still waiting for its design pass, Start route row names the person rule, one Decided line. Next: /design-brief 47 48.
 - 2026-11-17  triage 46: still waiting for its design pass, no conflict with the work since. Next: /design-brief 46.
 - 2026-11-17  triage 42: still waiting for its design pass, no conflict with the work since. Next: /design-brief 42.
 - 2026-11-17  request 57: filed from 56's Deferred paragraph, glossary Current claim entry, behavioural. Next: triage.
