@@ -233,6 +233,41 @@ RSpec.describe Game do
     end
   end
 
+  describe "#vote_end_game!" do
+    let(:game) {
+      Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: [], discard: []) }
+    }
+    let!(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#DC267F", last_seen_at: Time.current) }
+
+    it "records the vote and ends the room once every active player has voted" do
+      expect(game.vote_end_game!(alice)).to eq(game)
+      expect(game.reload.end_game_voters).to eq([alice.id])
+      expect(game).to be_playing
+
+      game.vote_end_game!(bob)
+      expect(game.reload).to be_ended
+    end
+
+    context "while a claim runs" do
+      it "is ignored: nil, the vote not recorded, the room still playing" do
+        game.try_claim!(alice)
+        expect(game.vote_end_game!(bob)).to be_nil
+        expect(game.reload.end_game_voters).to eq([])
+        expect(game).to be_playing
+      end
+
+      it "is ignored even when it would be the last vote" do
+        game.vote_end_game!(bob)
+        game.try_claim!(bob)
+        expect(game.vote_end_game!(alice)).to be_nil
+        expect(game.reload.end_game_voters).to eq([bob.id])
+        expect(game).to be_playing
+        expect(game.claim_player_id).to eq(bob.id)
+      end
+    end
+  end
+
   describe "#call_no_set!" do
     let(:game) { Game.create!.tap(&:start!) }
     let(:player) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }

@@ -27,5 +27,14 @@ RSpec.describe "EndGames" do
         .to change { player.reload.last_seen_at }
       expect(game.reload).to be_ended
     end
+
+    it "ignores a vote while a claim runs, still answering 204" do
+      player = sign_in
+      game.try_claim!(player)
+      post game_end_game_path(game.code)
+      expect(response).to have_http_status(:no_content)
+      expect(game.reload).to be_playing
+      expect(game.end_game_voters).to eq([])
+    end
   end
 end

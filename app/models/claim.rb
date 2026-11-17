@@ -8,7 +8,7 @@ class Claim < ApplicationRecord
   validate :card_ids_valid, if: -> { card_ids.present? }
 
   # The time ran out (§2, §11): judge the picks the claim holds. The caller
-  # (ExpireClaimJob) holds the game lock and has checked the claim is pending.
+  # (ExpireClaimJob) holds the game lock and has checked the claim is current.
   def expire!
     picks = card_ids || []
 
@@ -21,10 +21,15 @@ class Claim < ApplicationRecord
     end
   end
 
-  # Replaces the picks of a pending claim; an invalid selection is ignored.
+  # The room's running claim (§6 Key invariants). Read after the game lock's reload.
+  def current?
+    game.current_claim == self
+  end
+
+  # Replaces the picks of the room's current claim; an invalid selection is ignored.
   def pick!(ids)
     game.with_lock do
-      return unless reload.pending?
+      return unless reload.current?
       return unless valid_selection?(ids)
 
       update!(card_ids: ids)
@@ -32,11 +37,11 @@ class Claim < ApplicationRecord
   end
 
   # Submit (§11): judges the selection the request carries, not the stored
-  # picks, at once. Ignored unless the claim is pending and the selection is
-  # exactly 3 distinct board cards.
+  # picks, at once. Ignored unless the claim is the room's current one and the
+  # selection is exactly 3 distinct board cards.
   def submit!(ids)
     game.with_lock do
-      return unless reload.pending?
+      return unless reload.current?
       return unless ids.is_a?(Array) && ids.size == 3 && valid_selection?(ids)
 
       if Card.valid_set?(*ids.map { |id| Card.new(id) })

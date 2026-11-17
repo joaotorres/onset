@@ -67,6 +67,18 @@ RSpec.describe "Players" do
         expect_read_only_board
       end
 
+      it "posts picks to the running claim, not a leftover one from an earlier game" do
+        leftover = game.try_claim!(me)
+        game.update!(status: :ended)
+        game.restart!
+        running = game.try_claim!(me)
+        show
+        selection = status.at_css("[data-controller='card-selection']")
+        expect(selection["data-card-selection-url-value"]).to eq(game_claim_path(game.code, running.id))
+        expect(selection["data-card-selection-submit-url-value"]).to eq(submit_game_claim_path(game.code, running.id))
+        expect(leftover.reload).to be_pending
+      end
+
       it "keeps the board read-only during a No Set countdown" do
         game.call_no_set!(bob)
         show

@@ -134,6 +134,15 @@ class Game < ApplicationRecord
     no_set_started_at.present?
   end
 
+  # The claim running now, nil when none (§6 Key invariants): the room is playing and its newest
+  # claim is pending and held by claim_player_id. A claim left pending by an earlier game is never it.
+  def current_claim
+    return nil unless playing? && claim_active?
+
+    newest = claims.order(:id).last
+    newest if newest&.pending? && newest.player_id == claim_player_id
+  end
+
   # A refusal blocks No Set for everyone for NO_SET_TIMEOUT (§2).
   def no_set_blocked?
     no_set_refused_at.present? && no_set_refused_at > NO_SET_TIMEOUT.seconds.ago
@@ -204,6 +213,7 @@ class Game < ApplicationRecord
   def vote_end_game!(player)
     with_lock do
       return nil unless playing? && deck.empty?
+      return nil if claim_active?
       return self if end_game_voters.include?(player.id)
 
       new_voters = end_game_voters + [player.id]

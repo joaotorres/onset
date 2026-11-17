@@ -1,7 +1,7 @@
 <%
   game = local_assigns[:game] || player.game
   flash_claim = local_assigns[:flash_claim]
-  my_claim = (game.claim_player_id == player.id) ? game.claims.find_by(player: player, result: :pending) : nil
+  my_claim = (game.claim_player_id == player.id) ? game.current_claim : nil
   locked = player.locked?
   # During play (§8). Portrait: the scoreboard, the board, the 64px status slot, then the 128px SET! slot and its pill.
   # Landscape: three columns, the board, the 9rem action column (status slot, SET!, pill), the scores column.

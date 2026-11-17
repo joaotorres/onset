@@ -156,6 +156,39 @@ RSpec.describe "Claims" do
     end
   end
 
+  # §6 Key invariants: a claim left pending by an earlier game is never acted on.
+  describe "a leftover claim, from its player" do
+    let(:player) { sign_in }
+    let!(:leftover) do
+      game.try_claim!(player).tap do
+        game.update!(status: :ended)
+        game.restart!
+        game.update!(board: (0..11).to_a, deck: (12..80).to_a)
+      end
+    end
+
+    def state
+      game.reload
+      [leftover.reload.attributes, player.reload.score, player.locked_until, game.status, game.board, game.deck, game.discard]
+    end
+
+    it "answers 204 to a submit and changes nothing" do
+      expect {
+        post submit_game_claim_path(game.code, leftover.id), params: {card_ids: valid_set_ids}, as: :json
+      }.not_to change { state }
+      expect(response).to have_http_status(:no_content)
+      expect(leftover).to be_pending
+    end
+
+    it "answers 204 to a PATCH and changes nothing" do
+      expect {
+        patch game_claim_path(game.code, leftover.id), params: {card_ids: [0, 1]}, as: :json
+      }.not_to change { state }
+      expect(response).to have_http_status(:no_content)
+      expect(leftover.card_ids).to be_nil
+    end
+  end
+
   describe "POST /games/:code/claims/:id/submit" do
     def submit(claim, ids, as: :json)
       if as == :json

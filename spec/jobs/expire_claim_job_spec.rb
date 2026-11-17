@@ -88,6 +88,75 @@ RSpec.describe ExpireClaimJob do
     end
   end
 
+  # §6 Key invariants: a claim is acted on only while it is the room's current claim.
+  describe "a claim that is not the room's current one" do
+    let(:claim) { game.try_claim!(player) }
+
+    def state
+      game.reload
+      [claim.reload.attributes, player.reload.score, player.locked_until,
+        game.status, game.board, game.deck, game.discard, game.claim_player_id]
+    end
+
+    def restart_with_known_board
+      game.update!(status: :ended)
+      game.restart!
+      game.update!(board: (0..11).to_a, deck: (12..80).to_a)
+    end
+
+    shared_examples "an ignored expiry" do
+      it "changes nothing with fewer than three picks" do
+        expect { described_class.new.perform(claim) }.not_to change { state }
+        expect(claim).to be_pending
+      end
+
+      it "changes nothing with three picks that form a Set" do
+        claim.update_columns(card_ids: valid_set_ids)
+        expect { described_class.new.perform(claim) }.not_to change { state }
+        expect(claim).to be_pending
+      end
+    end
+
+    context "in an ended room" do
+      before do
+        player.update!(score: 2)
+        claim
+        game.update!(status: :ended)
+      end
+
+      include_examples "an ignored expiry"
+    end
+
+    context "left from an earlier game" do
+      before do
+        claim
+        restart_with_known_board
+        player.update!(score: 2)
+      end
+
+      include_examples "an ignored expiry"
+    end
+
+    context "superseded by its player's newer claim" do
+      let!(:newer) do
+        claim
+        restart_with_known_board
+        player.update!(score: 2)
+        game.try_claim!(player)
+      end
+
+      include_examples "an ignored expiry"
+
+      it "still expires the newer claim" do
+        described_class.new.perform(claim)
+        described_class.new.perform(newer)
+        expect(newer.reload).to be_expired
+        expect(claim.reload).to be_pending
+        expect(player.reload.score).to eq(1)
+      end
+    end
+  end
+
   describe "job enqueuing" do
     it "enqueues ExpireClaimJob with 5s delay when a claim is created" do
       expect { game.try_claim!(player) }

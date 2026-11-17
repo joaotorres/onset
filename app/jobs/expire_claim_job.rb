@@ -3,7 +3,7 @@ class ExpireClaimJob < ApplicationJob
 
   def perform(claim)
     claim.game.with_lock do
-      return unless claim.reload.pending?
+      return unless claim.reload.current?
       claim.expire!
     end
   end

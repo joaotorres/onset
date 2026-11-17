@@ -1,13 +1,13 @@
 # 56: A claim still pending when the room ends is not judged after the game is over
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: high
 Feature: Claiming a SET
 Model: fable
 Effort:
-Changelog:
+Changelog: A SET! call still running when the game ends can no longer reopen the game or change the scores, and an End game vote during a call is ignored until the call is judged.
 
 ## Request
 
