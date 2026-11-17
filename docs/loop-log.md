@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  triage 47: still waiting for its design pass, no DESIGN entry covers bots (build 49's v6 records edit made the board count it as one), blockers 44 and 45 deployed, no conflict with 50 to 55. Next: /design-brief 47 48.
 - 2026-11-17  request 55: filed from 11's Deferred paragraph (security review F5), behavioural. Next: triage.
 - 2026-11-16  deploy deploy-20261116-1720: 39, 41, 43, 44, 45, 49 deployed. Next: new requests.
 - 2026-11-16  review 20261116-041057-deep-fable: deep on Fable, records only (Feature lines, the security report, tickets 50 to 54), no ticket closed, four pending decisions (the security review's findings F2, F3, F4 and F6, in no ticket), one follow-up deferred on 11 (the host's Start game and Play again run in any state, F5). Next: file the follow-up.
