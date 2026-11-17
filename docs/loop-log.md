@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-17  request 57: filed from 56's Deferred paragraph, glossary Current claim entry, behavioural. Next: triage.
 - 2026-11-17  quick review 20261117-203012: tickets 50 to 56 clean on both axes, no pending decisions, 56's Changelog line corrected, one glossary follow-up deferred on 56. Next: file the follow-up.
 - 2026-11-17  build 50: done, per-palette and card-face custom properties read by the chips, `CardsHelper::COLOR_MARKS`, theme-color metas passed from `ThemesHelper` as a Stimulus value, one `variant:` map in the settings partial and one cookie-and-dataset writer, a sources spec and a chips system spec added. Next: review.
 - 2026-11-17  build 53: done, DESIGN v6 corrected to the build (byline colours, How to play width, menu placement, Palette quote), three system specs for theme-color after a pick, the menu closed on the page cache and the tray slot's card edge, each shown red first. Next: review.
