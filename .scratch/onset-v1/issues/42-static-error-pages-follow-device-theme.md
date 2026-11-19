@@ -7,7 +7,7 @@ Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog: The error pages (such as page not found) now follow your device's light or dark setting, or the theme you picked in Onset.
+Changelog: The error pages (such as page not found) now use Onset's own light and dark colors, following your device or the theme you picked in Onset.
 
 ## Request
 
@@ -101,3 +101,7 @@ Decided: each page's header SVG gets `role="img"` and an `aria-label` of the cod
 Decided: the error pages get the app's Match device `theme-color` pair and a `color-scheme` that follows the shown theme, the inline script narrowing `theme-color` to one when the cookie sets a theme, because SPEC §10 Themes holds both on every page and DESIGN v7 gives the pages' `theme-color`. Instead of: no `theme-color`, the browser bar keeping its default.
 
 Decided: Priority low, because the error pages are rarely seen and already follow the device in the scaffold's own colors. Instead of: normal, as the other theme tickets.
+
+Decided: deep review 20261119-233807 corrects the Changelog line, which said the pages newly follow the device (the scaffold already did), and leaves the error pages' test and CSS gaps for a follow-up, because they change no behaviour. Instead of: folding them into this closed ticket.
+
+Deferred: Behind the scenes: tighten the five static error pages in `public/` (400, 404, 406-unsupported-browser, 422, 500) and their specs. In each page, put the theme's colors in CSS custom properties on `:root`, overridden once for `[data-theme="light"]` and once under `@media (prefers-color-scheme: light)` for `:root:not([data-theme])`, so each light rule is written once instead of twice; the pages stay self-contained, plain hex. In `spec/system/static_error_pages/`, assert the page grounds and the `theme-color` metas against `ThemesHelper::THEME_COLORS` instead of hard-coded `#F9FAFB`/`#030712` (`markup_spec.rb`), so a change to the app's theme colors fails the error page specs, and add a check that each page's `<title>` and message text are unchanged from the scaffold (ticket 42's last criterion, untested).

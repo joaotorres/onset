@@ -88,3 +88,7 @@ Decided: Security: yes, and decided rather than parked, because the limits chang
 Decided: adding and removing a bot are left for a follow-up, because their controller does not exist until tickets 47 and 48 are built. Instead of: holding this ticket on them.
 
 Deferred: Limit how often the host may add or remove a bot in a waiting room (`POST` and `DELETE /games/:code/bots`), 30 a minute keyed by the `host_game` cookie, as Start game and Play again are (SPEC §5 Rate limits), once tickets 47 and 48 are built. Filed as 62.
+
+Decided: deep review 20261119-233807 leaves the stale "one exception" sentence in SPEC §5's URL surface for a follow-up, because a review edits no spec and the fix is wording only. Instead of: a pending decision.
+
+Deferred: Behind the scenes: SPEC §5's URL surface paragraph says every POST answers `204 No Content` and "the one exception" is a pick or submit without the claim, `403`; since the Rate limits block (tickets 60 and 62) a request over its limit answers `429`. Reword that paragraph so it names every answer other than `204` (the `403` claim case, the `429` over a limit) and points to Rate limits, and check tickets 60 and 62's own "the one new answer" wording against it.
