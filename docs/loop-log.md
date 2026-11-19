@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  triage 58: done in triage, SPEC §7 Hooks names everything the settings, invite, card-selection, countdown and telemetry controllers rely on, five Decided lines. Next: triage 59.
 - 2026-11-19  triage 54: ready, from the owner's answer, the server takes only a free preset color on join with a unique index on players (game_id, color), SPEC §4, §5, §8 Join page and §10 updated, Security yes, a name-index follow-up deferred, seven Decided lines. Next: file the deferred follow-up, then build.
 - 2026-11-19  triage 48: still waiting for the design pass, no entry for bots in v7; brief 20261119-42-46 has returned, so it is no longer held, no conflict with 54, 58, 59 or 60. Next: design brief 47 48.
 - 2026-11-19  triage 47: still waiting for the design pass, no entry for bots in v7; brief 20261119-42-46 has returned, so it is no longer held. Next: design brief 47.
