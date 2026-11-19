@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  auto: context cap, 196k of 200k, rest of the run handed to a headless bin/auto --unattended. Next: triage 46, 54, 58, 59, 60, then builds.
 - 2026-11-19  triage 42: ready, the design question settled (the faint numerals are a backdrop graphic, SPEC §10 Themes), four Decided lines. Next: build.
 - 2026-11-19  design-entry 42, 46: design-system v7, new `muted` token, dark field border `gray-500`, the static error pages' colors, 5 boards added; one design question for triage 42. Next: triage 42 and 46.
 - 2026-11-19  design-brief 42, 46: brief 20261119-42-46 against design-system v6, 5 new boards (error pages dark and light, DarkSheet); 47 and 48 held for it, over the 6-board round. Next: draw.
