@@ -1,6 +1,6 @@
 # 54: Enforce the 8-player cap on the server
 
-Status: needs-info
+Status: needs-triage
 Kind: behavioural
 Blocked by:
 Priority:
@@ -37,3 +37,5 @@ Questions for the owner:
   3. A ticket of its own, filed now (recommended): the cap fixes the stall the review found, while a tap limit needs its own numbers so a player picking cards fast is never refused mid-claim; a filed ticket is undone with wontfix.
   4. Add it to this ticket: one build, but its numbers are picked without play data, and a limit set too tight drops real taps during a claim.
   5. Drop it: no limit on taps.
+
+Answer, 2026-11-19, from the owner: 1 (build the server-side 8-player cap as triaged above: presets only, unique index on (game_id, color), spec players moved to presets) and 3 (the in-game tap limit goes in a ticket of its own, filed now with /request).
