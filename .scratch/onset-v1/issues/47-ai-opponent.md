@@ -2,6 +2,7 @@
 
 Status: needs-triage
 Kind: visual
+Design held: 20261119-42-46
 Blocked by: 44, 45
 Priority:
 Model:
@@ -51,3 +52,5 @@ Waiting for the design pass: docs/design-system.md has no changelog entry for th
 Decided: SPEC §5's `POST /games/:code/start` row, reworded by ticket 55 to "ignored unless the room is waiting and holds 2 or more players", now adds "at least one a person (AI opponent)", because AI opponent, Adding a bot already disables Start game while every player is a bot and the server must ignore that tap too, as the ready row says. Instead of: leaving the route row silent on bots, so a stale or scripted Start could begin a room of bots alone.
 
 Rechecked 2026-11-17, second time: still waiting for the design pass. docs/design-system.md has no changelog entry for this ticket; its one entry since, ticket 53's records correction, designs nothing for bots, and no brief folder covers it yet. The spec changes since fit the bot rules: 55's Start game and Play again act only in their state (the start row now names the person rule, above), and 56's current claim already covers `BotSubmitJob`, while its ignored End game vote during a claim leaves bots, which never vote, untouched. Open tickets: 54 (parked, the server-side player cap) would put a unique index on a room's player colors; if it is built first, the bots child's add takes the same index, and an add that loses the race for a color is ignored, still `204`, as an add with no color free. 57 is glossary wording on claims and does not touch the Bot entry. 48 (removing a bot) shares this brief. The brief is as described above.
+
+Decided: held for the next round, over the 6-board round: brief 20261119-42-46 takes 42 and 46 (5 boards) in number order, and this ticket's boards alone (the add-bot control and bot mark on the waiting big screen and the host's player screen in three layouts and both themes, the bot's claim, Start game's "Need a person to play") run well past 6, so it goes in a round of its own, with 48 after it. Instead of: briefing it with 42 and 46 in one oversized round.

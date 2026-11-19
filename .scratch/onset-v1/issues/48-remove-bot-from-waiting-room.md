@@ -2,6 +2,7 @@
 
 Status: needs-triage
 Kind: visual
+Design held: 20261119-42-46
 Blocked by: 47
 Priority:
 Model:
@@ -37,3 +38,5 @@ Waiting for the design pass: docs/design-system.md has no changelog entry for th
 Decided: SPEC AI opponent, Removing a bot's When bullet now says the server checks the room is waiting inside the game lock, as ticket 55 made starting do (§6 Key invariants), so a removal racing the last ready vote or Start game either lands first or is ignored, because a check outside the lock could delete a bot from a room that has just started, after its timer was drawn. Instead of: leaving the removal's waiting check unplaced.
 
 Rechecked 2026-11-17: still waiting for the design pass. docs/design-system.md has no changelog entry for this ticket; its one entry since the first triage, ticket 53's records correction, designs nothing for bots, and no brief folder covers it yet. Blocker 47 is still needs-triage and unsplit, so `Blocked by: 47` stands. The spec changes since fit the removal: 55's Start game and Play again act only in their state (the start row now needs a person, and a removal never removes one, so it never leaves a room of bots alone), the race with the start is settled above, and 56's current claim does not reach a waiting room. Open tickets: 54 (parked) would put a unique index on a room's player colors; deleting the bot's row frees its color under that index too, so nothing changes here. 57 is glossary wording on claims and does not touch the Bot entry. 42 and 46 do not touch the waiting room's controls. The brief is as described above, drawn with 47's.
+
+Decided: held for the next round, over the 6-board round: brief 20261119-42-46 takes 42 and 46 in number order, 47 alone runs past 6 boards and goes next, and this ticket's remove control sits on the bot pills and roster rows 47 draws first. Instead of: briefing it now, before the bots it removes are drawn.
