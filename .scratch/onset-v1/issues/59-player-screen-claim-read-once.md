@@ -1,13 +1,13 @@
 # 59: The player screen reads its claim in one place
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Claiming a SET
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the player screen no longer computes an unused copy of the claim.
 
 ## Request
 

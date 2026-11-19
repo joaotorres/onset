@@ -4,6 +4,5 @@ class ControllersController < ApplicationController
     token = cookies.encrypted[:player_token]
     @player = @game.players.find_by!(session_token: token)
     @player.seen!
-    @my_claim = @game.current_claim if @game.claim_player_id == @player.id
   end
 end
