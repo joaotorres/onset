@@ -7,7 +7,7 @@ Priority: normal
 Feature: Themes
 Model:
 Effort:
-Changelog: In the dark theme, muted text and the room code and name field borders are easier to read.
+Changelog: In the dark theme, faint gray text and the borders of the room code and name fields are easier to read.
 
 ## Request
 
