@@ -1,6 +1,6 @@
-# Onset design system, version 6
+# Onset design system, version 7
 
-The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, the No Set refusal drawn for ticket 21, the claim's Submit button drawn for ticket 37, and the light theme, the settings menu and the two card palettes drawn for tickets 40 and 41. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
+The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, the No Set refusal drawn for ticket 21, the claim's Submit button drawn for ticket 37, the light theme, the settings menu and the two card palettes drawn for tickets 40 and 41, the static error pages drawn for ticket 42 and the dark contrast shades drawn for ticket 46. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
 
 Boards for every screen and state are on the canvas named in `docs/design-handoff.md`. Where this file and a board differ, this file wins; tell the design tool in the next brief.
 
@@ -14,6 +14,7 @@ From `app/assets/tailwind/application.css` (`@theme`), on top of the Tailwind de
 | `--animate-shake` | `shake 0.4s ease-in-out 1`, ±8px | Locked-out player screen panel |
 | `--animate-arrive` | `arrive 3s ease-out forwards`, green-400 outline to transparent from 50% | Cards dealt by the last replace |
 | `.found-set-flash` | `found-set-fade-out 3s`, opaque until 50% | Correct-claim panels and the found-set banner |
+| `muted` (v7, dark only) | `#7C8390`, on the gray hue a third of the way from `gray-500` to `gray-400`, outside the Tailwind palette | Dark muted text and dark form placeholders (Shared: Themes (v6), Text). Light muted stays `gray-500` |
 
 Card palettes (v6), card color 0, 1, 2, the same in both themes, picked per browser under Card colors. Ratios against the `#FAFAFA` face; shapes are graphics, so 3:1 is the bar:
 
@@ -28,11 +29,11 @@ Player colors (`PlayersController::PRESET_COLORS`): `#E74C3C #2ECC71 #F1C40F #9B
 
 Byline logo colours (v3, `--wm-*`): light on `:root` green `#009C3B`, blue `#002776`, red `#C60B1E`, gold `#E08A00`; dark on `.byline-footer` in the dark theme: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`; under the light theme (`@variant light`) `.byline-footer` takes the light values again (SPEC §8 Byline footer, Logo colours).
 
-v2 adds no tokens: every new color is from the Tailwind default palette.
+v2 adds no tokens: every new color is from the Tailwind default palette. v7 adds `muted`, the one color outside it.
 
 ## Shared: Themes (v6)
 
-Two themes, Dark and Light, each color one CSS value per theme keyed on `<html>`, on the same markup. Dark is every value this file gave before v6. Ratios are WCAG contrast on the value's own ground: the light page (`gray-50` `#F9FAFB`) unless stated. Every value is from the Tailwind default palette. The light theme sheet on the canvas (`LightSheet`) shows each pair.
+Two themes, Dark and Light, each color one CSS value per theme keyed on `<html>`, on the same markup. Dark is every value this file gave before v6, but for the three dark rows v7 raises to contrast (ticket 46): muted text, placeholders and the field border at rest. Ratios are WCAG contrast on the value's own ground: the light page (`gray-50` `#F9FAFB`) unless stated; dark ratios, where given, on `gray-950` `#030712` unless stated. Every value is from the Tailwind default palette but dark `muted` `#7C8390` (Shared: Tokens). The light theme sheet on the canvas (`LightSheet`) shows each pair; the dark contrast sheet (`DarkSheet`) shows the v7 dark values on each ground they sit on, beside light.
 
 Surfaces and borders
 
@@ -45,7 +46,7 @@ Surfaces and borders
 | Raised, borderless (SET! while unavailable, Join with a room code) | `gray-800` | `gray-200` | `gray-800` text 11.85:1 |
 | Border, strong (toggle tracks, settings menu, QR sheet) | `gray-700` | `gray-300` | decorative |
 | Border, subtle (panel borders, header rule, dividers, settings button) | `gray-800` | `gray-200` | decorative |
-| Field border at rest | `gray-700` | `gray-500` (triage 40; the boards draw `gray-400`, 2.54:1) | 4.84:1 on white |
+| Field border at rest (the landing's room code field, the join page's name field) | `gray-500` (v7, was `gray-700`): 3.67:1 against `gray-900`, 4.16:1 against `gray-950`, so 3:1 against fill and surround on the landing phone, the landing desktop actions card and the join page; `gray-600` is 2.34:1 on `gray-900` | `gray-500` | 4.84:1 on white, 4.63:1 on `gray-50` |
 | Field border with an error | `red-500` | `red-600` | 4.62:1 |
 | Input fill | `gray-950` (desktop), `gray-900` (phone) | white | ground |
 | Empty tray slot border (dashed) | `gray-700` | `gray-400` | decorative |
@@ -58,7 +59,10 @@ Text
 | Values (`gray-200`: host name, How to play values, tip text) | `gray-200` | `gray-800` | 14.05:1 |
 | Body (`gray-300`: tagline, sub-lines, captions, "is calling SET!") | `gray-300` | `gray-700` | 9.86:1, 10.31:1 on white |
 | Secondary (`gray-400`: labels, deck line, "you", byline) | `gray-400` | `gray-600` | 7.23:1, 7.56:1 on white |
-| Muted (`gray-500`: Room CODE footer, empty band, tray slot numbers, player screen settings icon) | `gray-500` | `gray-500` | 4.63:1, 4.84:1 on white; never on `gray-100` (4.40:1) |
+| Muted (Room CODE footer, tray slot numbers, player screen settings icon, big screen empty band, "No one yet" and a locked player's row, the "/N" of the No Set count, join page hint) | `muted` `#7C8390` (v7, was `gray-500`): 5.28:1 on `gray-950`, 4.88:1 on the No Set band (`#130F29`), 4.65:1 on `gray-900`; never on `gray-800` (3.85:1) | `gray-500` | 4.63:1, 4.84:1 on white, 4.51:1 on the No Set band (`purple-50`); never on `gray-100` (4.40:1) |
+| Placeholder (v7: room code and name fields) | `muted` `#7C8390`: 4.65:1 on the `gray-900` fill, 5.28:1 on the `gray-950` desktop fill | `gray-500` | 4.84:1 on white |
+
+Dark text ladder on `gray-950` (v7): primary 19.27:1, values 16.25:1, body 13.66:1, secondary 7.93:1 (6.99:1 on `gray-900`), muted 5.28:1. Muted stays a step apart from secondary rather than merging into `gray-400`, so the footer, the empty band, "No one yet" and a locked player's row stay quieter than labels and the deck line, and dark keeps the five steps light has.
 
 Meaning colors as fills with white text are the same in both themes: `blue-600`, `violet-600`, `purple-700`, `red-600`, `green-700`, `orange-700`. So is the claim fill, `yellow-400` with `gray-950` text.
 
@@ -97,7 +101,7 @@ Disabled, rings, outlines and the rest
 | Role | Dark | Light |
 |---|---|---|
 | Disabled filled pill (v5 rule) | `purple-700` 35% + `purple-200`; `blue-600` 35% + `blue-200` | `purple-100` + `purple-700` (5.92:1); `blue-100` + `blue-700` (5.49:1) |
-| Disabled gray button (Start game with 1 player, Join when full) | `gray-800` + `gray-500` | `gray-200` + `gray-600` (6.10:1) |
+| Disabled gray button (Start game with 1 player, Join when full) | `gray-800` + `gray-500` (not `muted`: disabled labels are exempt, v7) | `gray-200` + `gray-600` (6.10:1) |
 | Countdown progress | `yellow-400`, `red-500`, `purple-400` | `yellow-600` (2.81:1, the seconds inside carry the count), `red-600`, `purple-600` |
 | Countdown track | `gray-800` (player screen), `gray-700` (big screen) | `gray-300` |
 | Focus outline, 2px, offset 2px | `blue-500` | `blue-500` (3.52:1, 3.68:1 on white) |
@@ -135,7 +139,7 @@ Disabled, rings, outlines and the rest
 - Two themes, Dark and Light. A light screen changes colors only, plus the card wrapper's edge: every element, size and position is the dark screen's. Values in Shared: Themes (v6)
 - A panel with no border (big screen room tile and player pills, How to play panels, the QR tile) gets a 1px `gray-200` inset edge in light, as a `box-shadow`, so nothing resizes. Panels that already have a border keep it, recoloured
 - Light tinted panels use the 50 tint of their color, a 600 border or ring (yellow: 500) and text in 700 or 800. Meaning fills with white text are the same in both themes
-- Muted text (`gray-500`) sits only on the page or on white in light, never on `gray-100`
+- Light muted text (`gray-500`) sits only on the page or on white in light, never on `gray-100`. Dark muted: Shared: Rules added in v7
 - The v5 disabled-pill rule in light: the 100 tint of the color as fill, its 700 as text, at full opacity
 - Both disabled No Set pills, while someone else claims and blocked after a refusal, follow the v5 rule in both themes: dark `purple-700` at 35% with `purple-200` text at full opacity, never the whole button at 35%. The old dark boards still draw the whole button faded; this rule wins
 - Countdown rings in light: progress in the 600 shade, track `gray-300`. The seconds digits carry the count
@@ -144,6 +148,14 @@ Disabled, rings, outlines and the rest
 - Card colors: Classic is the default; Color-blind is the IBM palette plus the color mark (`cards/_card`). Words that name a card color follow the setting: How to play's Color captions ("red, green, purple" or "blue, orange, magenta") and the Not a Set row ("two red, one green" or "two blue, one orange")
 - The settings button never moves SET!, the pill slot or the board, and adds no page scroll. On the player screen it lives in the "Room CODE" footer row
 - Page boards carry the byline footer under a viewport-tall `main`: landing and join page at 375×727 (667 + 60) and 1280×860 (800 + 60)
+
+## Shared: Rules added in v7
+
+- Dark muted text and dark placeholders are `muted` `#7C8390`, never `gray-500`. Dark muted sits only on `gray-950`, `gray-900` (the placeholders in their fields) or the No Set band, never on `gray-800` (3.85:1)
+- The player screen settings button icon follows muted in both themes (dark `#7C8390`, 5.28:1; its bar is 3:1 as a graphic), so the "Room CODE" footer row stays one shade
+- The two form fields' border at rest is `gray-500` in both themes. Their error border is unchanged (`red-500` dark, `red-600` light)
+- Stays as built: disabled controls keep `gray-800` with `gray-500` text, and every `gray-700` border that is not a form field stays `gray-700` (the mode toggle's track, the Join, Copy link and Show QR buttons, the settings menu, the QR sheet, the empty tray slot's dashed border)
+- Built dark boards still draw muted `gray-500` and the `gray-700` field border; this file and `DarkSheet` win. The code is the truth for each built screen's layout
 
 ## Shared: Visual rules
 
@@ -236,7 +248,7 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 - **Same in both themes:** the cards (the `_card` partial is never restyled, its near-white face and border included; on light surfaces the design pass may give the card's wrapper an edge so it reads), the card palettes (which one shows is the card colors setting, Palette above, not the theme), the player colors, what each color means (the meaning table above; the light theme may use other shades of the same color for contrast), the QR tile (dark modules on white), the layouts, sizes and animations
 - **Every page the app renders** takes the theme: the landing, How to play, the join page, the big screen, the player screen and the byline footer, which uses the light logo colours in the light theme and the dark ones in the dark theme (§8, Byline footer)
 
-`SPEC.md` §10 Themes also holds the `theme` cookie, the no-flash rule, `color-scheme` and the static error pages, which take both themes in Onset's own surfaces and text shades, not drawn yet (ticket 42).
+`SPEC.md` §10 Themes also holds the `theme` cookie, the no-flash rule, `color-scheme` and the static error pages, which take both themes in Onset's own surfaces and text shades (Screens > Static error pages, v7).
 
 ## Components
 
@@ -370,7 +382,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Computer: the board on the left; a 248px side column with the scoreboard stacked above the status panel, SET! and its pill
 - Deck: "N cards left in the deck" with the board, or an orange "Deck is empty" pill
 - Claiming (mine): portrait, the claim bar takes the status slot and the 3-slot tray and Submit replace SET! and its pill. Landscape and computer: one yellow block replaces the panel and SET!, and Submit takes the pill slot (v5)
-- Portrait tray (v5): a 128px row of three 72×101 slots, 14px apart, above the 44px pill slot holding Submit, 4px between, 176px in all, the height SET! and its pill take, so nothing else moves. An empty slot is a dashed `gray-700` box with its number (1, 2, 3) centred in display type, 22px/700, `gray-500`; a filled slot shows the picked card. Slots fill in pick order
+- Portrait tray (v5): a 128px row of three 72×101 slots, 14px apart, above the 44px pill slot holding Submit, 4px between, 176px in all, the height SET! and its pill take, so nothing else moves. An empty slot is a dashed `gray-700` box with its number (1, 2, 3) centred in display type, 22px/700, in muted text (dark `#7C8390` since v7, light `gray-500`); a filled slot shows the picked card. Slots fill in pick order
 - Submitted (v5): the board's cards are disabled, the three picks keep the selected ring, the tray and the n/3 count stay as at 3/3, the countdown ring keeps draining and Submit shows its submitted state. The board never dims, at 3 picks or after the tap
 - Someone else claiming: the disabled SET! shows the seconds large with a small "SET!" label under them, inside the yellow ring
 - Read-only boards (someone else claiming, No Set, locked out) are not dimmed
@@ -385,6 +397,23 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Computer: a 360px left column, the standings in a `gray-900` panel on the right
 - The standings scroll inside themselves when they do not fit; the page never does
 
+### Static error pages (ticket 42)
+
+- The five pages in `public/` (400, 404, 406 unsupported browser, 422, 500) keep the Rails scaffold's layout, sizes, font, header graphic and messages; only their colors change, to Onset's in each theme. No settings menu, no byline footer, no link, no wordmark (SPEC §10 Themes). Boards: `err-404-p-dark`, `err-404-p-light` (phone 375×667), `err-500-d-dark`, `err-500-d-light` (computer 1280×800, the line break after the first sentence shown); 400, 406 and 422 take the same values
+- Layout as the scaffold: one column centred in the viewport (`min-height: 100dvh`), text centred, 2em padding, 1em gaps; the header graphic at most 12em wide (SVG, viewBox 480×172); one paragraph at most 30em wide at 75% of the body size, its first sentence bold; body the system sans stack at `clamp(1rem, 2.5vw, 2rem)`, line height 1.4
+- The scaffold's one text color splits in two: the bold first sentence in primary, the rest of the paragraph in body
+
+| Part | Dark | Light |
+|---|---|---|
+| Page | `gray-950` | `gray-50` |
+| Bold first sentence | `gray-50`, 19.27:1 | `gray-900`, 16.98:1 |
+| Rest of the paragraph | `gray-300`, 13.66:1 | `gray-700`, 9.86:1 |
+| Numerals (the status code in the SVG) | `gray-800`, 1.37:1 | `gray-200`, 1.18:1 |
+| Status name (in the SVG) | `red-400`, 7.28:1 on the page, 5.31:1 over the numerals | `red-700`, 6.19:1 on the page, 5.23:1 over the numerals |
+| `theme-color` | `#030712` | `#F9FAFB` |
+
+- The numerals take the subtle border role of each theme, as faint as the scaffold's (1.36:1, 1.14:1): a backdrop graphic under the status name, not text. The red status name and the paragraph carry the message, and the page title and the SVG's label name the code. Whether SPEC §10's 4.5:1 text rule reaches them is open (Open questions)
+
 ## Known gaps
 
 None
@@ -392,7 +421,8 @@ None
 ## Open questions
 
 - The dark Locked out boards (`-wrong`, `-timeup`) still draw the 5-second ring, though lockout is 15 s since ticket 20. The v6 light boards draw it at 15 s (12 s left). Redraw the dark ones in the next brief that touches lockout
-- Answered by triage 40: dark muted text (`gray-500`, 4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest (`gray-700`, 1.72:1 on `gray-900`) stay as built in ticket 40, which keeps dark as it is; raising them is ticket 46, whose SPEC §10 Visual system rule (triage 46) now holds every text, muted and placeholders included, to 4.5:1 and field borders at rest to 3:1, and waits for its design pass
+- Answered by triage 40, then by v7: dark muted text (`gray-500`, 4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest (`gray-700`, 1.72:1 on `gray-900`) stayed as built in ticket 40; ticket 46's design pass raises them to `muted` `#7C8390` and `gray-500` (Shared: Themes (v6), Shared: Rules added in v7)
+- The static error pages' status code numerals are drawn at 1.37:1 dark and 1.18:1 light as a backdrop graphic, below SPEC §10's 4.5:1 for text, as the scaffold had them. Triage 42 confirms SPEC §10 treats them as decoration, or says they must reach 4.5:1, which would turn them into a visible second headline
 - Answered by triage 41 in SPEC §10 Palette: the Color-blind blue and orange stay at 2.91:1 against the card face, below 3:1 for graphics, as IBM sets them; the color marks keep them apart by form
 - Answered by triage 40: the light field border at rest is `gray-500` (4.84:1 on white), not the boards' `gray-400` (Shared: Themes (v6))
 - Answered by triage 40: the player screen settings button stays 40×28 (40×32 in the computer Waiting and Game over footers), above the WCAG 2.2 AA 24px minimum; the footer does not grow, so the board keeps its size
@@ -403,6 +433,8 @@ None
 
 ## Changelog
 
+- v7, 2026-11-19: ticket 42, the static error pages in Onset's dark and light: page, the bold first sentence in primary and the rest in body, faint numerals in the subtle border shade and the status name in the red text shade, layout and messages as the scaffold has them (Screens > Static error pages), with boards of 404 on a phone and 500 on a computer in both themes.
+- v7, 2026-11-19: ticket 46, dark contrast: the new `muted` token `#7C8390` for dark muted text and placeholders (5.28:1 on `gray-950`, 4.65:1 on `gray-900`), kept a step below secondary; the dark field border at rest `gray-500`; the player screen settings icon following muted; disabled labels and non-field borders as built (Shared: Themes (v6), Shared: Rules added in v7), on the `DarkSheet` board.
 - v6, 2026-11-17: ticket 53, the records corrected to the build, nothing new designed: `.byline-footer` holds the dark logo colours in the dark theme and the light ones under the light theme, How to play's 944px box is built, the settings menu opens 12px from the big screen's corner button, and the quoted SPEC §10 Palette matches SPEC again.
 - v6, 2026-11-15: ticket 49, the records corrected to the build, nothing new designed: the settings button and menu sit in the `layouts/_settings` partial each page's own view renders, the menu measures 304×278, and on the player screen it opens 46px from the bottom in portrait and computer play, 48px in the computer Waiting and Game over footers.
 - v6, 2026-11-15: ticket 40, a light theme and the settings menu: the light value of every surface, border, text and meaning color (Shared: Themes (v6)), the card wrapper's edge and inset panel edges in light, the settings button on every screen and the settings menu with its Theme option, light boards of every screen, the readable disabled No Set pills in both themes.

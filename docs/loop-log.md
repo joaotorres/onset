@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  design-entry 42, 46: design-system v7, new `muted` token, dark field border `gray-500`, the static error pages' colors, 5 boards added; one design question for triage 42. Next: triage 42 and 46.
 - 2026-11-19  design-brief 42, 46: brief 20261119-42-46 against design-system v6, 5 new boards (error pages dark and light, DarkSheet); 47 and 48 held for it, over the 6-board round. Next: draw.
 - 2026-11-19  request 60: limit how often one player may send in-game actions, from 54's answer. Next: triage.
 - 2026-11-19  request 59: the player screen reads its claim in one place, deferred from 56. Next: triage.

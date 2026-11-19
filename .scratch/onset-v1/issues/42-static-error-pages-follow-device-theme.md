@@ -31,3 +31,11 @@ Rechecked 2026-11-17: still waiting for the design pass. docs/design-system.md h
 Rechecked again 2026-11-17, after builds 50 to 56: still waiting for the design pass, no `DESIGN` changelog entry covers it and `public/` is unchanged. The spec and design edits since (claims, Start and Play again, the light selection ring, the byline footer and menu records) touch nothing on the error pages, and the new open tickets, 47, 48 and 57, do not conflict.
 
 Decided: brief 20261119-42-46 draws the error pages as four new boards, 404 on a phone and 500 on a computer, each dark and light, the other three pages taking the same layout with their own words, and redraws no board, because no board of the error pages exists yet and the five differ only in their text. Instead of: a board per page and theme, ten boards, over the 6-board round.
+
+Design entry: docs/design-system.md v7, Screens > Static error pages, boards `err-404-p-dark`, `err-404-p-light`, `err-500-d-dark`, `err-500-d-light`. Colors only: dark page `gray-950`, bold first sentence `gray-50`, rest `gray-300`, numerals `gray-800`, status name `red-400`; light `gray-50`, `gray-900`, `gray-700`, `gray-200`, `red-700`.
+
+Design question: the error pages' faint status code numerals (dark `gray-800` 1.37:1, light `gray-200` 1.18:1, as faint as the scaffold's) are below SPEC §10 Visual system's 4.5:1 for text. The design treats them as a backdrop graphic under the red status name, with the page title and the SVG's label naming the code. Confirm SPEC §10 Themes treats them as decoration, or say they must reach 4.5:1, which would turn them into a visible second headline.
+
+Decided: the design entry records the numerals as decoration in DESIGN v7 and leaves the 4.5:1 question to triage, because the scaffold draws them as SVG paths behind the status name, ticket 42 keeps the header graphic, and the SPEC rule lists text, not graphics. Instead of: flagging them as a conflict with SPEC §10 and holding the entry.
+
+Decided: the entry adds Screens > Static error pages and retires the Visual rules line that called the error pages "not drawn yet (ticket 42)"; no existing rule or token changes for this ticket. Instead of: leaving the stale line.
