@@ -3,7 +3,7 @@
   <% players.each do |player| %>
     <% claiming = game.claim_player_id == player.id %>
     <% locked = !claiming && player.locked? %>
-    <li class="flex items-center gap-4 rounded-2xl px-5 py-3 <%= "bg-yellow-400 text-gray-950" if claiming %> <%= "text-gray-500" if locked %>">
+    <li class="flex items-center gap-4 rounded-2xl px-5 py-3 <%= "bg-yellow-400 text-gray-950" if claiming %> <%= "text-muted light:text-gray-500" if locked %>">
       <span class="size-5 shrink-0 rounded-full ring-2 ring-black/20 <%= "opacity-50" if locked %>" style="background-color: <%= player.color %>;"></span>
       <span class="min-w-0 flex-1 truncate text-3xl font-semibold"><%= player.name %></span>
       <% if locked %>
@@ -13,6 +13,6 @@
     </li>
   <% end %>
   <% if players.none? %>
-    <li class="px-5 text-2xl text-gray-500">No one yet</li>
+    <li class="px-5 text-2xl text-muted light:text-gray-500">No one yet</li>
   <% end %>
 </ol>

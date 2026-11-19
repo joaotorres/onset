@@ -34,7 +34,7 @@
           <%= f.text_field :code, id: "room_code", maxlength: 6, placeholder: "Room code", autocomplete: "off",
                 autocapitalize: "characters", required: true,
                 aria: flash[:alert] ? {invalid: true, describedby: "room_code_error"} : {},
-                class: "h-13 min-w-0 flex-1 rounded-xl border-2 bg-gray-900 px-4 font-display text-[1.375rem] font-bold uppercase tracking-[0.18em] placeholder:font-sans placeholder:text-base placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-gray-500 focus:outline-none focus:ring-2 lg:bg-gray-950 light:bg-white lg:light:bg-white #{flash[:alert] ? "border-red-500 focus:ring-red-500 light:border-red-600" : "border-gray-700 focus:ring-blue-500 light:border-gray-500"}" %>
+                class: "h-13 min-w-0 flex-1 rounded-xl border-2 bg-gray-900 px-4 font-display text-[1.375rem] font-bold uppercase tracking-[0.18em] placeholder:font-sans placeholder:text-base placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-muted light:placeholder:text-gray-500 focus:outline-none focus:ring-2 lg:bg-gray-950 light:bg-white lg:light:bg-white #{flash[:alert] ? "border-red-500 focus:ring-red-500 light:border-red-600" : "border-gray-500 focus:ring-blue-500"}" %>
           <%= f.submit "Join", name: nil,
                 class: "h-13 w-21 cursor-pointer rounded-xl border border-gray-700 bg-gray-800 font-semibold hover:bg-gray-700 active:scale-95 transition lg:w-24 light:border-gray-300 light:bg-gray-100 light:hover:bg-gray-200" %>
         </div>

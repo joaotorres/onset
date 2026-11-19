@@ -98,7 +98,7 @@
         <%= render "players/controller/status_panel", game: game, player: player, variant: :claim, class: "landscape:max-lg:hidden lg:hidden" %>
         <div data-tray class="landscape:max-lg:hidden lg:hidden flex h-32 shrink-0 items-center justify-center gap-3.5">
           <% 3.times do |i| %>
-            <div data-card-selection-target="slot" class="w-[72px] aspect-[5/7] grid place-items-center overflow-hidden rounded-[7px] border-2 border-dashed border-gray-700 font-display text-2xl font-bold text-gray-500 light:border-gray-400"><%= i + 1 %></div>
+            <div data-card-selection-target="slot" class="w-[72px] aspect-[5/7] grid place-items-center overflow-hidden rounded-[7px] border-2 border-dashed border-gray-700 font-display text-2xl font-bold text-muted light:text-gray-500 light:border-gray-400"><%= i + 1 %></div>
           <% end %>
         </div>
         <div data-claim-block role="status" class="portrait:max-lg:hidden flex h-[242px] w-full shrink-0 flex-col items-center justify-center gap-2 rounded-2xl bg-yellow-400 px-2.5 py-3.5 text-center text-gray-950 lg:h-[216px] lg:gap-1.5 lg:rounded-[18px] lg:p-4"

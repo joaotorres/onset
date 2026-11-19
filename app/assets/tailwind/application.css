@@ -67,6 +67,9 @@
 }
 
 @theme {
+  /* Dark muted text and placeholders (DESIGN v7): the one color outside the Tailwind palette */
+  --color-muted: #7C8390;
+
   --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
 
   --animate-shake: shake 0.4s ease-in-out 1;

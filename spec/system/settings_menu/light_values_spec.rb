@@ -39,7 +39,7 @@ RSpec.describe "Light theme values", type: :system do
     visit root_path
     expect(page_background).to eq(color("gray-950"))
     expect(style("h1", "color")).to eq(color("white"))
-    expect(style("#room_code", "border-top-color")).to eq(color("gray-700"))
+    expect(style("#room_code", "border-top-color")).to eq(color("gray-500"))
     expect(style(".byline", "color")).to eq(color("gray-400"))
     expect(card_edge("figure .card-edge")).to eq("none")
   end

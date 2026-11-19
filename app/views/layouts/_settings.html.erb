@@ -8,7 +8,7 @@
 <% bordered = "border border-gray-800 text-gray-400 aria-expanded:bg-gray-800 light:border-gray-200 light:text-gray-600 light:aria-expanded:bg-gray-100" %>
 <% look = {
      default: {button: "size-11 rounded-xl #{bordered}", icon: "size-5", menu: "top-full mt-2"},
-     player_screen: {button: "h-7 w-10 rounded-lg text-gray-500 lg:h-8 lg:group-has-[[data-board]]/main:h-7 aria-expanded:bg-gray-800 light:aria-expanded:bg-gray-200",
+     player_screen: {button: "h-7 w-10 rounded-lg text-muted light:text-gray-500 lg:h-8 lg:group-has-[[data-board]]/main:h-7 aria-expanded:bg-gray-800 light:aria-expanded:bg-gray-200",
                      icon: "size-4 lg:size-[18px]", menu: "bottom-full mb-2"},
      big_screen: {button: "size-14 rounded-2xl #{bordered}", icon: "size-[26px]", menu: "bottom-full mb-3"}
    }.fetch(local_assigns.fetch(:variant, :default)) %>

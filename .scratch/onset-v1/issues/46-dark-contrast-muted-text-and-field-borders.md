@@ -1,13 +1,13 @@
 # 46: Dark theme muted text and field borders meet contrast
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by: 43, 44, 45
 Priority: normal
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: In the dark theme, muted text and the room code and name field borders are easier to read.
 
 ## Request
 
