@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  build 42: done, the five static error pages take Onset's dark and light, the theme cookie, theme-color metas and a named header graphic. Next: build the next ready ticket.
 - 2026-11-19  build 46: done, dark muted text and placeholders use the muted token, field borders at rest gray-500, light unchanged. Next: build the next ready ticket.
 - 2026-11-19  triage 62: ready, SPEC §5 Rate limits gains the host's bot controls, 30 a minute across add and remove, a count apart from Start game, blocked by 47, 48 and 60, eight Decided lines. Next: build after 47, 48 and 60.
 - 2026-11-19  triage 61: ready, SPEC §4 unique index on players (game_id, lower(name)), a lost name race answered as a taken name, blocked by 54, five Decided lines. Next: build after 54.

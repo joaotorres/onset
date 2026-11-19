@@ -1,13 +1,13 @@
 # 42: Static error pages follow the device's light or dark setting
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by: 43
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: The error pages (such as page not found) now follow your device's light or dark setting, or the theme you picked in Onset.
 
 ## Request
 
