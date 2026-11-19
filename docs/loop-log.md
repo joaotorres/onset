@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  request 62: filed from 60's deferral, rate limit on adding and removing bots, blocked by 47 and 48. Next: triage once they are built.
 - 2026-11-19  request 61: filed from 54's deferral, unique index for player names in a room. Next: triage.
 - 2026-11-19  triage 60: ready, Security yes, SPEC §5 Rate limits (claims 180 a minute per player, votes and host actions 30), ten Decided lines, bot limits deferred. Next: owner's security review, then build.
 - 2026-11-19  triage 59: ready, no spec change, drop the unread @my_claim in ControllersController#show, no other duplicate claim read found, six Decided lines. Next: triage 60.

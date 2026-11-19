@@ -87,4 +87,4 @@ Decided: Security: yes, and decided rather than parked, because the limits chang
 
 Decided: adding and removing a bot are left for a follow-up, because their controller does not exist until tickets 47 and 48 are built. Instead of: holding this ticket on them.
 
-Deferred: Limit how often the host may add or remove a bot in a waiting room (`POST` and `DELETE /games/:code/bots`), 30 a minute keyed by the `host_game` cookie, as Start game and Play again are (SPEC §5 Rate limits), once tickets 47 and 48 are built.
+Deferred: Limit how often the host may add or remove a bot in a waiting room (`POST` and `DELETE /games/:code/bots`), 30 a minute keyed by the `host_game` cookie, as Start game and Play again are (SPEC §5 Rate limits), once tickets 47 and 48 are built. Filed as 62.
