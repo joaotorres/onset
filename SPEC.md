@@ -127,7 +127,7 @@ A participant in a Game.
 | `user_id` | bigint | **nullable**; reserved for v1.5 accounts. Designed in now. |
 | `session_token` | string | Random hex, stored in player's cookie. Unique per game. |
 | `name` | string | 1–20 chars, displayed |
-| `color` | string | Hex code, chosen at join. UI offers 8 distinct presets. |
+| `color` | string | Hex code, chosen at join: one of the 8 presets (`Player::PRESET_COLORS`), so a room holds at most 8 players. |
 | `score` | integer | default 0 |
 | `locked_until` | datetime | nullable; the timestamp until which the player cannot call SET (the `Game::CLAIM_TIMEOUT` lockout) |
 | `last_seen_at` | datetime | updated on every player screen request via `Player#seen!`, which skips callbacks so it never broadcasts |
@@ -136,7 +136,9 @@ A participant in a Game.
 
 A bot keeps a random `session_token` like every player, held by no browser, so no request can act as it: a nil token would match a request that carries no player cookie.
 
-**Validations**: `name` present, length 1..20. `color` matches a hex pattern. `(game_id, name)` unique-case-insensitive (no two players in the same game can share a name). `(game_id, color)` unique (no two players in the same game can share a color).
+**Validations**: `name` present, length 1..20. `color` matches a hex pattern, and on create is one of `Player::PRESET_COLORS`: checked on create only, so a row from before the rule (any hex was accepted until ticket 54) still saves its score and lockout. `(game_id, name)` unique-case-insensitive (no two players in the same game can share a name). `(game_id, color)` unique (no two players in the same game can share a color), in the database too: a unique index on `players (game_id, color)`, so two joins at the same moment cannot both take one color.
+
+**The 8-player cap.** Eight presets, each unique in a room, cap a room at 8 players, people and bots alike (AI opponent). It is enforced on the server, never only by the join page's form: until ticket 54 the server took any hex color, so a script could add hundreds of players to one room, and every game update renders each player's screen for every player (§7), which stalls every room in the one process. A join that loses the race for a color at the index comes back as a taken color does (§8, Join page).
 
 **Methods**: `active?` (last_seen within 30s; a bot is never seen, so never active), `locked?`, `host?`, `bot?`.
 
@@ -234,7 +236,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
 | POST | `/games` | Create room (`mode=quick` for first to 5), give this browser the `host_game` cookie, redirect to the creator's join page `/games/:code/players/join` |
 | GET | `/games/:code` | Big screen, optional: any room can open it at any time |
 | GET | `/games/:code/players/join` | Join page, after starting a game, the QR scan or a code: name + color form |
-| POST | `/games/:code/players` | Create player, set cookie, redirect to the player screen |
+| POST | `/games/:code/players` | Create player, set cookie, redirect to the player screen. Refused, the join page back with the color error, unless the color is one of the 8 presets still free in the room (§4, The 8-player cap); a room with none free is full |
 | GET | `/games/:code/controller` | Player screen |
 | POST | `/games/:code/ready` | A player votes to start; the game starts when every player (2+, at least one a person) has voted, a bot counting as voted (AI opponent). Once ended, a player votes to play again; the room restarts when every active player has voted |
 | POST | `/games/:code/bots` | The host (the browser holding `host_game`, `403` otherwise) adds a bot at `level` `easy`, `medium` or `hard` (AI opponent). Ignored, still `204`, unless the room is waiting, the level is one of the three and a color is free |
@@ -387,7 +389,7 @@ For v1, **avoid a custom channel**. Turbo Streams over `broadcasts_to` covers al
 
 Two card palettes. Each browser picks one in the settings menu (§8, Settings menu), under **Card colors**:
 
-- **Classic** (the default): Set's own red, green and purple, far apart in hue so they read at a glance. The exact shades come from the design pass (`docs/design-system.md`). Each stays clearly apart from the other two, reads on the card face, and stays apart from the player colors, which already hold a red, a green and a purple of their own (`PlayersController::PRESET_COLORS`).
+- **Classic** (the default): Set's own red, green and purple, far apart in hue so they read at a glance. The exact shades come from the design pass (`docs/design-system.md`). Each stays clearly apart from the other two, reads on the card face, and stays apart from the player colors, which already hold a red, a green and a purple of their own (`Player::PRESET_COLORS`).
 - **Color-blind**: the IBM colorblind-safe palette, the one every card used before Classic: **Blue** `#648FFF`, **Orange** `#FE6100`, **Magenta** `#DC267F`. It also draws a **color mark** on every card: one small mark per color, the same on every card of that color, so the three colors can be told apart without seeing color at all. The mark never changes the shapes, their number or their shading, the card's other three features, and cannot be mistaken for one of them. It sits inside the card's SVG, so card sizes and every layout stay as they are. Its form and place come from the design pass. Its blue and orange measure 2.91:1 on the card face, just under the 3:1 bar for graphics; they stay as IBM sets them, because this is the palette players already know and the color mark tells the three apart by form, not by contrast.
 
 Card color 0, 1 and 2 (§4, Card) are red, green and purple in Classic and blue, orange and magenta in Color-blind, so a Set is the same Set under both.
@@ -453,7 +455,7 @@ Each color means one thing everywhere:
 | green | ready, correct, start, play again (`green-700` for white text; `green-600` is only about 3.3:1) |
 | orange | deck empty and the End game vote (`orange-700` for white text; `orange-600` is only about 3.3:1) |
 
-Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberately apart from both card palettes (Palette above). They show as dots, the player screen's top border strip and podium bars.
+Player colors are the 8 presets in `Player::PRESET_COLORS`, deliberately apart from both card palettes (Palette above). They show as dots, the player screen's top border strip and podium bars.
 
 Countdown rings: `r=45` in a 100 viewBox, gray track, colored progress with round caps, rotated -90° so they drain clockwise from the top. Seconds sit inside the ring, or inside the button the ring surrounds.
 
@@ -593,7 +595,7 @@ Full screen, built for a TV at 2m, and must also fit a laptop down to 1280px wid
 
 ## 8. Join page (`/games/:code/players/join`)
 
-Portrait. "Joining room" with the code in large type, since the code is what people check. The creator sees the same page after **Start a game**. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a ring and a white ✓, no JS: the ring white in the dark theme and `gray-900` in the light theme. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken the room is full: none is selected, the red base error box says "This room is full" and **Join** is disabled. The page does not update live as others join. **Join** sits at the bottom, under the thumb. In the browser that created the room (its `host_game` cookie matches), a **Use this screen as the big screen instead** text link sits under Join and opens the room's big screen `/games/:code` in the same tab; other browsers do not show it. Hosting stays with the browser, which gets the big screen's **Start game** and **Play again**, and on player screens everyone starts and plays again by the ready vote. Joining from the host browser records that player as `host_player_id` (§4) only so their player screen shows the add-bot control (AI opponent); it grants nothing else. Field errors show under their field; base errors (game already started) in a red box.
+Portrait. "Joining room" with the code in large type, since the code is what people check. The creator sees the same page after **Start a game**. **Your name** (max 20). **Pick a color**: a 4×2 grid of swatches that select with a ring and a white ✓, no JS: the ring white in the dark theme and `gray-900` in the light theme. Taken colors are faded with the taker's initial. The first free color, in preset order, comes selected, so a player can join with a name alone. If the chosen color was taken between render and submit, a join at the same moment included (§4, The 8-player cap), the form comes back with the color error and the next free color after it selected (preset order, wrapping); any other re-render keeps the player's free choice. With every color taken the room is full: none is selected, the red base error box says "This room is full" and **Join** is disabled. The page does not update live as others join. **Join** sits at the bottom, under the thumb. In the browser that created the room (its `host_game` cookie matches), a **Use this screen as the big screen instead** text link sits under Join and opens the room's big screen `/games/:code` in the same tab; other browsers do not show it. Hosting stays with the browser, which gets the big screen's **Start game** and **Play again**, and on player screens everyone starts and plays again by the ready vote. Joining from the host browser records that player as `host_player_id` (§4) only so their player screen shows the add-bot control (AI opponent); it grants nothing else. Field errors show under their field; base errors (game already started) in a red box.
 
 ## 8. Player screen (`/games/:code/controller`)
 
