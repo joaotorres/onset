@@ -1,9 +1,10 @@
 # 46: Dark theme muted text and field borders meet contrast
 
-Status: needs-triage
+Status: ready-for-agent
 Kind: visual
 Blocked by: 43, 44, 45
-Priority:
+Priority: normal
+Feature: Themes
 Model:
 Effort:
 Changelog:
@@ -13,6 +14,50 @@ Changelog:
 Deferred from 40. In the dark theme, muted text (the "Room CODE" footer, the big screen's empty band text, the tray slot numbers) reads at 4.5:1 or more on its ground, and field borders at rest at 3:1 or more, as the light theme's do.
 
 Ticket 40 kept dark as built, so muted `gray-500` (4.16:1 on `gray-950`) and the `gray-700` field border stayed below the spec's contrast.
+
+## Spec references
+
+- SPEC.md, Shared: 10. Cards and visual system > Visual system (the 4.5:1 text rule, muted and placeholders included, disabled labels exempt; the 3:1 form field border rule; the `muted` token)
+- SPEC.md, Shared: 10. Cards and visual system > Themes (every themed color from CSS keyed on `<html>`, never per-viewer markup)
+- docs/design-system.md v7: Shared: Tokens (`muted`), Shared: Themes (v6) Text (Muted and Placeholder rows) and Surfaces and borders (Field border at rest), Shared: Rules added in v7, Screens > Player screen (portrait tray slot numbers); board `DarkSheet`
+
+## Scope
+
+Colors only, in the dark theme. The light theme keeps every value it has.
+
+- Add the `muted` color token, `#7C8390`, to the Tailwind theme in the app's stylesheet, beside the existing tokens
+- Dark muted text becomes `muted` everywhere the views draw it in `gray-500` today, keeping `gray-500` in light: the player screen's "Room CODE" footer, the player screen's settings button icon, the portrait tray's empty slot numbers (also when the browser empties a slot again after a pick is undone), the big screen's empty band text ("Spot a Set? Hit SET! on your screen."), the "/N" of the No Set vote count, the big screen scoreboard's "No one yet" and a locked player's entry, and the join page's hint under the colors
+- Dark placeholders become `muted` in the landing's room code field and the join page's name field, `gray-500` in light
+- The dark border at rest of those two fields becomes `gray-500` (already `gray-500` in light). Their error borders and focus rings stay as they are
+- Every themed color stays CSS keyed on `<html>` (the `light:` variant), so broadcast partials (the announcement band, the scoreboards) render the same markup for every viewer
+- Update the existing specs that assert the old dark values
+
+Must not touch: the disabled labels (Join when the room is full, Start game with one player, `gray-800` with `gray-500`), any `gray-700` border that is not one of the two form fields (the mode toggle's track, the Join, Copy link and Show QR buttons, the settings menu and its toggles, the QR sheet, the empty tray slot's dashed border, the waiting box), the player screen scoreboard's own-entry `gray-500` border, layouts, sizes, the `_card` partial, the light theme's values and the static error pages.
+
+## Acceptance criteria
+
+- In the dark theme, each muted place in Scope computes its text color to `#7C8390`: the "Room CODE" footer, the settings button icon on the player screen, an empty tray slot's number (both as rendered and after a picked card is taken back out of the slot), the big screen's empty band text, the "/N" of the No Set count, "No one yet" and a locked player's entry on the big screen scoreboard, and the join page's hint
+- In the light theme each of those still computes to `gray-500`
+- In the dark theme the room code field's and the name field's placeholder color is `#7C8390`, and in light `gray-500`
+- In the dark theme the room code field (phone and desktop) and the name field at rest have a `gray-500` border; with an error they keep `red-500` dark and `red-600` light
+- The disabled Join and Start game labels still compute to `gray-500` on `gray-800` in dark
+- The mode toggle's track, the Join button on the landing, the settings menu and the empty tray slot's dashed border keep `gray-700` in dark
+- A broadcast partial that shows muted text (the announcement band, the big screen scoreboard) renders the same markup for a viewer in either theme: no theme-dependent markup
+- `muted` is defined once, as a theme token in the stylesheet, and no view writes `#7C8390` inline
+
+## Verification
+
+`bin/test-all && bundle exec standardrb`
+
+Tests first: a system spec in the dark theme reading the computed `color` of each muted place, the placeholder color (`::placeholder`) and the at-rest border color of both fields, plus the disabled labels and one non-field `gray-700` border as built; the light-theme values beside them, extending the existing light specs (the player screen light play spec, the settings menu light values spec) where they already read these elements. Keep each spec file under 8 s, splitting by `describe` group.
+
+## Out of scope
+
+- Raising disabled controls' labels or any non-field border
+- Redrawing the built dark boards on the canvas (DESIGN v7 and `DarkSheet` win, Shared: Rules added in v7)
+- The static error pages (ticket 42), which hold no muted text and no form field in DESIGN v7
+- Moving text and border shades into the one source for theme colors from ticket 50 (it covers the card palettes and the theme-color metas only)
+- Any light theme value
 
 ## Comments
 
@@ -39,3 +84,11 @@ Design entry: docs/design-system.md v7, Shared: Tokens, Shared: Themes (v6) and 
 Decided: DESIGN v7 changes these rules and tokens, each one this ticket's request asked for: a new token `muted` `#7C8390`, the first outside the Tailwind palette (Shared: Tokens, and the Themes intro's "every value is from the Tailwind default palette"); Shared: Themes (v6) Text, the Muted row's dark value `gray-500` to `muted`, and a new Placeholder row; Surfaces and borders, the Field border at rest row's dark value `gray-700` to `gray-500`, dropping its stale "the boards draw `gray-400`" note; the v6 rule on muted text, now light only; the portrait tray slot numbers in muted rather than `gray-500`. Instead of: asking first, since the request and the brief decided them.
 
 Decided: muted stays a separate role a step below secondary, not merged into `gray-400`, because merged, the footer, the empty band, "No one yet" and a locked player's row would read as loud as labels and the deck line, and dark keeps the five text steps light has. Instead of: merging muted into secondary `gray-400` (7.93:1).
+
+Gate 2 met: docs/design-system.md v7 (commit cf36849, after the ticket was filed) covers this ticket, and its Comments hold no Design proposes, conflicts or question lines. No conflict with the undeployed spec changes (triage 42's error page rules) or with open tickets 42, 47, 48, 54, 58, 59 and 60. A search of the views, the stylesheet and the Stimulus controllers finds the muted `gray-500` places, the two placeholders and the two field borders the Scope lists, and no other.
+
+Decided: the static error pages are out of this ticket's scope whichever of 42 and 46 is built first, because DESIGN v7's error pages hold only primary, body, the numerals and the red status name, no muted text and no form field. Instead of: keeping the earlier conditional scope on them.
+
+Decided: SPEC 10 Visual system lists `muted` `#7C8390` beside the other stylesheet tokens, as the one color outside the Tailwind default palette, so the build defines it once as a theme token rather than as an inline hex in each view. Instead of: leaving the spec's "Tailwind default palette plus these tokens" unchanged and the token to DESIGN alone.
+
+Decided: Priority normal, because it raises built text that is readable but under the spec's contrast on every dark screen, neither broken nor rare. Instead of: high as broken built work, or low as polish.
