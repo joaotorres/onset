@@ -238,6 +238,7 @@ URL surface. Every action a player screen or the big screen POSTs answers `204 N
   - **No Set** (`POST`, `DELETE /no_set` and `POST /no_set/refuse`, calling, agreeing, withdrawing and There's a Set), one count: 30 a minute
   - **End game** (`POST /end_game`): 30 a minute
 - **The host's room actions**: Start game and Play again on the big screen (`POST /start`, `POST /restart`), one count, 30 a minute, by the room the `host_game` cookie names; a request without the cookie, refused with `403` anyway, is counted by IP, so a stranger's requests never use up the host's.
+- **The host's bot controls** (ticket 62): adding and removing a bot in the waiting room (`POST /bots`, `DELETE /bots/:id`), one count across the two, 30 a minute, keyed as Start game and Play again are, by the room the `host_game` cookie names and by IP without it, but a count of its own: a host who has added and removed bots still has every Start game. A refused add adds no bot and a refused removal leaves the bot in the room.
 
 A refused in-game action shows nothing on the screen: the `429` has no body, so the screen stays as it was until the next broadcast, and the next tap in the following minute is answered as usual. The limits sit far above a person's pace, so only a script meets them. Why: with the 8-player cap (§4) each update's cost is bounded, but one client could still send updates as fast as the network allows, each taking the game lock and rendering every player's screen (§7), and so slow every room in the one process.
 

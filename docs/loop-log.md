@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  triage 62: ready, SPEC §5 Rate limits gains the host's bot controls, 30 a minute across add and remove, a count apart from Start game, blocked by 47, 48 and 60, eight Decided lines. Next: build after 47, 48 and 60.
 - 2026-11-19  triage 61: ready, SPEC §4 unique index on players (game_id, lower(name)), a lost name race answered as a taken name, blocked by 54, five Decided lines. Next: build after 54.
 - 2026-11-19  request 62: filed from 60's deferral, rate limit on adding and removing bots, blocked by 47 and 48. Next: triage once they are built.
 - 2026-11-19  request 61: filed from 54's deferral, unique index for player names in a room. Next: triage.
