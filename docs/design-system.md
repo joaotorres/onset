@@ -412,7 +412,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 | Status name (in the SVG) | `red-400`, 7.28:1 on the page, 5.31:1 over the numerals | `red-700`, 6.19:1 on the page, 5.23:1 over the numerals |
 | `theme-color` | `#030712` | `#F9FAFB` |
 
-- The numerals take the subtle border role of each theme, as faint as the scaffold's (1.36:1, 1.14:1): a backdrop graphic under the status name, not text. The red status name and the paragraph carry the message, and the page title and the SVG's label name the code. Whether SPEC §10's 4.5:1 text rule reaches them is open (Open questions)
+- The numerals take the subtle border role of each theme, as faint as the scaffold's (1.36:1, 1.14:1): a backdrop graphic under the status name, not text. The red status name and the paragraph carry the message, and the page title and the SVG's label name the code. SPEC §10 Themes exempts them from the 4.5:1 text rule (triage 42)
 
 ## Known gaps
 
@@ -422,7 +422,7 @@ None
 
 - The dark Locked out boards (`-wrong`, `-timeup`) still draw the 5-second ring, though lockout is 15 s since ticket 20. The v6 light boards draw it at 15 s (12 s left). Redraw the dark ones in the next brief that touches lockout
 - Answered by triage 40, then by v7: dark muted text (`gray-500`, 4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest (`gray-700`, 1.72:1 on `gray-900`) stayed as built in ticket 40; ticket 46's design pass raises them to `muted` `#7C8390` and `gray-500` (Shared: Themes (v6), Shared: Rules added in v7)
-- The static error pages' status code numerals are drawn at 1.37:1 dark and 1.18:1 light as a backdrop graphic, below SPEC §10's 4.5:1 for text, as the scaffold had them. Triage 42 confirms SPEC §10 treats them as decoration, or says they must reach 4.5:1, which would turn them into a visible second headline
+- Answered by triage 42 in SPEC §10 Themes: the static error pages' status code numerals (1.37:1 dark, 1.18:1 light) are a backdrop graphic, not text, so the 4.5:1 text rule does not reach them; the status name, the page title and the graphic's accessible name carry the code
 - Answered by triage 41 in SPEC §10 Palette: the Color-blind blue and orange stay at 2.91:1 against the card face, below 3:1 for graphics, as IBM sets them; the color marks keep them apart by form
 - Answered by triage 40: the light field border at rest is `gray-500` (4.84:1 on white), not the boards' `gray-400` (Shared: Themes (v6))
 - Answered by triage 40: the player screen settings button stays 40×28 (40×32 in the computer Waiting and Game over footers), above the WCAG 2.2 AA 24px minimum; the footer does not grow, so the board keeps its size
