@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  deploy deploy-20261119-1509: 50, 51, 52, 53, 55, 56, 57 deployed. Next: new requests.
 - 2026-11-17  review 20261117-211428: deep, tickets 50-56 meet their criteria, no pending decisions, two follow-ups deferred (50 SPEC §7 hooks, 56 unused controller claim lookup). Next: file the deferred follow-ups.
 - 2026-11-17  quick review 20261117-210140: ticket 57 clean on both axes, no pending decisions, nothing deferred. Next: none.
 - 2026-11-17  triage 57: done in triage, glossary adds Current claim and qualifies Claim, six Decided lines. Next: none for this ticket.

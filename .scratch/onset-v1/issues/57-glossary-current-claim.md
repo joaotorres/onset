@@ -1,6 +1,6 @@
 # 57: Glossary: add Current claim, qualify when a claim is judged
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

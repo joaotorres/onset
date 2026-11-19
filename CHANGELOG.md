@@ -2,6 +2,16 @@
 
 What each deploy shipped, newest first, from the tickets' Changelog: lines.
 
+## 2026-11-19, deploy-20261119-1509
+
+- Escape now closes the open settings menu even after a click on its blank space. (51)
+- A theme or card colors picked in another tab now show on the next page you open by a link or Back, not only after a reload. (52)
+- A late or repeated Start game or Play again tap no longer reshuffles a running game or wipes the scores. (55)
+- A SET! call still running when the game ends can no longer reopen the game or change the scores; an End game tap during a call does nothing, so tap it again once the call is judged. (56)
+- Behind the scenes: the card palette, the color marks and the theme colors are each written in one place, which the cards and the settings menu read. (50)
+- Behind the scenes: the design system matches what is built, and tests cover the browser color after a theme pick, the settings menu closed after Back and the tray slot's card edge. (53)
+- Behind the scenes: the glossary defines the current claim and says only it is ever judged. (57)
+
 ## 2026-11-16, deploy-20261116-1720
 
 - The How to play page uses its full 944 px for content, with the side padding outside it, and its running text is capped to a comfortable line length. (39)

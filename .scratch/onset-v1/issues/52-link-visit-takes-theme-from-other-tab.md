@@ -1,6 +1,6 @@
 # 52: A tab that follows a link takes on the theme and card colors picked in another tab
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: normal

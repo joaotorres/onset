@@ -1,6 +1,6 @@
 # 50: One source each for the card palette, the color marks and the theme colors
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by: 53
 Priority: low

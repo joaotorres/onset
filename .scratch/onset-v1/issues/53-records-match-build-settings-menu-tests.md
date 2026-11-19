@@ -1,6 +1,6 @@
 # 53: Bring the records in line with what is built and cover the settings menu's untested paths
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

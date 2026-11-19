@@ -1,6 +1,6 @@
 # 56: A claim still pending when the room ends is not judged after the game is over
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: high

@@ -1,6 +1,6 @@
 # 51: Escape closes the open settings menu wherever focus is
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: normal

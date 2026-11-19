@@ -1,6 +1,6 @@
 # 55: Start game and Play again act only in their state
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: high
