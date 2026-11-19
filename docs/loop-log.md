@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  request 59: the player screen reads its claim in one place, deferred from 56. Next: triage.
 - 2026-11-19  request 58: SPEC §7 Hooks names everything the settings controller relies on, deferred from 50. Next: triage.
 - 2026-11-19  answer 54: owner chose 1 (build the server-side 8-player cap as triaged) and 3 (tap limit in a ticket of its own), back to needs-triage. Next: file the tap limit, triage 54.
 - 2026-11-19  deploy deploy-20261119-1509: 50, 51, 52, 53, 55, 56, 57 deployed. Next: new requests.
