@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  triage 47: still waiting for the design pass, no entry for bots in v7; brief 20261119-42-46 has returned, so it is no longer held. Next: design brief 47.
 - 2026-11-19  triage 46: ready, dark muted text and placeholders to the `muted` token, the two field borders to gray-500, three Decided lines. Next: build.
 - 2026-11-19  auto: context cap, 196k of 200k, rest of the run handed to a headless bin/auto --unattended. Next: triage 46, 54, 58, 59, 60, then builds.
 - 2026-11-19  triage 42: ready, the design question settled (the faint numerals are a backdrop graphic, SPEC §10 Themes), four Decided lines. Next: build.
