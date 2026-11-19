@@ -228,6 +228,19 @@ end
 
 URL surface. Every action a player screen or the big screen POSTs answers `204 No Content`; the broadcast updates the screens (§7). The one exception is a pick or a submit from a player who does not hold the claim, `403`, which no screen sends.
 
+**Rate limits.** Each counts requests in a fixed one-minute window, in the app's cache store (Solid Cache in production), and a request over its limit answers `429 Too Many Requests` and changes nothing: no claim taken, no pick stored, nothing judged, no vote counted, no broadcast.
+
+- **Room creation** (`POST /games`): 10 a minute per IP, the landing back with "Too many new games. Try again in a minute."
+- **Joining** (`POST /games/:code/players`): 20 a minute per IP, the join page back with "Too many join attempts. Try again in a minute."
+- **A player's in-game actions** (ticket 60; the paths below are under `/games/:code`), each counted per player, by the `player_token` cookie, never by IP: the players at one table share one Wi-Fi address, so a count by IP would refuse a whole table for one fast player. A request with no player cookie, refused anyway (`403` or `404`), is counted by IP.
+  - **Claims**: SET!, card picks and Submit (`POST /claims`, `PATCH /claims/:id`, `POST /claims/:id/submit`), one count across the three, **180 a minute**. Picks are sent one at a time (§11), so even a player tapping 8 times a second through a whole 15-second claim sends 120; normal play is about 5 a claim. A player picking fast is therefore never refused mid-claim, where a refused pick would leave the server judging older picks at expiry
+  - **Ready** (`POST /ready`, I'm ready and Play again): 30 a minute
+  - **No Set** (`POST`, `DELETE /no_set` and `POST /no_set/refuse`, calling, agreeing, withdrawing and There's a Set), one count: 30 a minute
+  - **End game** (`POST /end_game`): 30 a minute
+- **The host's room actions**: Start game and Play again on the big screen (`POST /start`, `POST /restart`), one count, 30 a minute, by the room the `host_game` cookie names; a request without the cookie, refused with `403` anyway, is counted by IP, so a stranger's requests never use up the host's.
+
+A refused in-game action shows nothing on the screen: the `429` has no body, so the screen stays as it was until the next broadcast, and the next tap in the following minute is answered as usual. The limits sit far above a person's pace, so only a script meets them. Why: with the 8-player cap (§4) each update's cost is bounded, but one client could still send updates as fast as the network allows, each taking the game lock and rendering every player's screen (§7), and so slow every room in the one process.
+
 | Method | Path | Purpose |
 | --- | --- | --- |
 | GET | `/` | Landing: start a game, standard or first to 5, or join by code |

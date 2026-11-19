@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-19  triage 60: ready, Security yes, SPEC §5 Rate limits (claims 180 a minute per player, votes and host actions 30), ten Decided lines, bot limits deferred. Next: owner's security review, then build.
 - 2026-11-19  triage 59: ready, no spec change, drop the unread @my_claim in ControllersController#show, no other duplicate claim read found, six Decided lines. Next: triage 60.
 - 2026-11-19  triage 58: done in triage, SPEC §7 Hooks names everything the settings, invite, card-selection, countdown and telemetry controllers rely on, five Decided lines. Next: triage 59.
 - 2026-11-19  triage 54: ready, from the owner's answer, the server takes only a free preset color on join with a unique index on players (game_id, color), SPEC §4, §5, §8 Join page and §10 updated, Security yes, a name-index follow-up deferred, seven Decided lines. Next: file the deferred follow-up, then build.
