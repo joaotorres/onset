@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  request 63: filed from 42's deferral, static error pages' CSS variables and theme-color specs. Next: triage.
 - 2026-11-19  review 20261119-233807: deep, 42, 46, 58 and 59 no scope creep or hard breach, 42's Changelog line corrected, four follow-ups deferred (on 42, 46 twice, 60), no pending decisions. Next: file the follow-ups.
 - 2026-11-19  quick review 20261119-225020: 42, 46, 58 and 59 clean on both axes, no pending decisions, nothing deferred. Next: deploy when you like.
 - 2026-11-19  copy pass: 1 fixed, 0 flagged, ticket 46's Changelog line drops the token name "muted". Next: quick review.
