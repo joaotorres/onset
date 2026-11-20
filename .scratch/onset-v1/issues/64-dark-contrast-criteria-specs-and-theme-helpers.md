@@ -7,7 +7,7 @@ Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog: Behind the scenes: specs now cover the dark disabled labels, borders and light muted text of ticket 46, and the theme spec helpers are shared.
+Changelog: Behind the scenes: specs now cover the dark theme's disabled labels and borders and the light theme's muted text, and the theme spec helpers are shared.
 
 ## Request
 
