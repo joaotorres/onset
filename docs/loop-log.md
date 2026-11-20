@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  request 72: filed from 71's Deferred line, the big screen play area fitting laptops 800px tall and shorter, behavioural. Next: triage.
 - 2026-11-20  triage 71: ready, SPEC §8 Big screen Scoreboard fits 8 rows above the settings button down to 1280×720 with a second shrink under 800px tall, blocked by 67 and 68, one Deferred line, 9 Decided lines. Next: build after 67 and 68.
 - 2026-11-20  request 71: filed from 67's Deferred line, the rail clearing the settings button under 800px tall, behavioural. Next: triage.
 - 2026-11-20  triage 67: ready, SPEC §8 Big screen Scoreboard keeps 8 rows above the settings button in every state, compact rail under 1000px tall, design system open question answered, one Deferred line, 9 Decided lines. Next: build.
