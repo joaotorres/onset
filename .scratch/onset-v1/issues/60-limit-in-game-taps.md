@@ -8,7 +8,7 @@ Feature: Rate limits
 Model:
 Security: yes
 Effort:
-Changelog: A player sending game actions far faster than anyone can tap is now refused for the rest of the minute, without slowing the table.
+Changelog: Behind the scenes: a script sending game actions far faster than anyone can tap is now refused for the rest of the minute, without slowing the table.
 
 ## Request
 

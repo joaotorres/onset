@@ -8,7 +8,7 @@ Feature: Waiting room
 Model:
 Security: yes
 Effort:
-Changelog: A room now holds at most 8 players: a join must take one of the 8 player colors still free.
+Changelog: Behind the scenes: the server now refuses a join that does not take one of the 8 player colors still free, so a script can no longer push a room past 8 players.
 
 ## Request
 

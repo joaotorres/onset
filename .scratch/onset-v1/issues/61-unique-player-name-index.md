@@ -62,3 +62,7 @@ Decided: Blocked by 54, because both rescue `RecordNotUnique` in `PlayersControl
 Decided: a bot add that loses the name or color race is ignored, still `204`, as an add with no color free, written into SPEC §4, because SPEC §5 already ignores a bot add it cannot place and 47's triage notes chose the same for the color race. Instead of: retrying with the next free name.
 
 Decided: Priority low, because only two joins with one name in the same instant hit it, and the cost is two players sharing a name, not a broken room. Instead of: normal.
+
+Decided: quick review 20261120-055231 leaves the lost race's stale colors to a follow-up, because the fix is plain and the build met its criteria as its specs read them. Instead of: reopening 61.
+
+Deferred: A join that loses the race at the players color or name index re-renders the join page from colors loaded before the save: `PlayersController#create` rescues `RecordNotUnique` in `save_player` but never reloads `@color_owners` (`set_color_owners`), so `color_for_rerender` keeps the lost color selected, its swatch draws as free, and when the winner took the last color `full?` stays false and the page never says the room is full. Reload the taken colors in the rescue before re-rendering, and add request specs whose stubbed save commits the winner and then raises (today's race examples in `spec/requests/players/create_spec.rb` create the winner before the request, so they never see the stale load): the next free color selected, and the room-full answer when it was the last color.

@@ -7,7 +7,7 @@ Priority: high
 Feature: Page layout
 Model:
 Effort:
-Changelog: The big screen's waiting and game-over screens now fit inside the window on laptops down to 1280×720, with the QR code never under 160px.
+Changelog: On the big screen, the waiting room's join code, QR code and players and the game-over podium now fit inside the window on laptops down to 1280×720, with the QR code never under 160px.
 
 ## Request
 

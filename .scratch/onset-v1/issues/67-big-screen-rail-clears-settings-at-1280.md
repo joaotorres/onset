@@ -7,7 +7,7 @@ Priority: high
 Feature: Page layout
 Model:
 Effort:
-Changelog: On a laptop-sized big screen, all 8 players show in the rail and stay clear of the settings button.
+Changelog: On a big screen 800 to 999px tall, such as a 1280×800 or 1440×900 laptop, all 8 players show in the Players list, clear of the settings button.
 
 ## Request
 
