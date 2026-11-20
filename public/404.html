@@ -35,14 +35,42 @@
         margin: 0;
       }
 
-      html {
+      :root {
+        --ground: #030712;
+        --text: #D1D5DB;
+        --strong: #F9FAFB;
+        --error-id: #1F2937;
+        --error-description: #F87171;
         color-scheme: dark;
+      }
+
+      :root[data-theme="light"] {
+        --ground: #F9FAFB;
+        --text: #374151;
+        --strong: #111827;
+        --error-id: #E5E7EB;
+        --error-description: #B91C1C;
+        color-scheme: light;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme]) {
+          --ground: #F9FAFB;
+          --text: #374151;
+          --strong: #111827;
+          --error-id: #E5E7EB;
+          --error-description: #B91C1C;
+          color-scheme: light;
+        }
+      }
+
+      html {
         font-size: 16px;
       }
 
       body {
-        background: #030712;
-        color: #D1D5DB;
+        background: var(--ground);
+        color: var(--text);
         display: grid;
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Aptos, Roboto, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         font-size: clamp(1rem, 2.5vw, 2rem);
@@ -58,59 +86,15 @@
       }
 
       strong {
-        color: #F9FAFB;
+        color: var(--strong);
       }
 
       #error-description {
-        fill: #F87171;
+        fill: var(--error-description);
       }
 
       #error-id {
-        fill: #1F2937;
-      }
-
-      :root[data-theme="light"] {
-        color-scheme: light;
-      }
-
-      :root[data-theme="light"] body {
-        background: #F9FAFB;
-        color: #374151;
-      }
-
-      :root[data-theme="light"] strong {
-        color: #111827;
-      }
-
-      :root[data-theme="light"] #error-description {
-        fill: #B91C1C;
-      }
-
-      :root[data-theme="light"] #error-id {
-        fill: #E5E7EB;
-      }
-
-      @media (prefers-color-scheme: light) {
-        :root:not([data-theme]) {
-          color-scheme: light;
-        }
-
-        :root:not([data-theme]) body {
-          background: #F9FAFB;
-          color: #374151;
-        }
-
-        :root:not([data-theme]) strong {
-          color: #111827;
-        }
-
-        :root:not([data-theme]) #error-description {
-          fill: #B91C1C;
-        }
-
-        :root:not([data-theme]) #error-id {
-          fill: #E5E7EB;
-        }
+        fill: var(--error-id);
       }
 
       a {

@@ -1,13 +1,13 @@
 # 63: Static error pages: CSS variables and theme-color specs
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the static error pages write their theme colors once as CSS variables, and their specs follow the app's theme colors.
 
 ## Request
 

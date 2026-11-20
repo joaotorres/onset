@@ -4,21 +4,47 @@ require "rails_helper"
 RSpec.describe "Static error pages' metas and graphic", type: :system do
   include_context "static error pages"
 
-  StaticErrorPages::PAGES.each do |path, label|
+  light = ThemesHelper::THEME_COLORS["light"]
+  dark = ThemesHelper::THEME_COLORS["dark"]
+
+  StaticErrorPages::PAGES.each do |path, page_info|
+    label = page_info[:label]
+
     describe path do
       it "gives the Match device theme-color pair with no cookie" do
         visit path
-        expect(theme_colors).to eq([["#F9FAFB", "(prefers-color-scheme: light)"], ["#030712", ""]])
+        expect(theme_colors).to eq([[light, "(prefers-color-scheme: light)"], [dark, ""]])
       end
 
-      it "leaves one theme-color, #F9FAFB, with theme=light" do
+      it "leaves one theme-color, the light one, with theme=light" do
         visit_with_cookie(path, "light")
-        expect(theme_colors).to eq([["#F9FAFB", ""]])
+        expect(theme_colors).to eq([[light, ""]])
       end
 
-      it "leaves one theme-color, #030712, with theme=dark" do
+      it "leaves one theme-color, the dark one, with theme=dark" do
         visit_with_cookie(path, "dark")
-        expect(theme_colors).to eq([["#030712", ""]])
+        expect(theme_colors).to eq([[dark, ""]])
+      end
+
+      it "keeps the scaffold's title and message" do
+        visit path
+        expect(page.title).to eq(page_info[:title])
+        expect(page.evaluate_script("document.querySelector('main article p').innerHTML")).to eq(page_info[:message])
+      end
+
+      it "writes hex colors only in custom property declarations" do
+        css = File.read(Rails.public_path.join(path.delete_prefix("/")))[%r{<style>(.*?)</style>}m, 1]
+        stray = css.lines.select { |l| l.match?(/#\h{6}/) && !l.match?(/\A\s*--[\w-]+:\s*#\h{6};\s*\z/) }
+        expect(stray).to be_empty
+      end
+
+      it "writes each themed rule once, with one light override block per light condition" do
+        css = File.read(Rails.public_path.join(path.delete_prefix("/")))[%r{<style>(.*?)</style>}m, 1]
+        %w[body strong #error-id #error-description].each do |selector|
+          expect(css.scan(/^\s*#{Regexp.escape(selector)} \{/).size).to eq(1), selector
+        end
+        expect(css.scan('[data-theme="light"]').size).to eq(1)
+        expect(css.scan(":root:not([data-theme])").size).to eq(1)
       end
 
       it "names the header graphic by the code and name in the title's brackets" do
