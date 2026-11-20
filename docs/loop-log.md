@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  design-entry 47: design system v8 (bot mark, add-bot control, "Need a person to play"), 10 boards added, 3 Design proposes, 1 Deferred, 2 Decided lines. Next: triage.
 - 2026-11-20  design-brief 47: brief 20261120-47 against design system v7, 10 boards (add-bot control, bot mark, "Need a person to play"), three Decided lines; 48 held for it over the 6-board round. Next: draw.
 - 2026-11-20  request 66: filed from 60's deferral, SPEC URL surface names every non-204 answer, one Decided line. Next: triage.
 - 2026-11-20  request 65: filed from 46's deferral, design system's SPEC quote brought current. Next: triage.

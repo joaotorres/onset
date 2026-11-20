@@ -5,8 +5,8 @@ Where the design tool's work lives and what it was last given.
 ## Design links
 
 - Canvas: https://claude.ai/artifact/123TNq7nwcKGoXDaroSGcM (private, created 2026-10-12)
-- Handed off: docs/design-system.md v7, 2026-11-19 (return in `.scratch/onset-v1/design/20261119-42-46/return.md`)
-- Components (each also a board): Main (landing), Join, Waiting, PlayPortrait, PlayLandscape, PlayComputer, PlayPortraitRefusal, PlayLandscapeRefusal, PlayComputerRefusal, GameOver, BigScreen. Themed components (v6, props for theme, palette, state and menu; each a board at light and Classic): LandingTh, JoinTh, HowToPlayTh, WaitingTh, PlayPortraitTh, PlayLandscapeTh, PlayComputerTh, GameOverTh, BigScreenTh, and SettingsMenu. Every other board imports one of them with a state. Board files are `project/<name>.dc.html`
+- Handed off: docs/design-system.md v8, 2026-11-20 (return in `.scratch/onset-v1/design/20261120-47/return.md`)
+- Components (each also a board): Main (landing), Join, Waiting, PlayPortrait, PlayLandscape, PlayComputer, PlayPortraitRefusal, PlayLandscapeRefusal, PlayComputerRefusal, GameOver, BigScreen. Themed components (v6, props for theme, palette, state and menu; each a board at light and Classic): LandingTh, JoinTh, HowToPlayTh, WaitingTh, PlayPortraitTh, PlayLandscapeTh, PlayComputerTh, GameOverTh, BigScreenTh, and SettingsMenu. Every other board imports one of them with a state, but the `bot-*` boards (v8), which are self-contained. Board files are `project/<name>.dc.html`
 
 | Screen | Tickets | Boards | State |
 |---|---|---|---|
@@ -26,7 +26,7 @@ Where the design tool's work lives and what it was last given.
 | Big screen, during play | 21 | BigScreen | built |
 | Player screen, play, claiming with Submit, every layout | 37 | play-p8-, play-p3-, play-l- and play-c- each with -claim0, -claiming, -claim2, -claim3, -submitted (PlayPortrait, PlayLandscape, PlayComputer states claiming0, claiming2, claiming3, submitted) | built |
 | Foundations: light theme sheet, card colors sheet | 40, 41 | LightSheet, CardColorsSheet | built |
-| Foundations: dark contrast sheet | 46 | DarkSheet | exploring |
+| Foundations: dark contrast sheet | 46 | DarkSheet | built |
 | Settings menu, landing and join page | 40, 41 | SettingsMenu, s-landing-p-dark, -p-dark-open, -p-light-open, s-landing-d-dark, -d-dark-open, -d-light-open, s-join-dark-open, s-join-light-open | built |
 | Settings menu, player screen | 40, 41 | s-waiting-p-dark-open, s-waiting-p-light-open, s-play-p-dark, -p-dark-open, -p-light-open, -p-picked-light, -p-picked-cb, s-gameover-p-dark, s-play-l-dark, s-play-c-dark, -c-dark-open, -c-light-open | built |
 | Settings menu, big screen | 40, 41 | s-big-dark, s-big-dark-open, s-big-light-open | built |
@@ -39,4 +39,6 @@ Where the design tool's work lives and what it was last given.
 | Big screen, light, and dark waiting and ended | 40, 41 | l-big-waiting4, l-big-waiting1, d-big-waiting4, d-big-waiting1, BigScreenTh, l-big-claiming, -noset, -refused, -correct, -wrong, -deck-empty, -ended, d-big-ended | built |
 | Color-blind card colors, player screen and landing | 41 | cb-play-p-dark, -light, cb-play-p-claim2-dark, -light, cb-play-p-found-dark, -light, cb-play-c-dark, -light, cb-landing-p-dark, -light, cb-landing-d-dark, -light | built |
 | Color-blind card colors, big screen and How to play | 41 | cb-big-correct-dark, -light, cb-htp-d-dark, -light | built |
-| Static error pages, dark and light | 42 | err-404-p-dark, err-404-p-light, err-500-d-dark, err-500-d-light | exploring |
+| Static error pages, dark and light | 42 | err-404-p-dark, err-404-p-light, err-500-d-dark, err-500-d-light | built |
+| Bots: big screen waiting, claiming and ended | 47 | bot-big-waiting8-light, bot-big-botsonly-dark, bot-big-claiming-light, bot-big-ended-dark | exploring |
+| Bots: player screen waiting (host), play and game over | 47 | bot-waiting-p-alone-light, bot-waiting-p8-dark, bot-waiting-l7-dark, bot-waiting-c7-light, bot-play-p8-other-dark, bot-gameover-p-light | exploring |

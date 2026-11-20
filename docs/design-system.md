@@ -1,6 +1,6 @@
-# Onset design system, version 7
+# Onset design system, version 8
 
-The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, the No Set refusal drawn for ticket 21, the claim's Submit button drawn for ticket 37, the light theme, the settings menu and the two card palettes drawn for tickets 40 and 41, the static error pages drawn for ticket 42 and the dark contrast shades drawn for ticket 46. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
+The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, the No Set refusal drawn for ticket 21, the claim's Submit button drawn for ticket 37, the light theme, the settings menu and the two card palettes drawn for tickets 40 and 41, the static error pages drawn for ticket 42, the dark contrast shades drawn for ticket 46 and the bots (the add-bot control and the bot mark) drawn for ticket 47. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
 
 Boards for every screen and state are on the canvas named in `docs/design-handoff.md`. Where this file and a board differ, this file wins; tell the design tool in the next brief.
 
@@ -29,7 +29,7 @@ Player colors (`PlayersController::PRESET_COLORS`): `#E74C3C #2ECC71 #F1C40F #9B
 
 Byline logo colours (v3, `--wm-*`): light on `:root` green `#009C3B`, blue `#002776`, red `#C60B1E`, gold `#E08A00`; dark on `.byline-footer` in the dark theme: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`; under the light theme (`@variant light`) `.byline-footer` takes the light values again (SPEC §8 Byline footer, Logo colours).
 
-v2 adds no tokens: every new color is from the Tailwind default palette. v7 adds `muted`, the one color outside it.
+v2 adds no tokens: every new color is from the Tailwind default palette. v7 adds `muted`, the one color outside it. v8 adds none: the bot mark and the add-bot control use existing roles (secondary text, raised bordered, the disabled gray button, the focus outline, the band name colors).
 
 ## Shared: Themes (v6)
 
@@ -157,6 +157,14 @@ Disabled, rings, outlines and the rest
 - Stays as built: disabled controls keep `gray-800` with `gray-500` text, and every `gray-700` border that is not a form field stays `gray-700` (the mode toggle's track, the Join, Copy link and Show QR buttons, the settings menu, the QR sheet, the empty tray slot's dashed border)
 - Built dark boards still draw muted `gray-500` and the `gray-700` field border; this file and `DarkSheet` win. The code is the truth for each built screen's layout
 
+## Shared: Rules added in v8
+
+- A bot shows the bot mark (Components > Bot mark) right after its name everywhere a player's name shows: big screen pills, rail scoreboard rows, the announcement band, the ended headline and the podium; player screen roster, play scoreboard chips and rows, the status panel, the found-set banner, the winner line and the standings. It comes after "you" where both show, and before the ✓, the Locked tag and the score, so it never moves those
+- The mark takes secondary text (`gray-400` dark, `gray-600` light); on a claim-filled entry (`yellow-400`) the entry's `gray-950` text; in a band the band's name color
+- The add-bot control (Components > Add-bot control) sits on the big screen's waiting rail and under the host's own waiting roster, nowhere else. It exists only while waiting, so it never moves SET!, the pill slot or the board
+- Room for ticket 48's remove control: on a bot's big screen pill, after the ✓ (pills are content-sized and wrap; `bot-big-waiting8-light` leaves a third pill row free at 1280×800); on a roster row, after the ✓ at the row's right end, where it truncates the name further rather than moving anything
+- New dark boards (v8 on) draw muted as `muted` `#7C8390` (the "Room CODE" footer, the player screen settings icon)
+
 ## Shared: Visual rules
 
 Quoted from `SPEC.md`.
@@ -267,7 +275,7 @@ ERB partials, no component library.
 ### games/_scoreboard
 - `games/_scoreboard`: big screen score rows, sorted by score
 ### games/_start_button
-- `games/_start_button`: Start game with "n of m ready", or disabled with the reason
+- `games/_start_button`: Start game with "n of m ready", or disabled with the reason. v8: the reason "Need a person to play" while every player is a bot, in the disabled gray button with the reason beside it in secondary text at the size of "Need at least 2 players", tied to the button with `aria-describedby` (board `bot-big-botsonly-dark`)
 ### games/_announcement
 - `games/_announcement`: the 9rem announcement band and its tinted panels. Refused (v4): the No Set panel's tint, ring and type; the ring counts the block down (`purple-400` progress, `purple-300` seconds), "Alex says there's a Set" in 48px display bold with the name in `purple-400`, "No Set is back when the ring runs out" in 24px `gray-300`, nothing on the right. At 1280px wide the headline wraps onto two balanced lines inside the band, as "Alex called No Set" does
 ### players/controller/_header
@@ -301,7 +309,7 @@ ERB partials, no component library.
 ### players/controller/_found_banner
 - `players/controller/_found_banner` (v2): `green-950` panel with a `green-500` border, the 3 cards small, the caller's dot, "Alex found a Set" and "+1" in `green-400`. Absolutely positioned over the top of the board area, over the scoreboard in portrait. `pointer-events: none`, `.found-set-flash`
 ### players/controller/_roster
-- `players/controller/_roster` (v2): the Waiting roster, two columns, each a dot, the name, "you" for the player and a `green-400` ✓ once ready
+- `players/controller/_roster` (v2): the Waiting roster, two columns, each a dot, the name, "you" for the player and a `green-400` ✓ once ready. v8: a bot's row carries the bot mark after the name, and its ✓ from the start
 ### players/controller/_invite
 - `players/controller/_invite` (v2): the room code in display type, "or open onset.joaotorr.es and enter the code" (`join_host`), the link button (Copy link, Copied ✓, Couldn't copy, Share link), a Show QR button and the "Show on a big screen →" text link
 ### players/controller/_qr_sheet
@@ -324,6 +332,34 @@ ERB partials, no component library.
   - Fieldset "Card colors": the same control with two segments, Classic and Color-blind, each a 54×16 chip on the card face (`#FAFAFA`) over a 13px/600 label. Classic shows three 9px dots in the Classic red, green and purple; Color-blind shows the three color marks in blue, orange and magenta
   - Each option is a radio. The current choice is the selected segment (dark `gray-700`, light `gray-800`, white text), its radio checked. Keyboard focus: a 2px `blue-500` outline, offset 2px, on the focused segment (board `s-play-p-picked-light`)
   - Placement: it opens away from its button, right-aligned to it, 8px from it, 12px on the big screen (`mb-3`, 108px from the bottom over the 96px-high corner button, as Screens > Settings button placement gives): below a top-right button (landing, join page, How to play), above a footer or corner button (Screens below). It covers SET! and part of the board while open on the player screen
+### Bot mark
+- Bot mark (v8): the Lucide-style "bot" glyph (a rounded head with an antenna, two eyes and two ears), inline stroke SVG, 24 viewBox, stroke 2 (2.4 at 11px), round caps and joins, `stroke="currentColor"`. Not decorative: it is the one sign of a bot that does not rely on the name, so it carries accessible text (what it reads: SPEC, AI opponent). Its color and place: Shared: Rules added in v8. Contrast, as a graphic (3:1 bar):
+  - `gray-600` light: 7.56:1 on white, 7.23:1 on `gray-50`, 6.8:1 on the `gray-100` own row
+  - `gray-400` dark: 7.8:1 on `gray-950`, 6.8:1 on `gray-900`, 5.6:1 on the `gray-800` own entry
+  - `gray-950` on the `yellow-400` claim fill: 13.2:1
+  - Claiming band: light `yellow-800` on `yellow-50`, 6.6:1; dark `yellow-400` on its 10% tint, about 11:1
+  - Found-set banner: `gray-400` on `green-950`, 5.8:1; `gray-600` on `green-50`, 7.2:1
+- Sizes, per place; the gap to the name is the row's own (4 to 12px):
+  - Big screen waiting pills: 26px at 1920 (30px names), 22px at 1280 (24px names)
+  - Big screen rail scoreboard rows: 26px
+  - Big screen announcement band (Claiming, Correct): 44px inline in the 60px headline, `vertical-align: -4px`, between the name and the rest, in the band's name color (Claiming `yellow-400` dark, `yellow-800` light; Correct `green-400` dark, `green-700` light)
+  - Big screen ended headline: 72px between the name and "wins", in secondary text (the headline stays primary)
+  - Big screen podium: 30px under the first place's 36px name, 26px under the 30px names
+  - Player screen waiting roster: 14px portrait, 13px landscape, 16px computer
+  - Player screen play scoreboard: 11px in portrait chips; 13px in landscape rows, 16px in computer rows, after the truncated name, before the Locked tag (never on a bot) and the score; `gray-950` on the claiming row
+  - Status panel (someone else claiming): 16px, 4px closer to the name than the panel's 10px gap
+  - Found-set banner: 14px, in secondary text after the name ("Easy bot [mark] found a Set")
+  - Winner line: 16px, "★ Hard bot [mark] wins with 9"
+  - Standings rows: 14px portrait and landscape, 16px computer
+- Portrait chips are 83px wide, so a bot's name truncates there ("Easy…") like any long name; the mark and the dot still tell it apart
+### Add-bot control
+- Add-bot control (v8): a group of three equal buttons, one per level, Easy, Medium and Hard, each a 2.5-stroke "+" glyph then the level, in the Raised, bordered style of Copy link and Show QR (dark `gray-800`, `gray-700` border, `gray-50` text; light `gray-100`, `gray-300` border, `gray-900` text, 16.12:1). No picker and no open state. What a tap does, its accessible names and its disabled reason's words: SPEC, AI opponent
+  - Big screen: a panel tile at the top of the rail while waiting, in the room tile's place (the room tile is hidden while waiting); gone once play starts. Panel, radius 24, padding 20, the light inset edge. "ADD A BOT" label 18px uppercase, 0.1em tracking, secondary text, as "ROOM" and "PLAYERS". Then the three buttons, 56px tall, radius 14, gap 10, 22px semibold, 18px "+". Tile 136px tall, 16px shorter than the room tile, so the rail is no taller while waiting than in play
+  - Player screen, host only, while waiting: one row right under the roster, before the invite. The label "Add a bot" in a fixed column on the left, then the three buttons. Portrait: 44px tall, label column 72px, 14px semibold label, 15px buttons, 14px "+", radius 12, gap 8. Landscape: 40px tall, label column 64px, 13px label, 14px buttons, 13px "+", in the roster column. Computer: 48px tall, label column 88px, 16px label and buttons, 16px "+", inside the roster panel
+  - Focus: the 2px `blue-500` outline at 2px offset on the focused button (boards `bot-big-botsonly-dark`, `bot-waiting-p-alone-light`)
+  - Pressed or pending: none. The action answers 204 and the broadcast adds the bot; the control does not change
+  - Disabled, every color taken: all three take the disabled gray button (`gray-800` + `gray-500` dark, `gray-200` + `gray-600` light, 6.10:1; labels exempt), the border set to the fill so nothing resizes, `disabled` and `aria-describedby` on the reason. The reason sits at the right of the big screen tile's label row (18px, secondary) and under "Add a bot" in the player screen's label column (12px, secondary) (boards `bot-big-waiting8-light`, `bot-waiting-p8-dark`)
+  - No size moves between states
 ### Stimulus controllers
 - Stimulus: `card-selection` (picks sent to the server, tray, count, Submit and the freeze after it), `countdown` (rings and seconds), `settings` (v6: the settings button and menu, writes the `theme` and `card_colors` cookies)
 
@@ -363,15 +399,19 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Top to bottom: the nav row ("← Back", the "Onset" wordmark, the settings button), the header, Every card has four features (four panels), What makes a Set (two green-ringed panels), Almost, but not a Set (a red-ringed panel, then Quick check and Tip on blue tints), Playing Onset (four numbered panels, then No Set on the table? and End of the game), Ready to play?, the byline footer
 - Color captions and the Not a Set row name the card colors of the current setting (Shared: Rules added in v6); `cb-htp-d-dark` and `cb-htp-d-light` draw the Color-blind words
 
-### Big screen (tickets 21, 40)
+### Big screen (tickets 21, 40, 47)
 
 - Drawn in light for every state (`l-big-*`, `BigScreenTh`), and in dark for waiting and ended (`d-big-waiting4`, `d-big-waiting1`, `d-big-ended`), which had no dark board before v6
 - The room tile, the player pills and the QR tile get the light inset edge; band panels follow the light tinted panel rows; the podium ★ is `yellow-700` in light
+- Bots (v8): `bot-big-waiting8-light` (1280×800, 8 players with 3 bots, add-bot control disabled), `bot-big-botsonly-dark` (bots only, "Need a person to play", add-bot control focused), `bot-big-claiming-light` (Claiming band and rail row of a bot), `bot-big-ended-dark` (a bot wins, a bot on the podium). Waiting: the add-bot tile heads the rail, the Players scoreboard under it. Each board is self-contained and imports no themed component
+- `bot-big-waiting8-light` draws the 1280×800 waiting state smaller than 1920: room code 80px, hero text 24px and 20px, pills 24px with 16px dots, Start game 80px tall, rail rows 52px (padding 8px 16px, 36px scores, 6px gaps) so 8 rows fit under the add-bot tile and clear the settings button. The code is the truth for how the built hero and rail shrink; the rail's clearance at 1280 is an open question below
 
-### Player screen, Waiting (ticket 10)
+### Player screen, Waiting (tickets 10, 47)
 
 - Header, then "You're in", the roster, the invite and I'm ready (`green-700`). Once voted: "Ready ✓ · waiting for n more" as outlined `green-700` text on a 12% `green-700` tint, `green-300` text
 - Landscape and computer put the roster and the invite side by side
+- Host's screen (v8): the add-bot control's row right under the roster, before the invite in portrait, in the roster column in landscape and inside the roster panel on computer; no page scroll with 8 players in portrait and 7 in landscape and computer (the two-column roster is 4 rows at 7 as at 8). Boards `bot-waiting-p-alone-light`, `bot-waiting-p8-dark`, `bot-waiting-l7-dark`, `bot-waiting-c7-light`. Other players' screens: the roster as those boards draw it, bots with their mark and ✓, and no add-bot row (the roster runs straight into the invite)
+- Host alone (v8): `bot-waiting-p-alone-light` draws "Waiting for more players to join…" as plain secondary text centred in the 56px I'm ready slot; the built `waiting-p-1` look wins where it differs
 - The link button's feedback states (Copied ✓, Couldn't copy) stay neutral gray
 - The QR sheet is `_qr_sheet`; the "Room CODE" footer stays
 
@@ -386,6 +426,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Submitted (v5): the board's cards are disabled, the three picks keep the selected ring, the tray and the n/3 count stay as at 3/3, the countdown ring keeps draining and Submit shows its submitted state. The board never dims, at 3 picks or after the tap
 - Someone else claiming: the disabled SET! shows the seconds large with a small "SET!" label under them, inside the yellow ring
 - Read-only boards (someone else claiming, No Set, locked out) are not dimmed
+- A bot claiming (v8, `bot-play-p8-other-dark`): its chip solid yellow with a `gray-950` mark, the status panel "Hard bot [mark] is calling SET!", the other bots' chips with the mark
 - No Set countdown, may refuse (v4): the No Set status panel, SET!, and the refusal pair in the pill slot. Locked out at the same time: the No Set panel keeps the status slot, since the call is the news; SET! shows the lockout ring with the seconds and "Locked", as in Locked out, and the chip shows the Locked tag
 - No Set blocked after a refusal (v4): idle with the refused status panel and the blocked No Set pill; SET! stays round blue and enabled
 - Found-set banner: in portrait it covers the scoreboard for its 3s; the board under it shows the replaced cards with the arrive outline
@@ -396,6 +437,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Landscape: rank, winner line and Play again in a 250px left column, the standings on the right
 - Computer: a 360px left column, the standings in a `gray-900` panel on the right
 - The standings scroll inside themselves when they do not fit; the page never does
+- A bot wins (v8, `bot-gameover-p-light`): "★ Hard bot [mark] wins with 9", 8 standings rows with 3 bots, ranks 1, 2, 3, 3, 5, 6, 7, 8
 
 ### Static error pages (ticket 42)
 
@@ -420,6 +462,7 @@ None
 
 ## Open questions
 
+- Big screen at 1280×800 with 8 players: the rail as the built boards draw it (152px room tile, 60px rows, 8px gaps) is about 760px tall and runs under the 56×56 settings button, in play as well as waiting. `bot-big-waiting8-light` draws 52px rows to fit. Left to a request of its own (ticket 47's Deferred line): check what the code does at 1280 and keep the rail clear of the settings button in every state
 - The dark Locked out boards (`-wrong`, `-timeup`) still draw the 5-second ring, though lockout is 15 s since ticket 20. The v6 light boards draw it at 15 s (12 s left). Redraw the dark ones in the next brief that touches lockout
 - Answered by triage 40, then by v7: dark muted text (`gray-500`, 4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest (`gray-700`, 1.72:1 on `gray-900`) stayed as built in ticket 40; ticket 46's design pass raises them to `muted` `#7C8390` and `gray-500` (Shared: Themes (v6), Shared: Rules added in v7)
 - Answered by triage 42 in SPEC §10 Themes: the static error pages' status code numerals (1.37:1 dark, 1.18:1 light) are a backdrop graphic, not text, so the 4.5:1 text rule does not reach them; the status name, the page title and the graphic's accessible name carry the code
@@ -433,6 +476,7 @@ None
 
 ## Changelog
 
+- v8, 2026-11-20: ticket 47, bots: the bot mark after a bot's name in every place a player's name shows, at each place's size and color (Components > Bot mark, Shared: Rules added in v8); the add-bot control, three level buttons in the raised bordered style, on the big screen's waiting rail and under the host's own waiting roster in every layout, with its focus and disabled states (Components > Add-bot control); Start game's "Need a person to play" in `_start_button`; room left for ticket 48's remove control; ten boards in both themes.
 - v7, 2026-11-19: ticket 42, the static error pages in Onset's dark and light: page, the bold first sentence in primary and the rest in body, faint numerals in the subtle border shade and the status name in the red text shade, layout and messages as the scaffold has them (Screens > Static error pages), with boards of 404 on a phone and 500 on a computer in both themes.
 - v7, 2026-11-19: ticket 46, dark contrast: the new `muted` token `#7C8390` for dark muted text and placeholders (5.28:1 on `gray-950`, 4.65:1 on `gray-900`), kept a step below secondary; the dark field border at rest `gray-500`; the player screen settings icon following muted; disabled labels and non-field borders as built (Shared: Themes (v6), Shared: Rules added in v7), on the `DarkSheet` board.
 - v6, 2026-11-17: ticket 53, the records corrected to the build, nothing new designed: `.byline-footer` holds the dark logo colours in the dark theme and the light ones under the light theme, How to play's 944px box is built, the settings menu opens 12px from the big screen's corner button, and the quoted SPEC §10 Palette matches SPEC again.
