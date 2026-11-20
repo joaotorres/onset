@@ -4,6 +4,14 @@
    takes the compact sizes so 8 rows end above the settings button. */
 @custom-variant short (@media (max-height: 999px));
 
+/* The big screen's waiting and ended play area (SPEC §8 Big screen, Fit): four
+   steps down from the 1080px design, each smaller than the last, so the hero,
+   pills and podium sit inside the board from 1280x720 up. */
+@custom-variant snug (@media (max-height: 1079px));
+@custom-variant tight (@media (max-height: 919px));
+@custom-variant compact (@media (max-height: 819px));
+@custom-variant cramped (@media (max-height: 739px));
+
 /* Themes (SPEC §10): dark is every class as written; `light:` gives an element
    its light value next to it. Keyed on <html> only, never on markup rendered per
    viewer: data-theme comes from the theme cookie, and with none the device
