@@ -2,7 +2,6 @@
 
 Status: needs-triage
 Kind: visual
-Design held: 20261119-42-46
 Blocked by: 44, 45
 Priority:
 Model:
@@ -56,3 +55,9 @@ Rechecked 2026-11-17, second time: still waiting for the design pass. docs/desig
 Decided: held for the next round, over the 6-board round: brief 20261119-42-46 takes 42 and 46 (5 boards) in number order, and this ticket's boards alone (the add-bot control and bot mark on the waiting big screen and the host's player screen in three layouts and both themes, the bot's claim, Start game's "Need a person to play") run well past 6, so it goes in a round of its own, with 48 after it. Instead of: briefing it with 42 and 46 in one oversized round.
 
 Rechecked 2026-11-19, third time: still waiting for the design pass. docs/design-system.md has no changelog entry for this ticket; its v7 entries are tickets 42 (static error pages) and 46 (dark contrast), which design nothing for bots. Brief 20261119-42-46 has returned (its return.md and the v7 entry are in), so the hold is over: the next brief takes this ticket and drops its `Design held:` line, as the brief step does. The spec changes since, triage 42's error page numerals and triage 46's muted token and field borders, do not touch the bot rules. Open tickets: 54, now answered (presets only, a unique index on a room's player colors), is the rule bots already take colors by, as noted above. 58 (§7 Hooks of the settings menu) and 59 (the player screen reads its claim once) touch no bot rule; a bot's claim still shows through `_controller_status`. 60 (a rate limit on the gameplay POSTs) limits a person's requests, and a bot acts through its jobs, not requests, so it is untouched; the add-bot POST is the host's and is not on 60's list. The brief is as described above.
+
+Decided: brief 20261120-47 takes this ticket alone, 10 boards (11 if the add-bot control opens a level picker), over the 6-board round, because a ticket alone over 6 still goes alone and 48's remove control sits on the bot pills and rows these boards draw first. Instead of: 48 in the same round.
+
+Decided: each board in one theme, the new parts (add-bot control, bot mark, "Need a person to play") each shown in both themes across the boards, and the 8-player no-scroll check in portrait with 7 players in landscape and computer so the enabled control shows there (the two-column roster is 4 rows at 7 as at 8), the big screen waiting at 8 players at 1280×800, because a light screen changes colors only (design system, Shared: Rules added in v6) and this keeps the round at 10 boards. Instead of: every board in both themes, about 20 boards.
+
+Decided: the built boards WaitingTh, l-waiting-l-8, l-waiting-c-8, PlayPortraitTh, l-play-p-other, GameOverTh, l-big-waiting4, d-big-waiting1, l-big-claiming and d-big-ended are left as drawn, new boards beside them, because what shipped since them (builds 43 to 45 of those boards, 46's dark muted text and field border, 56's claim reading) does not touch the roster, pills, Start game, scoreboards or announcements this brief extends, and the v7 rules the brief quotes give the dark muted value; the code is the truth for the rest. Instead of: redrawing them from the code first.

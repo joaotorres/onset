@@ -2,7 +2,7 @@
 
 Status: needs-triage
 Kind: visual
-Design held: 20261119-42-46
+Design held: 20261120-47
 Blocked by: 47
 Priority:
 Model:
@@ -42,3 +42,5 @@ Rechecked 2026-11-17: still waiting for the design pass. docs/design-system.md h
 Decided: held for the next round, over the 6-board round: brief 20261119-42-46 takes 42 and 46 in number order, 47 alone runs past 6 boards and goes next, and this ticket's remove control sits on the bot pills and roster rows 47 draws first. Instead of: briefing it now, before the bots it removes are drawn.
 
 Rechecked 2026-11-19, third time: still waiting for the design pass. docs/design-system.md has no changelog entry for this ticket; its v7 entries are tickets 42 (static error pages) and 46 (dark contrast), which design nothing for bots. Brief 20261119-42-46 has returned (its return.md and the v7 entry are in), so that hold is over and the brief step drops the `Design held:` line; this ticket's remove control still sits on the bot pills and roster rows 47 draws, so it goes in 47's round when the boards fit, or the round after it. Blocker 47 is still needs-triage and unsplit, so `Blocked by: 47` stands. The spec changes since, triage 42's error page numerals, triage 46's muted token and field borders and 57's glossary Current claim, do not touch the removal. Open tickets: 54, now answered (presets only, a unique index on a room's player colors), is freed by deleting the bot's row as noted above. 58 (§7 Hooks of the settings menu) and 59 (the player screen reads its claim once) touch no waiting room control. 60 (a rate limit on the gameplay POSTs) lists I'm ready, SET!, picks, Submit, No Set and End game; the host's remove-bot DELETE is not on its list, so nothing conflicts. The brief is as described above, drawn with or after 47's.
+
+Decided: held for brief 20261120-47, over the 6-board round: 47 alone takes 10 boards, and this ticket's remove control sits on the bot pills and roster rows that brief draws, so it is briefed in the next round, from 47's boards. Instead of: briefing it with 47 in one oversized round.
