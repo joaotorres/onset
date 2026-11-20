@@ -35,11 +35,13 @@ class PlayersController < ApplicationController
 
   private
 
-  # A join that loses the race at the (game_id, color) index is a taken color.
+  # A join that loses the race at the (game_id, color) or (game_id, lower(name))
+  # index: the winner is committed now, so the validations name what is taken.
   def save_player
     @player.save
   rescue ActiveRecord::RecordNotUnique
-    @player.errors.add(:color, "has already been taken in this game")
+    @player.valid?
+    @player.errors.add(:color, "has already been taken in this game") if @player.errors.empty?
     false
   end
 

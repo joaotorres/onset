@@ -1,13 +1,13 @@
 # 61: Back the unique player name rule with a database index
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by: 54
 Priority: low
 Feature: Waiting room
 Model:
 Effort:
-Changelog:
+Changelog: Two players joining at the same moment with the same name can no longer both get in; the second sees the taken-name message.
 
 ## Request
 

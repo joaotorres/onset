@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  build 61: done, unique (game_id, lower(name)) index on players, join race re-runs validations for name and color errors. Next: review.
 - 2026-11-20  build 72: done, big screen waiting and ended play areas step their sizes down by window height so they fit from 1280×720 up, QR never under 160px. Next: review.
 - 2026-11-20  build 67: done, under 1000px tall the big screen rail takes 52px rows, 6px gaps, 36px scores and tighter spacing so 8 rows clear the settings button. Next: review.
 - 2026-11-20  request 73: filed from 72's Deferred line, waiting pills with 20-character names fitting laptops 800px tall and shorter, visual. Next: triage.

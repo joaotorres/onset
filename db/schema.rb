@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_20_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_100000) do
   create_table "claims", force: :cascade do |t|
     t.integer "game_id", null: false
     t.integer "player_id", null: false
@@ -63,6 +63,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_090000) do
     t.datetime "updated_at", null: false
     t.integer "score", default: 0, null: false
     t.datetime "locked_until"
+    t.index "game_id, LOWER(name)", name: "index_players_on_game_id_and_lower_name", unique: true
     t.index ["game_id", "color"], name: "index_players_on_game_id_and_color", unique: true
     t.index ["game_id"], name: "index_players_on_game_id"
     t.index ["session_token"], name: "index_players_on_session_token", unique: true

@@ -105,6 +105,32 @@ RSpec.describe "Players" do
       expect(checked_colors).to eq([presets[1]])
     end
 
+    it "answers a join that loses the race on the name with the name error and keeps a free color" do
+      game.players.create!(name: "Alex", color: presets[0])
+      allow_any_instance_of(Player).to receive(:save).and_raise(ActiveRecord::RecordNotUnique)
+      expect { post game_players_path(game.code), params: {player: {name: "alex", color: presets[1]}} }
+        .not_to change(Player, :count)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("has already been taken in this game")
+      expect(checked_colors).to eq([presets[1]])
+    end
+
+    it "shows both errors when the race is lost on name and color" do
+      game.players.create!(name: "Alex", color: presets[0])
+      allow_any_instance_of(Player).to receive(:save).and_raise(ActiveRecord::RecordNotUnique)
+      post game_players_path(game.code), params: {player: {name: "alex", color: presets[0]}}
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body.scan("has already been taken in this game").size).to eq(2)
+      expect(checked_colors).to eq([presets[1]])
+    end
+
+    it "answers a plain taken name with the name error" do
+      game.players.create!(name: "Alex", color: presets[0])
+      post game_players_path(game.code), params: {player: {name: "ALEX", color: presets[1]}}
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("has already been taken in this game")
+    end
+
     it "rejects a duplicate color in the same game" do
       Player.create!(name: "Alice", color: "#E74C3C", game: game)
       post game_players_path(game.code), params: {player: {name: "Bob", color: "#E74C3C"}}

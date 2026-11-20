@@ -41,6 +41,18 @@ RSpec.describe Player do
       other_game = Game.create!
       expect(Player.new(valid_attrs.merge(game: other_game))).to be_valid
     end
+
+    it "has the database refuse a case-variant name in one game" do
+      Player.create!(valid_attrs)
+      twin = Player.new(valid_attrs.merge(name: valid_attrs[:name].swapcase, color: "#2ECC71", session_token: "t2"))
+      expect { twin.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
+    it "has the database accept the same name in two games" do
+      Player.create!(valid_attrs)
+      twin = Player.new(valid_attrs.merge(game: Game.create!, session_token: "t2"))
+      expect { twin.save!(validate: false) }.not_to raise_error
+    end
   end
 
   describe "color validations" do
