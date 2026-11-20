@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  build 65: done, design system's quoted SPEC §10 Visual system matches SPEC (muted bullet, History ending), Themes pointer names all four left-out bullets, v8 changelog entry. Next: review.
 - 2026-11-20  build 64: done, six new contrast examples (each seen red on a wrong shade first), style_of, mix and theme_cookie! shared in the settings menu context, dark! renamed dark_device!. Next: review.
 - 2026-11-20  build 63: done, error pages use :root custom properties with one light block per condition, specs tie grounds and theme-color to THEME_COLORS and check titles, messages and hex placement. Next: review.
 - 2026-11-20  build 61: done, unique (game_id, lower(name)) index on players, join race re-runs validations for name and color errors. Next: review.

@@ -1,13 +1,13 @@
 # 65: Design system's quote of SPEC visual system matches SPEC
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the design system's quote of the SPEC visual system matches SPEC again.
 
 ## Request
 

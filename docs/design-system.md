@@ -222,13 +222,14 @@ Two themes, dark and light, on every page the app renders (Themes below). In the
 - `animate-shake`: once, 0.4s. Locked-out player screen panel.
 - `animate-arrive`: green outline that holds 1.5s and fades by 3s. Cards dealt by the last replace (`Game#last_dealt`), on the big screen and the player screen board.
 - `.found-set-flash`: holds 1.5s, fades by 3s. Correct-claim panels on the big screen and the player screen.
+- `muted` (`#7C8390`): dark muted text and dark form placeholders, the one color outside the Tailwind default palette (ticket 46). Light muted text and placeholders stay `gray-500`.
 
 Surfaces, dark theme: page `gray-950`, panels `gray-900`, borders `gray-700`/`gray-800`. Secondary text `gray-400`. The light theme's surfaces, borders and text shades, and the dark muted text and field border shades, come from the design pass (`docs/design-system.md`). Both themes hold the same contrast:
 
 - **Text** at least 4.5:1 on its ground, the page or the panel it sits on, whatever its size: body, secondary and muted text alike (the "Room CODE" footer, the big screen's empty band text, "No one yet" and a locked player's entry on its scoreboard, the "/N" of a No Set vote count, the join page's hint under the colors, the tray slot numbers), and the placeholders in form fields, as the white-on-color rules in the meaning table below are. The labels of disabled controls are exempt, as WCAG makes them, and keep the disabled looks `docs/design-system.md` gives
 - **A form field's border at rest** at least 3:1 against the field's fill and against the surface around it, because a field sits on a surface close to its fill and its border is all that shows it. Today the room code field on the landing and the name field on the join page
 
-History: until ticket 46, dark muted text was `gray-500` (4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest `gray-700` (1.72:1 on `gray-900`); ticket 40 left them so, since it kept dark as built, and deferred them to ticket 46.
+History: until ticket 46, dark muted text was `gray-500` (4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest `gray-700` (1.72:1 on `gray-900`); ticket 40 left them so, since it kept dark as built, and deferred them to ticket 46, which raises them to `muted` and `gray-500`.
 
 Each color means one thing everywhere:
 
@@ -256,7 +257,7 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 - **Same in both themes:** the cards (the `_card` partial is never restyled, its near-white face and border included; on light surfaces the design pass may give the card's wrapper an edge so it reads), the card palettes (which one shows is the card colors setting, Palette above, not the theme), the player colors, what each color means (the meaning table above; the light theme may use other shades of the same color for contrast), the QR tile (dark modules on white), the layouts, sizes and animations
 - **Every page the app renders** takes the theme: the landing, How to play, the join page, the big screen, the player screen and the byline footer, which uses the light logo colours in the light theme and the dark ones in the dark theme (§8, Byline footer)
 
-`SPEC.md` §10 Themes also holds the `theme` cookie, the no-flash rule, `color-scheme` and the static error pages, which take both themes in Onset's own surfaces and text shades (Screens > Static error pages, v7).
+`SPEC.md` §10 Themes also holds the `theme` cookie, the no-flash rule, `color-scheme`, picking a theme applying at once (other tabs on their next page load, `theme-color` included) and the static error pages, which take both themes in Onset's own surfaces and text shades (Screens > Static error pages, v7).
 
 ## Components
 
@@ -476,6 +477,7 @@ None
 
 ## Changelog
 
+- v8, 2026-11-20: ticket 65, the records corrected to SPEC, nothing new designed: the quoted SPEC §10 Visual system matches SPEC again (the `muted` token bullet, the History line's ending) and the Themes pointer names every bullet the quote leaves out.
 - v8, 2026-11-20: ticket 47, bots: the bot mark after a bot's name in every place a player's name shows, at each place's size and color (Components > Bot mark, Shared: Rules added in v8); the add-bot control, three level buttons in the raised bordered style, on the big screen's waiting rail and under the host's own waiting roster in every layout, with its focus and disabled states (Components > Add-bot control); Start game's "Need a person to play" in `_start_button`; room left for ticket 48's remove control; ten boards in both themes.
 - v7, 2026-11-19: ticket 42, the static error pages in Onset's dark and light: page, the bold first sentence in primary and the rest in body, faint numerals in the subtle border shade and the status name in the red text shade, layout and messages as the scaffold has them (Screens > Static error pages), with boards of 404 on a phone and 500 on a computer in both themes.
 - v7, 2026-11-19: ticket 46, dark contrast: the new `muted` token `#7C8390` for dark muted text and placeholders (5.28:1 on `gray-950`, 4.65:1 on `gray-900`), kept a step below secondary; the dark field border at rest `gray-500`; the player screen settings icon following muted; disabled labels and non-field borders as built (Shared: Themes (v6), Shared: Rules added in v7), on the `DarkSheet` board.
