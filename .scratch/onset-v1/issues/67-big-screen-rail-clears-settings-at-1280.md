@@ -77,4 +77,4 @@ Decided: Model left empty and no Security line, because it is a CSS sizing chang
 
 Decided: big screens shorter than 800px are filed as a follow-up of their own, because the request names 1280×800 and the compact rail (about 654px) still overlaps the button under about 800px tall. Instead of: folding 768 and 720 tall laptops into this ticket.
 
-Deferred: On the big screen on laptops shorter than 800px (1366×768, 1280×720) with 8 players, keep every Players row visible and the rail clear of the settings button in waiting, playing and ended, shrinking the rail further below 800px tall.
+Deferred: On the big screen on laptops shorter than 800px (1366×768, 1280×720) with 8 players, keep every Players row visible and the rail clear of the settings button in waiting, playing and ended, shrinking the rail further below 800px tall. Filed as 71.

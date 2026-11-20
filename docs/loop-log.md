@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  request 71: filed from 67's Deferred line, the rail clearing the settings button under 800px tall, behavioural. Next: triage.
 - 2026-11-20  triage 67: ready, SPEC §8 Big screen Scoreboard keeps 8 rows above the settings button in every state, compact rail under 1000px tall, design system open question answered, one Deferred line, 9 Decided lines. Next: build.
 - 2026-11-20  triage 66: done, SPEC §5 URL surface names the 403, 404 and 429 answers and points to Rate limits, §7 Actions answer 204 points to it, 8 Decided lines. Next: auto.
 - 2026-11-20  triage 65: ready, no spec change, design system's SPEC §10 quote gets the muted bullet, the full History line and a complete Themes pointer, 6 Decided lines. Next: build.
