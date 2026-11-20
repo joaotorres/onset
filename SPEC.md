@@ -227,7 +227,13 @@ Rails.application.routes.draw do
 end
 ```
 
-URL surface. Every action a player screen or the big screen POSTs answers `204 No Content`; the broadcast updates the screens (§7). The one exception is a pick or a submit from a player who does not hold the claim, `403`, which no screen sends.
+URL surface. Every action a player screen or the big screen sends (a POST, or the PATCH of a pick and the DELETEs of No Set and of a bot) answers `204 No Content`, one the server ignores included; the broadcast updates the screens (§7). The other answers only a stale page or a script meets, never a person's taps on a current screen:
+
+- `403`: a pick or a submit from a player who does not hold the claim; Start game, Play again, adding or removing a bot from a browser without the room's `host_game` cookie; a ready vote from a browser that is no player of the room
+- `404`: a room code or a claim that does not exist (a room the idle cleanup deleted, §12), and SET!, a pick, Submit, No Set and End game from a browser that is no player of the room
+- `429`: a request over its limit, which changes nothing (Rate limits, below)
+
+The landing's and join page's forms (`POST /games`, `POST /games/:code/players`) are pages, not screen actions: they redirect or render the page back with its error, as their rows and Rate limits say.
 
 **Rate limits.** Each counts requests in a fixed one-minute window, in the app's cache store (Solid Cache in production), and a request over its limit answers `429 Too Many Requests` and changes nothing: no claim taken, no pick stored, nothing judged, no vote counted, no broadcast.
 
@@ -357,7 +363,7 @@ The big screen subscribes to `game:CODE` only. The player screen subscribes to *
 
 ### Actions answer 204, broadcasts update the screen
 
-Every POST from a player screen or the big screen (SET!, a card pick, Submit, No Set, agree, End game, ready, Start game, Play again) answers `204 No Content`. Turbo leaves the page alone, and the broadcast the action triggers updates every screen, including the one that acted.
+Every action a player screen or the big screen sends (SET!, a card pick, Submit, No Set, agree, There's a Set, End game, ready, Start game, Play again, adding and removing a bot) answers `204 No Content`. The answers a stale page or a script meets instead (`403`, `404`, `429`) are listed in §5, URL surface. Turbo leaves the page alone, and the broadcast the action triggers updates every screen, including the one that acted.
 
 Do not redirect back to the same page. A redirect reloads it, which drops its stream subscriptions for about 500 ms, and any broadcast in that window is lost. Do not send per-player broadcasts for bookkeeping either (see `last_seen_at`): a broadcast per heartbeat is traffic with nothing new to show. `Player#seen!` writes `last_seen_at` without callbacks for that reason; the guard against a stale message is the version check below, not the bookkeeping.
 
