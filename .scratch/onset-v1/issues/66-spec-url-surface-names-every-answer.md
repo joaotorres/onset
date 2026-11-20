@@ -59,3 +59,7 @@ Decided: the ticket closes in triage as `done`, as tickets 25, 27, 57 and 58 did
 Decided: Priority low, Feature "Rate limits" (tickets 60 and 62's), Model and Security empty, because no user notices a spec fix and it changes no rule of who can do what. Instead of: normal.
 
 Decided: no conflict with open tickets or the spec changes since the last deploy, because 48, 62, 68 and 70 answer the bot controls `403` without `host_game` and `204` otherwise, as the paragraph now says, and 61 and 69 add no screen answer. Instead of: blocking on any of them.
+
+Decided: deep review 20261120-094918 leaves two answers SPEC §5 does not name, §11's older claim wording and one design system size for a follow-up, because a review edits no record and none changes what a user sees. Instead of: a pending decision.
+
+Deferred: Behind the scenes: bring three records in line with what is built. SPEC §5's URL surface, and §7's pointer to it naming `403`, `404` and `429`, lists every answer a screen action can get besides `204`, but leaves out two the app gives any request: `406` to a browser `allow_browser` turns away, and `422` to a missing or stale CSRF token. SPEC §11 (Submit) still says a late submit is ignored once the claim is "no longer pending", and judges at expiry a claim still pending, where §5, §6 Key invariants and the glossary now say the room's current claim. `docs/design-system.md` (Portrait tray) gives the tray slot number as 22px, and the built slot is `text-2xl`, 24px: make the two agree.

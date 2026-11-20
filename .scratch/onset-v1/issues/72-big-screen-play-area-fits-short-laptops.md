@@ -7,7 +7,7 @@ Priority: high
 Feature: Page layout
 Model:
 Effort:
-Changelog: On the big screen, the waiting room's join code, QR code and players and the game-over podium now fit inside the window on laptops down to 1280×720, with the QR code never under 160px.
+Changelog: On the big screen, the waiting room's room code, QR code and player pills and the game-over podium now shrink to fit shorter windows, down to 1280×720, with the QR code never under 160px. Eight players with long names can still run past the bottom of the waiting room.
 
 ## Request
 
@@ -90,3 +90,7 @@ Deferred: On the big screen at 1280×800 and shorter, keep the waiting play area
 Decided: at 1280×800 the room code takes what its column allows (about 71px, between 64 and 80), not 80px, because the code's 17cqi cap keeps six wide letters off the rail and the 800px-tall hero cannot widen the column without dropping the QR under 160px; Start game is 80px tall and the other hero sizes as the design board. Instead of: 80px room code with a QR under 160px.
 
 Decided: the Join link steps down with the height (24px, 20px under 920px, 16px under 820px, 14px under 740px), because it must stay one line no wider than the shrinking QR tile. Instead of: letting it outgrow the tile.
+
+Decided: deep review 20261120-094918 leaves the names of the big screen's height variants for a follow-up, because the sizes are right and a rename changes nothing a user sees. Instead of: a pending decision.
+
+Deferred: Behind the scenes: name the big screen's height variants by what they mean, before another step joins them. `app/assets/tailwind/application.css` defines `short` (under 1000px tall, ticket 67's rail) and `snug`, `tight`, `compact` and `cramped` (under 1080, 920, 820 and 740px, ticket 72's play area). The names give neither their order nor their threshold, `short` falls between `snug` and `tight`, and the comment on `short` says the rail "takes the compact sizes" though `compact:` is another step. Rename the five by threshold, or by one clear order, across their 30 uses in `app/views/games/` (`_board`, `_scoreboard`, `_start_button`, `_room_tile`, `show`), correct the comment, and name ticket 71's under-800px rail step the same way, whichever is built first. No size changes.

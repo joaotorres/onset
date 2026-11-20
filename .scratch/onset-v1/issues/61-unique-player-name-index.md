@@ -7,7 +7,7 @@ Priority: low
 Feature: Waiting room
 Model:
 Effort:
-Changelog: Two players joining at the same moment with the same name can no longer both get in; the second sees the taken-name message.
+Changelog: Behind the scenes: the database itself now refuses two players with the same name in one room, a guard behind the join page's own check.
 
 ## Request
 

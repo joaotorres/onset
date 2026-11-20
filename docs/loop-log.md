@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  review 20261120-094918: deep, 20 tickets since 20261116-041057-deep-fable, 1 pending decision (a ceiling per address on the in-game tap limits), 8 follow-ups deferred on 46, 52, 60, 64, 66 and 72, Changelog lines of 61 and 72 corrected, no standards breach. Next: file the follow-ups.
 - 2026-11-20  copy pass 20261120-094918: 1 fixed (64's Changelog line named a ticket number), 0 flagged. Next: deep review.
 - 2026-11-20  triage 74: ready, no spec change (SPEC §8 Join page already covers it), every failed join reloads the taken colors, three Decided lines. Next: build.
 - 2026-11-20  triage 73: spec settled (SPEC §8 Big screen, Fit covers 8 names of up to 20 characters, a name that does not fit its pill truncates), four Decided lines, gate 2 not met. Next: /design-brief 48 73.
