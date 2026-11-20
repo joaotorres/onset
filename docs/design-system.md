@@ -404,7 +404,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Drawn in light for every state (`l-big-*`, `BigScreenTh`), and in dark for waiting and ended (`d-big-waiting4`, `d-big-waiting1`, `d-big-ended`), which had no dark board before v6
 - The room tile, the player pills and the QR tile get the light inset edge; band panels follow the light tinted panel rows; the podium ★ is `yellow-700` in light
 - Bots (v8): `bot-big-waiting8-light` (1280×800, 8 players with 3 bots, add-bot control disabled), `bot-big-botsonly-dark` (bots only, "Need a person to play", add-bot control focused), `bot-big-claiming-light` (Claiming band and rail row of a bot), `bot-big-ended-dark` (a bot wins, a bot on the podium). Waiting: the add-bot tile heads the rail, the Players scoreboard under it. Each board is self-contained and imports no themed component
-- `bot-big-waiting8-light` draws the 1280×800 waiting state smaller than 1920: room code 80px, hero text 24px and 20px, pills 24px with 16px dots, Start game 80px tall, rail rows 52px (padding 8px 16px, 36px scores, 6px gaps) so 8 rows fit under the add-bot tile and clear the settings button. The code is the truth for how the built hero and rail shrink; the rail's clearance at 1280 is an open question below
+- `bot-big-waiting8-light` draws the 1280×800 waiting state smaller than 1920: room code 80px, hero text 24px and 20px, pills 24px with 16px dots, Start game 80px tall, rail rows 52px (padding 8px 16px, 36px scores, 6px gaps) so 8 rows fit under the add-bot tile and clear the settings button. The code is the truth for how the built hero and rail shrink; the rail's clearance at 1280: SPEC §8 Big screen, Scoreboard (triage 67)
 
 ### Player screen, Waiting (tickets 10, 47)
 
@@ -462,7 +462,7 @@ None
 
 ## Open questions
 
-- Big screen at 1280×800 with 8 players: the rail as the built boards draw it (152px room tile, 60px rows, 8px gaps) is about 760px tall and runs under the 56×56 settings button, in play as well as waiting. `bot-big-waiting8-light` draws 52px rows to fit. Left to a request of its own (ticket 47's Deferred line): check what the code does at 1280 and keep the rail clear of the settings button in every state
+- Answered by triage 67 in SPEC §8 Big screen, Scoreboard: with 8 players the rail ends above the settings button in every state; under 1000px tall its rows take `bot-big-waiting8-light`'s 52px (padding 8px 16px, 36px scores, 6px gaps) and its spacing tightens. As built (a 152px room tile, 72px rows, 8px gaps) the play rail is 856px tall and cut the eighth row off at 1280×800
 - The dark Locked out boards (`-wrong`, `-timeup`) still draw the 5-second ring, though lockout is 15 s since ticket 20. The v6 light boards draw it at 15 s (12 s left). Redraw the dark ones in the next brief that touches lockout
 - Answered by triage 40, then by v7: dark muted text (`gray-500`, 4.16:1 on `gray-950`, 3.67:1 on `gray-900`) and the dark field border at rest (`gray-700`, 1.72:1 on `gray-900`) stayed as built in ticket 40; ticket 46's design pass raises them to `muted` `#7C8390` and `gray-500` (Shared: Themes (v6), Shared: Rules added in v7)
 - Answered by triage 42 in SPEC §10 Themes: the static error pages' status code numerals (1.37:1 dark, 1.18:1 light) are a backdrop graphic, not text, so the 4.5:1 text rule does not reach them; the status name, the page title and the graphic's accessible name carry the code
