@@ -9,10 +9,10 @@
     <%= render "announcement", game: @game, flash_claim: @game.flash_claim %>
   </div>
 
-  <aside class="min-h-0 flex flex-col gap-8">
+  <aside class="min-h-0 flex flex-col gap-8 short:gap-4">
     <%= render "room_tile", game: @game %>
     <div class="min-h-0">
-      <p class="mb-3 px-5 text-lg uppercase tracking-widest text-gray-400 light:text-gray-600">Players</p>
+      <p class="mb-3 short:mb-2 px-5 text-lg uppercase tracking-widest text-gray-400 light:text-gray-600">Players</p>
       <%= render "scoreboard", game: @game %>
     </div>
   </aside>

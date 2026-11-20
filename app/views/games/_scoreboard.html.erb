@@ -1,15 +1,15 @@
 <% players = game.players.order(score: :desc).to_a %>
-<ol id="scoreboard" data-version="<%= stream_version(game, *players) %>" class="space-y-2">
+<ol id="scoreboard" data-version="<%= stream_version(game, *players) %>" class="space-y-2 short:space-y-1.5">
   <% players.each do |player| %>
     <% claiming = game.claim_player_id == player.id %>
     <% locked = !claiming && player.locked? %>
-    <li class="flex items-center gap-4 rounded-2xl px-5 py-3 <%= "bg-yellow-400 text-gray-950" if claiming %> <%= "text-muted light:text-gray-500" if locked %>">
+    <li class="flex items-center gap-4 rounded-2xl px-5 py-3 short:px-4 short:py-2 <%= "bg-yellow-400 text-gray-950" if claiming %> <%= "text-muted light:text-gray-500" if locked %>">
       <span class="size-5 shrink-0 rounded-full ring-2 ring-black/20 <%= "opacity-50" if locked %>" style="background-color: <%= player.color %>;"></span>
       <span class="min-w-0 flex-1 truncate text-3xl font-semibold"><%= player.name %></span>
       <% if locked %>
         <span class="rounded-full bg-red-500/15 px-3 py-1 text-lg font-semibold text-red-400 light:bg-red-100 light:text-red-700">Locked</span>
       <% end %>
-      <span class="font-display text-5xl font-bold leading-none tabular-nums"><%= player.score %></span>
+      <span class="font-display text-5xl short:text-4xl font-bold leading-none tabular-nums"><%= player.score %></span>
     </li>
   <% end %>
   <% if players.none? %>

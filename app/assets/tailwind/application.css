@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Short windows (SPEC §8 Big screen, Scoreboard): under 1000px tall the rail
+   takes the compact sizes so 8 rows end above the settings button. */
+@custom-variant short (@media (max-height: 999px));
+
 /* Themes (SPEC §10): dark is every class as written; `light:` gives an element
    its light value next to it. Keyed on <html> only, never on markup rendered per
    viewer: data-theme comes from the theme cookie, and with none the device

@@ -1,13 +1,13 @@
 # 67: Big screen Players rail clears the settings button at 1280×800
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: high
 Feature: Page layout
 Model:
 Effort:
-Changelog:
+Changelog: On a laptop-sized big screen, all 8 players show in the rail and stay clear of the settings button.
 
 ## Request
 
