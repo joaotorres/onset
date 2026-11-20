@@ -1,13 +1,13 @@
 # 64: Cover ticket 46's remaining criteria and share theme spec helpers
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: specs now cover the dark disabled labels, borders and light muted text of ticket 46, and the theme spec helpers are shared.
 
 ## Request
 

@@ -11,7 +11,7 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
 
   def theme!(name)
     visit root_path
-    page.driver.browser.manage.add_cookie(name: "theme", value: name, path: "/")
+    theme_cookie!(name)
   end
 
   it "defines muted once, as a theme token, and no view writes the hex" do
@@ -54,6 +54,30 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
     theme!("dark")
     visit root_path
     expect(style("input[type=submit]", "border-top-color")).to eq(color("gray-700"))
+  end
+
+  it "keeps the Game mode toggle track border gray-700 in dark" do
+    resize(1280, 860)
+    theme!("dark")
+    visit root_path
+    expect(style("fieldset > div", "border-top-color")).to eq(color("gray-700"))
+  end
+
+  it "keeps the open settings menu border gray-700 in dark" do
+    resize(1280, 860)
+    theme!("dark")
+    visit root_path
+    open_settings
+    expect(style("#settings_menu", "border-top-color")).to eq(color("gray-700"))
+  end
+
+  it "draws the disabled Join label gray-500 on gray-800 in dark when the room is full" do
+    Player::PRESET_COLORS.each_with_index { |c, i| game.players.create!(name: "P#{i}", color: c, session_token: "t#{i}") }
+    theme!("dark")
+    visit new_game_player_path(game.code)
+    join = find("input[type=submit][disabled]")
+    expect(style_of(join, "color")).to eq(color("gray-500"))
+    expect(style_of(join, "background-color")).to eq(color("gray-800"))
   end
 
   it "draws the join page's name field, placeholder and hint muted in dark, gray-500 in light" do

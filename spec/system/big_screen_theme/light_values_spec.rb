@@ -5,10 +5,6 @@ require "rails_helper"
 RSpec.describe "Big screen light values", type: :system do
   include_context "big screen theme"
 
-  def style_of(element, property)
-    page.evaluate_script("getComputedStyle(arguments[0]).getPropertyValue(#{property.to_json})", element)
-  end
-
   def ring(color_name, width = 2) = "#{color(color_name)} 0px 0px 0px #{width}px inset"
 
   let!(:players) { add_players(2) }
@@ -63,7 +59,7 @@ RSpec.describe "Big screen light values", type: :system do
   end
 
   it "renders the dark values with the dark theme" do
-    page.driver.browser.manage.add_cookie(name: "theme", value: "dark", path: "/")
+    theme_cookie!("dark")
     game.start!
     game.try_claim!(players.first)
     visit_big_screen

@@ -10,7 +10,7 @@ RSpec.describe "Dark muted text on the player screen", type: :system do
   let(:slot) { "[data-tray] [data-card-selection-target=slot]" }
 
   it "draws the footer, the settings icon and the empty slot numbers muted, with the slot border as built" do
-    dark!
+    dark_device!
     game.try_claim!(me)
     visit game_controller_path(game.code)
     expect(page).to have_css(slot, count: 3)
@@ -27,5 +27,14 @@ RSpec.describe "Dark muted text on the player screen", type: :system do
     expect(page).to have_no_css("#{slot}.card-edge")
     expect(style(slot, "color")).to eq(muted)
     expect(style(slot, "border-top-color")).to eq(color("gray-700"))
+  end
+
+  it "draws an empty tray slot's number gray-500 in light" do
+    game.try_claim!(me)
+    visit game_controller_path(game.code)
+    light!
+    visit game_controller_path(game.code)
+    expect(page).to have_css(slot, count: 3)
+    expect(style(slot, "color")).to eq(color("gray-500"))
   end
 end

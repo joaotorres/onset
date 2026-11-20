@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  build 64: done, six new contrast examples (each seen red on a wrong shade first), style_of, mix and theme_cookie! shared in the settings menu context, dark! renamed dark_device!. Next: review.
 - 2026-11-20  build 63: done, error pages use :root custom properties with one light block per condition, specs tie grounds and theme-color to THEME_COLORS and check titles, messages and hex placement. Next: review.
 - 2026-11-20  build 61: done, unique (game_id, lower(name)) index on players, join race re-runs validations for name and color errors. Next: review.
 - 2026-11-20  build 72: done, big screen waiting and ended play areas step their sizes down by window height so they fit from 1280×720 up, QR never under 160px. Next: review.

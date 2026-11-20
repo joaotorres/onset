@@ -4,7 +4,7 @@ RSpec.shared_context "dark contrast" do
   # The `muted` theme token, #7C8390.
   let(:muted) { "rgb(124, 131, 144)" }
 
-  def dark!
+  def dark_device!
     emulate_color_scheme("dark")
   end
 

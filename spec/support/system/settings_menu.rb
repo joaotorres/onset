@@ -27,7 +27,30 @@ RSpec.shared_context "settings menu" do
     page.evaluate_script("getComputedStyle(document.querySelector(#{selector.to_json})).getPropertyValue(#{property.to_json})")
   end
 
+  def style_of(element, property)
+    page.evaluate_script("getComputedStyle(arguments[0]).getPropertyValue(#{property.to_json})", element)
+  end
+
+  # The computed value of a Tailwind color at an opacity, as Tailwind mixes it.
+  def mix(name, percent)
+    page.evaluate_script(<<~JS)
+      (() => {
+        const probe = document.createElement("div")
+        probe.style.backgroundColor = "color-mix(in oklab, var(--color-#{name}) #{percent}%, transparent)"
+        document.body.append(probe)
+        const value = getComputedStyle(probe).backgroundColor
+        probe.remove()
+        return value
+      })()
+    JS
+  end
+
   def page_background = style("body > main", "background-color")
+
+  # Sets the theme cookie; the page must already be on the app's host.
+  def theme_cookie!(value)
+    page.driver.browser.manage.add_cookie(name: "theme", value: value, path: "/")
+  end
 
   def theme_cookie
     page.driver.browser.manage.all_cookies.find { |c| c[:name] == "theme" }

@@ -10,7 +10,7 @@ RSpec.describe "Light theme values", type: :system do
 
   def light!
     visit root_path
-    page.driver.browser.manage.add_cookie(name: "theme", value: "light", path: "/")
+    theme_cookie!("light")
   end
 
   def card_edge(selector) = style(selector, "box-shadow")

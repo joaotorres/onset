@@ -13,7 +13,7 @@ RSpec.shared_context "card colors" do
   end
 
   def light!
-    page.driver.browser.manage.add_cookie(name: "theme", value: "light", path: "/")
+    theme_cookie!("light")
   end
 
   def card_colors_cookie

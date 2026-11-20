@@ -10,7 +10,7 @@ RSpec.shared_context "big screen theme" do
   def menu_open? = page.has_css?("#settings_menu", visible: true, wait: 0)
 
   def light!
-    page.driver.browser.manage.add_cookie(name: "theme", value: "light", path: "/")
+    theme_cookie!("light")
   end
 
   def add_players(count)
@@ -25,20 +25,6 @@ RSpec.shared_context "big screen theme" do
   end
 
   def shadow(selector) = style(selector, "box-shadow")
-
-  # The computed value of a Tailwind color at an opacity, as Tailwind mixes it.
-  def mix(name, percent)
-    page.evaluate_script(<<~JS)
-      (() => {
-        const probe = document.createElement("div")
-        probe.style.backgroundColor = "color-mix(in oklab, var(--color-#{name}) #{percent}%, transparent)"
-        document.body.append(probe)
-        const value = getComputedStyle(probe).backgroundColor
-        probe.remove()
-        return value
-      })()
-    JS
-  end
 
   # The button 56x56 in the bottom-right corner, 40px in from both edges,
   # outside every broadcast target, and the page does not scroll.

@@ -7,21 +7,7 @@ RSpec.shared_context "player screen theme" do
   def settings_button = find('button[aria-label="Settings"]')
 
   def light!
-    page.driver.browser.manage.add_cookie(name: "theme", value: "light", path: "/")
-  end
-
-  # The computed value of a Tailwind color at an opacity, as Tailwind mixes it.
-  def mix(name, percent)
-    page.evaluate_script(<<~JS)
-      (() => {
-        const probe = document.createElement("div")
-        probe.style.backgroundColor = "color-mix(in oklab, var(--color-#{name}) #{percent}%, transparent)"
-        document.body.append(probe)
-        const value = getComputedStyle(probe).backgroundColor
-        probe.remove()
-        return value
-      })()
-    JS
+    theme_cookie!("light")
   end
 
   # The settings button sits in the "Room CODE" footer row, outside

@@ -39,7 +39,7 @@ RSpec.describe "A pick from another tab on a Turbo visit", type: :system do
   it "takes a theme set elsewhere on a link visit, and Match device once it is deleted" do
     emulate_color_scheme("dark")
     visit root_path
-    set_cookie("theme", "light")
+    theme_cookie!("light")
     to_how_to_play
     expect(html_data("theme")).to eq("light")
     expect(page_background).to eq(color("gray-50"))
@@ -78,7 +78,7 @@ RSpec.describe "A pick from another tab on a Turbo visit", type: :system do
     emulate_color_scheme("dark")
     visit root_path
     to_how_to_play
-    set_cookie("theme", "light")
+    theme_cookie!("light")
     colorblind!
     mark_window
     page.go_back
@@ -93,7 +93,7 @@ RSpec.describe "A pick from another tab on a Turbo visit", type: :system do
   it "sets nothing for a cookie value the server would not accept" do
     emulate_color_scheme("dark")
     visit root_path
-    set_cookie("theme", "blue")
+    theme_cookie!("blue")
     set_cookie("card_colors", "x")
     to_how_to_play
     expect(html_data("theme")).to be_nil

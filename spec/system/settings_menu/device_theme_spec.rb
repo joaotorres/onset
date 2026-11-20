@@ -36,7 +36,7 @@ RSpec.describe "Theme from the device and the cookie", type: :system do
   it "takes the cookie over the device on every page" do
     emulate_color_scheme("dark")
     visit root_path
-    page.driver.browser.manage.add_cookie(name: "theme", value: "light", path: "/")
+    theme_cookie!("light")
     [root_path, how_to_play_path, join_game_players_path(game.code)].each do |path|
       visit path
       expect(page_background).to eq(color("gray-50"))
@@ -45,7 +45,7 @@ RSpec.describe "Theme from the device and the cookie", type: :system do
     end
 
     emulate_color_scheme("light")
-    page.driver.browser.manage.add_cookie(name: "theme", value: "dark", path: "/")
+    theme_cookie!("dark")
     [root_path, how_to_play_path, join_game_players_path(game.code)].each do |path|
       visit path
       expect(page_background).to eq(color("gray-950"))

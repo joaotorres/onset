@@ -79,7 +79,7 @@ module StaticErrorPages
   # The cookie is set on the app's host, then the page is loaded again.
   def visit_with_cookie(path, value)
     visit path
-    page.driver.browser.manage.add_cookie(name: "theme", value: value, path: "/")
+    theme_cookie!(value)
     visit path
   end
 end
