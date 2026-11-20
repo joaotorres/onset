@@ -85,4 +85,4 @@ Decided: Model left empty and no Security line, because it is a CSS sizing chang
 
 Decided: 8 players with long names in waiting are filed as a follow-up of their own, because 8 pills of 20-character names wrap to four rows at 1280 wide (about 260px at the board's 24px pills), leaving the hero under the 160px QR floor at 800 tall, so fitting them needs a different pill layout (columns, truncation or smaller text), a behaviour the spec decides on its own. Instead of: folding long-name pills into this ticket.
 
-Deferred: On the big screen at 1280×800 and shorter, keep the waiting play area inside the window with 8 players whose names run to 20 characters, whose pills wrap to four rows at 1280 wide, without the QR going under 160px.
+Deferred: On the big screen at 1280×800 and shorter, keep the waiting play area inside the window with 8 players whose names run to 20 characters, whose pills wrap to four rows at 1280 wide, without the QR going under 160px. Filed as 73.

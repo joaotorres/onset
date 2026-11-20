@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  request 73: filed from 72's Deferred line, waiting pills with 20-character names fitting laptops 800px tall and shorter, visual. Next: triage.
 - 2026-11-20  triage 72: ready, SPEC §8 Big screen gains a Fit bullet, the waiting and ended play area inside its box from 1280×720 up with the QR at least 160px, one Deferred line, 11 Decided lines. Next: build.
 - 2026-11-20  request 72: filed from 71's Deferred line, the big screen play area fitting laptops 800px tall and shorter, behavioural. Next: triage.
 - 2026-11-20  triage 71: ready, SPEC §8 Big screen Scoreboard fits 8 rows above the settings button down to 1280×720 with a second shrink under 800px tall, blocked by 67 and 68, one Deferred line, 9 Decided lines. Next: build after 67 and 68.
