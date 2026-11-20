@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  triage 74: ready, no spec change (SPEC §8 Join page already covers it), every failed join reloads the taken colors, three Decided lines. Next: build.
 - 2026-11-20  triage 73: spec settled (SPEC §8 Big screen, Fit covers 8 names of up to 20 characters, a name that does not fit its pill truncates), four Decided lines, gate 2 not met. Next: /design-brief 48 73.
 - 2026-11-20  request 74: filed from 61's deferral, a lost join race re-renders with fresh colors, behavioural. Next: triage.
 - 2026-11-20  quick review 20261120-055231: no pending decisions, 1 follow-up deferred on 61 (lost join race re-renders stale colors), Changelog lines of 54, 60, 67, 72 corrected, no standards breach. Next: file the follow-up.
