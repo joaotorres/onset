@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  triage 65: ready, no spec change, design system's SPEC §10 quote gets the muted bullet, the full History line and a complete Themes pointer, 6 Decided lines. Next: build.
 - 2026-11-20  triage 64: ready, no spec change, specs for ticket 46's remaining criteria and the theme spec helpers shared in the settings menu context, 6 Decided lines. Next: build.
 - 2026-11-20  triage 63: ready, no spec change, error pages' colors into custom properties and their specs tied to THEME_COLORS with title and message checks, 6 Decided lines. Next: build.
 - 2026-11-20  triage 47: split into 68, 69, 70 on design-system v8, SPEC Adding a bot settles the three Design proposes, additive `players.bot_timer`, 10 Decided lines. Next: build 68.
