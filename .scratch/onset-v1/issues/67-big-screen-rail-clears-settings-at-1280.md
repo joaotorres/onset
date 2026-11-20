@@ -1,6 +1,6 @@
 # 67: Big screen Players rail clears the settings button at 1280×800
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: high

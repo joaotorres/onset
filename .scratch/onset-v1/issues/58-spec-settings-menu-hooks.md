@@ -1,6 +1,6 @@
 # 58: SPEC §7 Hooks names everything the settings controller relies on
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

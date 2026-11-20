@@ -1,6 +1,6 @@
 # 64: Cover ticket 46's remaining criteria and share theme spec helpers
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

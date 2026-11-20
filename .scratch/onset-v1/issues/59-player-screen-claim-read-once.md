@@ -1,6 +1,6 @@
 # 59: The player screen reads its claim in one place
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

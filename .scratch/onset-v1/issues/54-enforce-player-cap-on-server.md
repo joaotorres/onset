@@ -1,6 +1,6 @@
 # 54: Enforce the 8-player cap on the server
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: high

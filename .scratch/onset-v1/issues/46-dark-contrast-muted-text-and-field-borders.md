@@ -1,6 +1,6 @@
 # 46: Dark theme muted text and field borders meet contrast
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by: 43, 44, 45
 Priority: normal

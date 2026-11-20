@@ -1,6 +1,6 @@
 # 65: Design system's quote of SPEC visual system matches SPEC
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

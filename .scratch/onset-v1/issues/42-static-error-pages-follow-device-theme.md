@@ -1,6 +1,6 @@
 # 42: Static error pages follow the device's light or dark setting
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by: 43
 Priority: low

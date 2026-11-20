@@ -1,6 +1,6 @@
 # 72: Big screen play area fits laptops 800px tall and shorter
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: high

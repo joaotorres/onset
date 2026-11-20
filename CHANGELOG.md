@@ -2,6 +2,22 @@
 
 What each deploy shipped, newest first, from the tickets' Changelog: lines.
 
+## 2026-11-20, deploy-20261120-1251
+
+- The error pages (such as page not found) now use Onset's own light and dark colors, following your device or the theme you picked in Onset. (42)
+- In the dark theme, faint gray text and the borders of the room code and name fields are easier to read. (46)
+- On a big screen 800 to 999px tall, such as a 1280×800 or 1440×900 laptop, all 8 players show in the Players list, clear of the settings button. (67)
+- On the big screen, the waiting room's room code, QR code and player pills and the game-over podium now shrink to fit shorter windows, down to 1280×720, with the QR code never under 160px. Eight players with long names can still run past the bottom of the waiting room. (72)
+- Behind the scenes: the server now refuses a join that does not take one of the 8 player colors still free, so a script can no longer push a room past 8 players. (54)
+- Behind the scenes: the spec's list of markup hooks names everything the settings menu, invite, card picking, countdown and telemetry controllers rely on. (58)
+- Behind the scenes: the player screen no longer computes an unused copy of the claim. (59)
+- Behind the scenes: a script sending game actions far faster than anyone can tap is now refused for the rest of the minute, without slowing the table. (60)
+- Behind the scenes: the database itself now refuses two players with the same name in one room, a guard behind the join page's own check. (61)
+- Behind the scenes: the static error pages write their theme colors once as CSS variables, and their specs follow the app's theme colors. (63)
+- Behind the scenes: specs now cover the dark theme's disabled labels and borders and the light theme's muted text, and the theme spec helpers are shared. (64)
+- Behind the scenes: the design system's quote of the SPEC visual system matches SPEC again. (65)
+- Behind the scenes: the spec's list of routes names every answer a screen action can get besides "no content", and points to the rate limits. (66)
+
 ## 2026-11-19, deploy-20261119-1509
 
 - Escape now closes the open settings menu even after a click on its blank space. (51)

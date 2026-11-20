@@ -1,6 +1,6 @@
 # 60: Limit how often one player may send in-game actions
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: normal

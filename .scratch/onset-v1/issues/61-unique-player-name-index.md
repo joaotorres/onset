@@ -1,6 +1,6 @@
 # 61: Back the unique player name rule with a database index
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by: 54
 Priority: low

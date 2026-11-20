@@ -1,6 +1,6 @@
 # 66: SPEC URL surface names every non-204 answer
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

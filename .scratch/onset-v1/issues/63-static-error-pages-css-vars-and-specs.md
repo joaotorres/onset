@@ -1,6 +1,6 @@
 # 63: Static error pages: CSS variables and theme-color specs
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low
