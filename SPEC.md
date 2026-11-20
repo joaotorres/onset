@@ -97,7 +97,7 @@ The room.
 | `deck` | json | Array of remaining card ids `0..80`, in draw order |
 | `board` | json | Array of card ids currently face-up (length 12, 15, or 18) |
 | `discard` | json | Array of card ids already collected |
-| `host_player_id` | bigint | nullable; the player who joined from the host browser, set at join. The host is the browser that created the room, marked by its `host_game` cookie (§8 Landing), not a player: this column only tells which player screen shows the bot control (AI opponent), and every host action still checks the cookie |
+| `host_player_id` | bigint | nullable; the player who joined from the host browser, set at join, the newest one when that browser joins again (it holds one player cookie). The host is the browser that created the room, marked by its `host_game` cookie (§8 Landing), not a player: this column only tells which player screen shows the bot control (AI opponent), and every host action still checks the cookie |
 | `claim_player_id` | bigint | nullable; the player currently holding the claim lock |
 | `claim_started_at` | datetime | nullable; for the 15s claim window |
 | `no_set_started_at` | datetime | nullable; for 15s No-Set countdown |
@@ -133,6 +133,7 @@ A participant in a Game.
 | `last_seen_at` | datetime | updated on every player screen request via `Player#seen!`, which skips callbacks so it never broadcasts |
 | `left_at` | datetime | nullable; for graceful disconnect |
 | `bot_level` | enum | nullable; `easy`, `medium`, `hard` for a bot (AI opponent), nil for a person |
+| `bot_timer` | integer | default 0, not null; a bot's draw count, raised by each new timer draw (AI opponent, How a bot plays), so `BotMoveJob` acts only for the draw it carries when that is still the latest. Written without callbacks, as `Player#seen!` writes, since a draw shows nothing and broadcasts nothing (§7). Always 0 for a person |
 
 A bot keeps a random `session_token` like every player, held by no browser, so no request can act as it: a nil token would match a request that carries no player cookie.
 
@@ -497,7 +498,7 @@ QR codes: dark modules on a white tile. Inverted codes fail on some phone camera
 - **`UnblockNoSetJob`** — enqueued with `wait: Game::NO_SET_TIMEOUT` when a call is refused. Broadcasts so the No Set pill and the big screen band return to idle; the block itself is enforced by `no_set_refused_at` at call time.
 - **`ExpirePlayerLockoutJob`** — optional; the lockout is enforced by checking `locked_until` at claim time, but a job that broadcasts UI updates when the lockout expires is nice-to-have.
 
-- **`BotMoveJob`** — a bot's timer (AI opponent): enqueued with the delay its level draws whenever the room starts or restarts, the board changes or a claim resolves, each replacing the bot's earlier one. If it is the bot's latest, the room is playing and no claim runs, call SET! for the bot on a random Set on the board, or do nothing when there is none.
+- **`BotMoveJob`** — a bot's timer (AI opponent): enqueued with the delay its level draws whenever the room starts or restarts, the board changes or a claim resolves, each replacing the bot's earlier one: the draw raises the bot's `bot_timer` (§4) and the job carries the new number. If it is the bot's latest (its number still equals `bot_timer`, read inside the game lock), the room is playing and no claim runs, call SET! for the bot on a random Set on the board, or do nothing when there is none.
 - **`BotSubmitJob`** — enqueued 2 seconds after a bot's claim is acquired. If it is still the room's current claim (§6 Key invariants), submit its three cards as a Submit does (§11).
 
 All jobs are idempotent: they re-check the relevant state inside a transaction and no-op if no longer applicable.
@@ -706,15 +707,16 @@ A **bot** is a player Onset plays itself (`GLOSSARY.md`), so a room can play wit
 
 - **Who**: the host, the browser holding the room's `host_game` cookie, from the big screen's waiting state and from the host's own player screen while waiting (§8). `POST /games/:code/bots` (§5) checks the cookie, as Start game does
 - **When**: only while the room is waiting; once play starts the control goes, as late joining is blocked. Bots stay in the room for Play again, their scores reset with everyone's
-- **Levels**: **Easy**, **Medium** and **Hard**, picked with each add. A room may hold several bots, of any levels, up to its eight colors. With every color taken the control is disabled, as Join is on a full room
-- **Name and color**: "Easy bot", "Medium bot", "Hard bot"; a second bot at the same level is "Easy bot 2", and so on, so names stay unique (§4). A new bot takes the lowest free name of its level, so after a removal (Removing a bot) "Easy bot" is used again before "Easy bot 3". The first free color in preset order, as the join page selects one
+- **Levels**: **Easy**, **Medium** and **Hard**, one button each in the **add-bot control**. One tap adds one bot at that level, so three bots take three taps; there is no level picker to open or close, and the control does not change while the add is on its way: the broadcast shows the bot (§7). A room may hold several bots, of any levels, up to its eight colors. With every color taken the three buttons are disabled, as Join is on a full room, with the reason "Room full" beside them
+- **Accessible names**: the control is a group named "Add a bot", its buttons "Add Easy bot", "Add Medium bot" and "Add Hard bot", the visible level word inside each name. Disabled, the buttons point to the "Room full" reason with `aria-describedby`
+- **Name and color**: "Easy bot", "Medium bot", "Hard bot"; a second bot at the same level is "Easy bot 2", and so on, so names stay unique (§4). A new bot takes the lowest free name of its level, matched case-insensitively as §4 matches names, so after a removal (Removing a bot) "Easy bot" is used again before "Easy bot 3", and a name a person already took ("easy bot") is skipped. The first free color in preset order, as the join page selects one
 - **Ready at once**: a bot counts as voted in the ready vote from the moment it joins, so its ✓ shows at once. A room starts with at least 2 players, bots included, and at least one person: the ready vote starts it when every person has voted, and the big screen's Start game is disabled while every player is a bot, since nobody could call No Set or vote to end
-- **Shown everywhere a player is**: the waiting roster and pills, both scoreboards, the standings, the podium and the announcements ("Easy bot is calling SET!", "Easy bot found a Set", "Easy bot wins"), with a bot mark beside the name. The control's look, where it sits on each screen and the bot mark come from the design pass
-- **Telemetry**: the tap sends `bot_added` (§17)
+- **Shown everywhere a player is**: the waiting roster and pills, both scoreboards, the standings, the podium and the announcements ("Easy bot is calling SET!", "Easy bot found a Set", "Easy bot wins"), with a bot mark beside the name. The mark is not decoration: it reads "bot" to a screen reader (`role="img"`, `aria-label="bot"`), so "Easy bot, bot" is heard in every list, pill, row and announcement, and a person who named themselves "Easy bot" still reads apart from a bot. The control's look, where it sits on each screen and the bot mark come from the design pass
+- **Telemetry**: each tap sends `bot_added` with its level (§17)
 
 ### How a bot plays
 
-- **Its timer.** Each bot draws a delay, uniform within its level's range, whenever the room starts or restarts, the board changes (a Set removed or cards dealt) and a claim resolves. Each bot keeps its own timer, and each new draw replaces the bot's earlier one, which then does nothing when it runs out
+- **Its timer.** Each bot draws a delay, uniform within its level's range, whenever the room starts or restarts, the board changes (a Set removed or cards dealt) and a claim resolves. Each bot keeps its own timer, and each new draw replaces the bot's earlier one, which then does nothing when it runs out. A draw count on the bot (`bot_timer`, §4) tells the latest apart, since a queued job is never cancelled
 
   | Level | Delay |
   |---|---|

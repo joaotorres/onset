@@ -1,12 +1,15 @@
 # 47: AI opponent the host can add from the lobby
 
-Status: needs-triage
+Status: split
 Kind: visual
 Blocked by: 44, 45
-Priority:
+Priority: normal
+Feature: AI opponent
 Model:
+Security: yes
 Effort:
 Changelog:
+Split: yes
 
 ## Request
 
@@ -75,3 +78,25 @@ Decided: the control's look and place (the big screen's waiting rail, in the roo
 Decided: the rail at 1280×800 with 8 players, which as built may run under the settings button in play as well as waiting, is left to a request of its own, because it predates bots (8 people fill the rail too) and the add-bot tile is 16px shorter than the room tile it stands in for, so this ticket adds no height. Instead of: folding a play-state rail fix into this ticket.
 
 Deferred: On the big screen at 1280×800 with 8 players, keep the Players rail clear of the 56×56 settings button in every state (waiting, playing and ended): the built boards' rail, a 152px room tile and 60px rows with 8px gaps, is about 760px tall and runs under the button. Check what the code renders at 1280 and shrink the rows as the design system's 1280 board draws them (52px rows, padding 8px 16px, 36px scores, 6px gaps) where it does not fit. Filed as 67.
+
+Decided: gate 2 passes on design-system v8, the entry committed for this ticket on 2026-11-20 after it was filed. Instead of: another design pass.
+
+Decided: one tap adds one bot, three buttons Easy, Medium and Hard with no level picker, each tap sending `bot_added` with its level, now in SPEC AI opponent, Adding a bot (Levels, Telemetry), because the design entry draws it so, "picked with each add" already reads so, and a picker is one more tap per bot. Instead of: a level picker that opens from one Add a bot button.
+
+Decided: the disabled control's reason reads "Room full", beside the big screen tile's label and under "Add a bot" on the player screen, tied by `aria-describedby`, in SPEC Adding a bot (Levels, Accessible names), because it is the design entry's wording and matches the join page's "This room is full" in fewer words. Instead of: no reason shown.
+
+Decided: the accessible names as the design proposes, the bot mark `role="img"` with `aria-label="bot"` everywhere, the control a group "Add a bot" with buttons "Add Easy bot", "Add Medium bot" and "Add Hard bot", in SPEC Adding a bot (Accessible names, Shown everywhere a player is), because a person may name themselves "Easy bot", so the mark, not the name, tells a screen reader user it is a bot. Instead of: an `aria-hidden` mark, relying on the name.
+
+Decided: a bot's lowest free name is matched case-insensitively and skips names people hold, in SPEC Adding a bot (Name and color), because SPEC §4 matches names that way and a person called "easy bot" would otherwise make the add fail. Instead of: failing the add.
+
+Decided: additive migration `players.bot_timer` (integer, default 0, not null), a bot's draw count, in SPEC §4 Player, §12 BotMoveJob and How a bot plays, because a queued Solid Queue job is never cancelled and each `BotMoveJob` must tell whether it is its bot's latest draw; written without callbacks, so a draw broadcasts nothing. Instead of: comparing scheduled times, or a board fingerprint with no column.
+
+Decided: a later join from the host browser repoints `host_player_id` at the newer player, in SPEC §4 Game, because the browser holds one player cookie, so its newest player is the screen the host sees. Instead of: keeping the first.
+
+Decided: split into 68 (bots as players, the add route, the vote and start rules, the big screen's add-bot tile, the bot mark in the waiting room, the telemetry), 69 (the bots' timers, claims and submit, the bot mark in play and game over) and 70 (the host's player screen control and `host_player_id` at join), 69 and 70 blocked by 68, published without waiting for approval, because the whole feature does not fit one session and each child is a vertical slice on bots existing. Instead of: the two-way split expected at the first triage (the play rules and the big screen in one), which would not fit one session either.
+
+Decided: Model fable on 68 alone, because it adds a host-only action and a player whose `session_token` must stay unreachable; 69's timers are logic-dense but nothing else depends on them. Security yes on 68 and 70, which decide who adds bots and who sees the control. Instead of: fable on all three.
+
+Decided: 48's `Blocked by: 47` becomes 68 and 70, and 62's `47` becomes 68, because a split parent never reaches done: 48's remove control sits on the big screen pills (68) and the host's roster rows (70), and 62 limits the bots route 68 builds. Instead of: leaving them blocked on 47.
+
+Split into 68, 69, 70.
