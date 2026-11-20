@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  request 66: filed from 60's deferral, SPEC URL surface names every non-204 answer, one Decided line. Next: triage.
 - 2026-11-20  request 65: filed from 46's deferral, design system's SPEC quote brought current. Next: triage.
 - 2026-11-20  request 64: filed from 46's deferral, specs for 46's remaining criteria and shared theme spec helpers. Next: triage.
 - 2026-11-20  request 63: filed from 42's deferral, static error pages' CSS variables and theme-color specs. Next: triage.
