@@ -1,4 +1,5 @@
 class EndGamesController < ApplicationController
+  rate_limit to: 30, within: 1.minute, by: :player_limit_key, name: "end_game", with: :refuse_over_limit
   before_action :set_game
   before_action :set_player
 

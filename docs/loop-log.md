@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-20  build 60: in-game rate limits on claims, ready, No Set, End game and host start/restart, 17 new request specs. Next: review.
 - 2026-11-20  request 67: filed from 47's deferral, big screen rail clears the settings button at 1280×800, one Decided line. Next: triage.
 - 2026-11-20  build 54: server enforces the 8 preset colors on join, unique (game_id, color) index, race answered 422. Next: review.
 - 2026-11-20  design-entry 47: design system v8 (bot mark, add-bot control, "Need a person to play"), 10 boards added, 3 Design proposes, 1 Deferred, 2 Decided lines. Next: triage.

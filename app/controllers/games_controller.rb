@@ -4,6 +4,8 @@ class GamesController < ApplicationController
     flash.now[:alert] = "Too many new games. Try again in a minute."
     render "lobbies/new", status: :too_many_requests
   }
+  rate_limit to: 30, within: 1.minute, only: :ready, by: :player_limit_key, name: "ready", with: :refuse_over_limit
+  rate_limit to: 30, within: 1.minute, only: [:start, :restart], by: :host_limit_key, name: "host", with: :refuse_over_limit
 
   def create
     game = Game.create!(mode: (params[:mode] == "quick") ? :quick : :standard)

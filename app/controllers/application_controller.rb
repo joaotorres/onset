@@ -14,6 +14,21 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # SPEC.md §5, Rate limits: a refused in-game request answers 429 with no body.
+  def refuse_over_limit
+    head :too_many_requests
+  end
+
+  # Counted per player, never by the shared table IP; by IP only without the cookie.
+  def player_limit_key
+    cookies.encrypted[:player_token].presence || request.remote_ip
+  end
+
+  # The room the host cookie names; by IP without it, so a stranger never uses up the host's count.
+  def host_limit_key
+    cookies.encrypted[:host_game].presence || request.remote_ip
+  end
+
   def keep_out_of_search_results
     response.headers["X-Robots-Tag"] = "noindex"
   end

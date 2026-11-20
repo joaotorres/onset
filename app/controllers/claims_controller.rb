@@ -1,5 +1,6 @@
 class ClaimsController < ApplicationController
   before_action :stamp_arrival, only: :create
+  rate_limit to: 180, within: 1.minute, by: :player_limit_key, name: "claims", with: :refuse_over_limit
   before_action :set_game
   before_action :set_player
 

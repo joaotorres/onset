@@ -1,6 +1,6 @@
 # 60: Limit how often one player may send in-game actions
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: normal
@@ -8,7 +8,7 @@ Feature: Rate limits
 Model:
 Security: yes
 Effort:
-Changelog:
+Changelog: A player sending game actions far faster than anyone can tap is now refused for the rest of the minute, without slowing the table.
 
 ## Request
 
