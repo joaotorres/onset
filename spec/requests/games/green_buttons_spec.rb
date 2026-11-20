@@ -5,7 +5,7 @@ RSpec.describe "Games" do
     let(:game) { Game.create! }
 
     before do
-      game.players.create!(name: "Alice", color: "#648FFF")
+      game.players.create!(name: "Alice", color: "#E74C3C")
       game.players.create!(name: "Bob", color: "#2ECC71")
     end
 

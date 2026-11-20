@@ -78,6 +78,33 @@ RSpec.describe "Players" do
       expect(response).to redirect_to(join_game_players_path(game.code))
     end
 
+    it "refuses a color that is not a preset" do
+      expect { post game_players_path(game.code), params: {player: {name: "Bob", color: "#FE6100"}} }
+        .not_to change(Player, :count)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("is not included in the list")
+      expect(checked_colors).to eq([presets[0]])
+    end
+
+    it "refuses a ninth join whatever color it posts" do
+      presets.each_with_index { |hex, i| game.players.create!(name: "p#{i}", color: hex) }
+      [presets[0], "#FE6100"].each do |color|
+        expect { post game_players_path(game.code), params: {player: {name: "Nine", color: color}} }
+          .not_to change(Player, :count)
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include("This room is full")
+      end
+    end
+
+    it "answers a join that loses the race at the index with the color error" do
+      game.players.create!(name: "a", color: presets[0])
+      allow_any_instance_of(Player).to receive(:save).and_raise(ActiveRecord::RecordNotUnique)
+      post game_players_path(game.code), params: {player: {name: "Bob", color: presets[0]}}
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include("has already been taken in this game")
+      expect(checked_colors).to eq([presets[1]])
+    end
+
     it "rejects a duplicate color in the same game" do
       Player.create!(name: "Alice", color: "#E74C3C", game: game)
       post game_players_path(game.code), params: {player: {name: "Bob", color: "#E74C3C"}}

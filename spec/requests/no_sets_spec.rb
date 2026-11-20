@@ -30,7 +30,7 @@ RSpec.describe "NoSets" do
     it "joins an existing No-Set call when one is already active" do
       # Charlie is created directly so she's active but the session cookie stays
       # on Alice/Bob — three active players means Bob joining alone won't resolve.
-      game.players.create!(name: "Charlie", color: "#DC267F", last_seen_at: Time.current)
+      game.players.create!(name: "Charlie", color: "#F1C40F", last_seen_at: Time.current)
 
       sign_in(name: "Alice")
       post game_no_set_path(game.code)  # Alice calls No Set; her last_seen_at is set.
@@ -63,7 +63,7 @@ RSpec.describe "NoSets" do
   end
 
   describe "POST /games/:code/no_set/refuse" do
-    let!(:caller_player) { game.players.create!(name: "Caller", color: "#648FFF", last_seen_at: Time.current) }
+    let!(:caller_player) { game.players.create!(name: "Caller", color: "#9B59B6", last_seen_at: Time.current) }
 
     it "refuses the running call and answers 204" do
       alice = sign_in
@@ -93,7 +93,7 @@ RSpec.describe "NoSets" do
     end
 
     it "answers 204 and changes nothing for a player who agreed" do
-      game.players.create!(name: "Third", color: "#DC267F", last_seen_at: Time.current)
+      game.players.create!(name: "Third", color: "#F1C40F", last_seen_at: Time.current)
       game.call_no_set!(caller_player)
       sign_in
       post game_no_set_path(game.code)

@@ -6,8 +6,8 @@ RSpec.describe "Players" do
   describe "GET /games/:code/controller" do
     context "during a No Set countdown" do
       let(:me) { game.players.find_by!(name: "Alice") }
-      let!(:bob) { game.players.create!(name: "Bob", color: "#3498DB", last_seen_at: Time.current) }
-      let!(:cat) { game.players.create!(name: "Cat", color: "#2ECC71", last_seen_at: Time.current) }
+      let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
+      let!(:cat) { game.players.create!(name: "Cat", color: "#F1C40F", last_seen_at: Time.current) }
       let(:doc) { Nokogiri::HTML(response.body) }
       let(:status) { doc.at_css("#controller_status") }
       let(:nodes) { status.css("*").to_a }

@@ -29,7 +29,7 @@ RSpec.shared_context "claim submit" do
     click_button "Join"
     expect(page).to have_current_path(game_controller_path(game.code))
     taken = game.players.pluck(:color)
-    names.drop(1).zip(PlayersController::PRESET_COLORS - taken).each do |name, color|
+    names.drop(1).zip(Player::PRESET_COLORS - taken).each do |name, color|
       game.players.create!(name: name, color: color, last_seen_at: Time.current)
     end
     game.start!

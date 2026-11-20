@@ -60,7 +60,7 @@ RSpec.describe "Card colors" do
   end
 
   context "on the player screen" do
-    let!(:bob) { game.players.create!(name: "Bob", color: "#3498DB", last_seen_at: Time.current) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
 
     before do
       post game_players_path(game.code), params: {player: {name: "Alice", color: "#E74C3C"}}
@@ -94,7 +94,7 @@ RSpec.describe "Card colors" do
   context "on the big screen" do
     before do
       game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current)
-      game.players.create!(name: "Bob", color: "#3498DB", last_seen_at: Time.current)
+      game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current)
       game.start!
     end
 

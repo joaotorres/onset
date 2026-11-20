@@ -1,10 +1,13 @@
 class Player < ApplicationRecord
   COLOR_FORMAT = /\A#[0-9A-Fa-f]{6}\z/
+  PRESET_COLORS = %w[#E74C3C #2ECC71 #F1C40F #9B59B6 #1ABC9C #E91E63 #00BCD4 #8BC34A].freeze
 
   belongs_to :game
 
   validates :name, presence: true, length: {maximum: 20}
   validates :color, presence: true, format: {with: COLOR_FORMAT}, uniqueness: {scope: :game_id, message: "has already been taken in this game"}
+  # On create only: a room live before this rule may hold a non-preset row.
+  validates :color, inclusion: {in: PRESET_COLORS}, on: :create
   validates :session_token, presence: true, uniqueness: true
   validate :name_unique_within_game
 

@@ -14,7 +14,7 @@ RSpec.shared_context "game over standings" do
     taken = game.players.pluck(:color)
     names = ["Alexandria Pemberton", "Samuel Wainwright", "Priya Ramanathan", "Jonas Oppenheimer",
       "Mei Lin Takahashi", "Tomás Villanueva", "Leopold Fairweather"]
-    (PlayersController::PRESET_COLORS - taken).zip(names).each do |color, name|
+    (Player::PRESET_COLORS - taken).zip(names).each do |color, name|
       game.players.create!(name: name, color: color)
     end
     game.players.order(:id).zip([6, 7, 4, 3, 2, 3, 1, 0]).each { |p, s| p.update!(score: s) }

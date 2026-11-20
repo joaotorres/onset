@@ -29,7 +29,7 @@
       <fieldset>
         <legend class="mb-3 text-sm font-medium text-gray-300 light:text-gray-700">Pick a color</legend>
         <div class="grid grid-cols-4 gap-3">
-          <% PlayersController::PRESET_COLORS.each_with_index do |hex, i| %>
+          <% Player::PRESET_COLORS.each_with_index do |hex, i| %>
             <% owner = @color_owners[hex] %>
             <% if owner %>
               <%# The preset blended 30% over the page, not faded, so the initial stays readable %>

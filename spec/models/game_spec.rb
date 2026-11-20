@@ -105,7 +105,7 @@ RSpec.describe Game do
     end
 
     context "while playing" do
-      let(:alice) { game.players.create!(name: "Alice", color: "#648FFF") }
+      let(:alice) { game.players.create!(name: "Alice", color: "#E74C3C") }
 
       before do
         game.start!
@@ -237,8 +237,8 @@ RSpec.describe Game do
     let(:game) {
       Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: [], discard: []) }
     }
-    let!(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
-    let!(:bob) { game.players.create!(name: "Bob", color: "#DC267F", last_seen_at: Time.current) }
+    let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#F1C40F", last_seen_at: Time.current) }
 
     it "records the vote and ends the room once every active player has voted" do
       expect(game.vote_end_game!(alice)).to eq(game)
@@ -270,7 +270,7 @@ RSpec.describe Game do
 
   describe "#call_no_set!" do
     let(:game) { Game.create!.tap(&:start!) }
-    let(:player) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
 
     it "sets no_set fields and returns the game" do
       result = game.call_no_set!(player)
@@ -293,16 +293,16 @@ RSpec.describe Game do
 
     it "returns nil when a No-Set is already active" do
       game.call_no_set!(player)
-      other = game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current)
+      other = game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current)
       expect(game.call_no_set!(other)).to be_nil
     end
   end
 
   describe "#join_no_set!" do
     let(:game) { Game.create!.tap(&:start!) }
-    let(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
-    let(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current) }
-    let(:charlie) { game.players.create!(name: "Charlie", color: "#DC267F", last_seen_at: Time.current) }
+    let(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
+    let(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
+    let(:charlie) { game.players.create!(name: "Charlie", color: "#F1C40F", last_seen_at: Time.current) }
 
     before {
       alice
@@ -338,7 +338,7 @@ RSpec.describe Game do
 
   describe "#cancel_no_set!" do
     let(:game) { Game.create!.tap(&:start!) }
-    let(:player) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
 
     it "clears all no_set fields" do
       game.call_no_set!(player)
@@ -352,7 +352,7 @@ RSpec.describe Game do
 
   describe "#resolve_no_set!" do
     let(:game) { Game.create!.tap(&:start!) }
-    let(:player) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
+    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
 
     before { game.call_no_set!(player) }
 
@@ -399,8 +399,8 @@ RSpec.describe Game do
 
   describe "#restart!" do
     let(:game) { Game.create!.tap(&:start!) }
-    let(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
-    let(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current) }
+    let(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
+    let(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
 
     before do
       alice.update!(score: 3, locked_until: 1.minute.from_now)
@@ -499,8 +499,8 @@ RSpec.describe Game do
 
   describe "#vote_play_again!" do
     let(:game) { Game.create!(mode: :quick).tap(&:start!) }
-    let!(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current, score: 4) }
-    let!(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current, score: 5) }
+    let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current, score: 4) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current, score: 5) }
 
     before { game.update!(status: :ended, deck: [], board: [1, 2, 3]) }
 
@@ -579,7 +579,7 @@ RSpec.describe Game do
 
     it "is the wait call_no_set! schedules ExpireNoSetJob with, not a literal" do
       game = Game.create!.tap(&:start!)
-      player = game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current)
+      player = game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current)
       stub_const("Game::NO_SET_TIMEOUT", 20)
       freeze_time do
         expect { game.call_no_set!(player) }
@@ -590,9 +590,9 @@ RSpec.describe Game do
 
   describe "refusing a No Set call" do
     let(:game) { Game.create!.tap(&:start!) }
-    let!(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current, score: 2) }
-    let!(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current, score: 1) }
-    let!(:charlie) { game.players.create!(name: "Charlie", color: "#DC267F", last_seen_at: Time.current) }
+    let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current, score: 2) }
+    let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current, score: 1) }
+    let!(:charlie) { game.players.create!(name: "Charlie", color: "#F1C40F", last_seen_at: Time.current) }
 
     describe "#refuse_no_set!" do
       before { game.call_no_set!(alice) }
@@ -747,8 +747,8 @@ RSpec.describe Game do
 
     it "stamps the starting vote's board with the game's new updated_at, newer than the earlier vote's" do
       game = Game.create!
-      alice = game.players.create!(name: "Alice", color: "#648FFF")
-      bob = game.players.create!(name: "Bob", color: "#FE6100")
+      alice = game.players.create!(name: "Alice", color: "#E74C3C")
+      bob = game.players.create!(name: "Bob", color: "#2ECC71")
 
       first = capture_turbo_stream_broadcasts("game:#{game.code}") { game.vote_start!(alice) }
       second = capture_turbo_stream_broadcasts("game:#{game.code}") { game.vote_start!(bob) }
@@ -764,7 +764,7 @@ RSpec.describe Game do
       game = Game.create!
       alice = nil
       first_board = capture_turbo_stream_broadcasts("game:#{game.code}") {
-        alice = game.players.create!(name: "Alice", color: "#648FFF")
+        alice = game.players.create!(name: "Alice", color: "#E74C3C")
       }.find { |s| s["target"] == "board" }
       # Alice's own controller_status in her join carried the newer of the game's and hers.
       alice_join_version = [game.reload.updated_at, alice.updated_at].map { |t| (t.to_r * 1_000_000).to_i }.max
@@ -773,7 +773,7 @@ RSpec.describe Game do
       board_streams = nil
       status_streams = capture_turbo_stream_broadcasts("player:#{alice.id}") {
         board_streams = capture_turbo_stream_broadcasts("game:#{game.code}") {
-          bob = game.players.create!(name: "Bob", color: "#FE6100")
+          bob = game.players.create!(name: "Bob", color: "#2ECC71")
         }
       }
       bob_version = (bob.updated_at.to_r * 1_000_000).to_i

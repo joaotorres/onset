@@ -25,7 +25,7 @@ Card palettes (v6), card color 0, 1, 2, the same in both themes, picked per brow
 
 The Classic shades sit darker than the player presets and apart in hue: red `#C1121F` (hue 356°, 41% lightness) against `#E74C3C` (6°, 57%) and `#E91E63` (340°, 52%); green `#198A1E` (123°, 32%) against `#2ECC71` (145°, 49%) and `#8BC34A` (88°, 53%); purple `#5E2CA5` (265°, 41%) against `#9B59B6` (283°, 53%). Luminance ratio between each Classic shade and its nearest preset: 1.63, 2.13, 1.89. Before v6 every card used the Color-blind colors, without the mark.
 
-Player colors (`PlayersController::PRESET_COLORS`): `#E74C3C #2ECC71 #F1C40F #9B59B6 #1ABC9C #E91E63 #00BCD4 #8BC34A`.
+Player colors (`Player::PRESET_COLORS`): `#E74C3C #2ECC71 #F1C40F #9B59B6 #1ABC9C #E91E63 #00BCD4 #8BC34A`.
 
 Byline logo colours (v3, `--wm-*`): light on `:root` green `#009C3B`, blue `#002776`, red `#C60B1E`, gold `#E08A00`; dark on `.byline-footer` in the dark theme: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`; under the light theme (`@variant light`) `.byline-footer` takes the light values again (SPEC §8 Byline footer, Logo colours).
 
@@ -175,7 +175,7 @@ Quoted from `SPEC.md`.
 
 Two card palettes. Each browser picks one in the settings menu (§8, Settings menu), under **Card colors**:
 
-- **Classic** (the default): Set's own red, green and purple, far apart in hue so they read at a glance. The exact shades come from the design pass (`docs/design-system.md`). Each stays clearly apart from the other two, reads on the card face, and stays apart from the player colors, which already hold a red, a green and a purple of their own (`PlayersController::PRESET_COLORS`).
+- **Classic** (the default): Set's own red, green and purple, far apart in hue so they read at a glance. The exact shades come from the design pass (`docs/design-system.md`). Each stays clearly apart from the other two, reads on the card face, and stays apart from the player colors, which already hold a red, a green and a purple of their own (`Player::PRESET_COLORS`).
 - **Color-blind**: the IBM colorblind-safe palette, the one every card used before Classic: **Blue** `#648FFF`, **Orange** `#FE6100`, **Magenta** `#DC267F`. It also draws a **color mark** on every card: one small mark per color, the same on every card of that color, so the three colors can be told apart without seeing color at all. The mark never changes the shapes, their number or their shading, the card's other three features, and cannot be mistaken for one of them. It sits inside the card's SVG, so card sizes and every layout stay as they are. Its form and place come from the design pass. Its blue and orange measure 2.91:1 on the card face, just under the 3:1 bar for graphics; they stay as IBM sets them, because this is the palette players already know and the color mark tells the three apart by form, not by contrast.
 
 Card color 0, 1 and 2 (§4, Card) are red, green and purple in Classic and blue, orange and magenta in Color-blind, so a Set is the same Set under both.
@@ -242,7 +242,7 @@ Each color means one thing everywhere:
 | green | ready, correct, start, play again (`green-700` for white text; `green-600` is only about 3.3:1) |
 | orange | deck empty and the End game vote (`orange-700` for white text; `orange-600` is only about 3.3:1) |
 
-Player colors are the 8 presets in `PlayersController::PRESET_COLORS`, deliberately apart from both card palettes (Palette above). They show as dots, the player screen's top border strip and podium bars.
+Player colors are the 8 presets in `Player::PRESET_COLORS`, deliberately apart from both card palettes (Palette above). They show as dots, the player screen's top border strip and podium bars.
 
 Countdown rings: `r=45` in a 100 viewBox, gray track, colored progress with round caps, rotated -90° so they drain clockwise from the top. Seconds sit inside the ring, or inside the button the ring surrounds.
 

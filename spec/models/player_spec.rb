@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Player do
   let(:game) { Game.create! }
-  let(:valid_attrs) { {game: game, name: "Alice", color: "#648FFF"} }
+  let(:valid_attrs) { {game: game, name: "Alice", color: "#E74C3C"} }
 
   describe "session token generation" do
     it "generates a session token on create" do
@@ -53,8 +53,28 @@ RSpec.describe Player do
       expect(Player.new(valid_attrs.merge(color: "#GGGGGG"))).not_to be_valid
     end
 
-    it "is valid with a lowercase hex color" do
-      expect(Player.new(valid_attrs.merge(color: "#fe6100"))).to be_valid
+    it "holds the 8 presets in order" do
+      expect(Player::PRESET_COLORS).to eq(%w[#E74C3C #2ECC71 #F1C40F #9B59B6 #1ABC9C #E91E63 #00BCD4 #8BC34A])
+    end
+
+    it "refuses a well-formed color that is not a preset on create" do
+      player = Player.new(valid_attrs.merge(color: "#FE6100"))
+      expect(player).not_to be_valid
+      expect(player.errors[:color]).to be_present
+    end
+
+    it "still saves an update to an existing row with a non-preset color" do
+      player = Player.create!(valid_attrs)
+      player.update_column(:color, "#FE6100")
+      player = Player.find(player.id)
+      expect(player.update(score: 3, locked_until: 5.seconds.from_now, last_seen_at: Time.current)).to be true
+      expect(player.reload.score).to eq(3)
+    end
+
+    it "has the database refuse a second player with one color in a game" do
+      Player.create!(valid_attrs)
+      twin = Player.new(valid_attrs.merge(name: "Bob", session_token: "t2"))
+      expect { twin.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
     it "rejects a duplicate color in the same game" do

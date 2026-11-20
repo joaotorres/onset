@@ -22,7 +22,7 @@ RSpec.shared_context "tap card claim" do
     expect(page).to have_content("You're in")
     expect(page).to have_css("turbo-cable-stream-source[connected]", count: 2, visible: :all)
 
-    game.players.create!(name: "Bob", color: "#3498DB", last_seen_at: Time.current)
+    game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current)
     game.start!
     game.update_columns(board: (0..11).to_a)
     # A fresh load: two broadcasts back to back can land out of order (§7).

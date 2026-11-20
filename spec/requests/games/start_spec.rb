@@ -8,8 +8,8 @@ RSpec.describe "Games" do
       before do
         post games_path  # sets host cookie
         @game = Game.last
-        @game.players.create!(name: "Alice", color: "#648FFF", session_token: SecureRandom.hex)
-        @game.players.create!(name: "Bob", color: "#FE6100", session_token: SecureRandom.hex)
+        @game.players.create!(name: "Alice", color: "#E74C3C", session_token: SecureRandom.hex)
+        @game.players.create!(name: "Bob", color: "#2ECC71", session_token: SecureRandom.hex)
       end
 
       it "transitions the game to playing" do

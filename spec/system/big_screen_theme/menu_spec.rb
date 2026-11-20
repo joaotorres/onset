@@ -31,7 +31,7 @@ RSpec.describe "Settings menu on the big screen", type: :system do
     open_settings
     find("label", text: "Dark").click
 
-    game.players.create!(name: "Carol", color: PlayersController::PRESET_COLORS[2], last_seen_at: Time.current)
+    game.players.create!(name: "Carol", color: Player::PRESET_COLORS[2], last_seen_at: Time.current)
     expect(page).to have_css("#board li", text: "Carol")
     expect(menu_open?).to be(true)
 

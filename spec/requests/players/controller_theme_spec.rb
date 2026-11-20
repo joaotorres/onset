@@ -6,7 +6,7 @@ RSpec.describe "Player screen and the theme cookie" do
   include_context "players"
 
   let(:me) { game.players.find_by!(name: "Alice") }
-  let!(:bob) { game.players.create!(name: "Bob", color: "#3498DB", last_seen_at: Time.current) }
+  let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
 
   before { post game_players_path(game.code), params: {player: {name: "Alice", color: "#E74C3C"}} }
 

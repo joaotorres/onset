@@ -24,7 +24,7 @@ RSpec.describe "Players" do
 
     context "the landscape board strip" do
       let(:me) { game.players.find_by!(name: "Alice") }
-      let!(:bob) { game.players.create!(name: "Bob", color: "#3498DB", last_seen_at: Time.current) }
+      let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
       let(:status) { Nokogiri::HTML(response.body).at_css("#controller_status") }
       let(:card_svgs) { status.css("svg").select { |svg| svg.ancestors("[class*='aspect-[5/7]']").any? } }
 

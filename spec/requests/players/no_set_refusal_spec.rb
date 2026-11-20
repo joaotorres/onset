@@ -8,8 +8,8 @@ RSpec.describe "Players" do
       include ActiveSupport::Testing::TimeHelpers
 
       let(:me) { game.players.find_by!(name: "Alice") }
-      let!(:bob) { game.players.create!(name: "Bob", color: "#3498DB", last_seen_at: Time.current) }
-      let!(:cat) { game.players.create!(name: "Cat", color: "#2ECC71", last_seen_at: Time.current) }
+      let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
+      let!(:cat) { game.players.create!(name: "Cat", color: "#F1C40F", last_seen_at: Time.current) }
       let(:doc) { Nokogiri::HTML(response.body) }
       let(:status) { doc.at_css("#controller_status") }
       let(:pill_slot) { status.at_css("[data-pill-slot]") }

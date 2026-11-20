@@ -45,7 +45,7 @@ RSpec.describe "Light theme values", type: :system do
   end
 
   it "draws the join page swatches in light" do
-    game.players.create!(name: "Ana", color: PlayersController::PRESET_COLORS.first, session_token: "t1")
+    game.players.create!(name: "Ana", color: Player::PRESET_COLORS.first, session_token: "t1")
     light!
     visit join_game_players_path(game.code)
     taken = find("label[title='Taken by Ana']")

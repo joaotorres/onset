@@ -14,7 +14,7 @@ RSpec.shared_context "big screen theme" do
   end
 
   def add_players(count)
-    PlayersController::PRESET_COLORS.first(count).each_with_index.map do |color, i|
+    Player::PRESET_COLORS.first(count).each_with_index.map do |color, i|
       game.players.create!(name: "Player #{i + 1}", color: color, last_seen_at: Time.current)
     end
   end

@@ -1,6 +1,6 @@
 # 54: Enforce the 8-player cap on the server
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: high
@@ -8,7 +8,7 @@ Feature: Waiting room
 Model:
 Security: yes
 Effort:
-Changelog:
+Changelog: A room now holds at most 8 players: a join must take one of the 8 player colors still free.
 
 ## Request
 

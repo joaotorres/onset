@@ -7,8 +7,8 @@ RSpec.describe UnlockBroadcastJob do
   let(:game) {
     Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
   }
-  let!(:alice) { game.players.create!(name: "Alice", color: "#648FFF", last_seen_at: Time.current) }
-  let!(:bob) { game.players.create!(name: "Bob", color: "#FE6100", last_seen_at: Time.current) }
+  let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
+  let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
 
   def version(html) = html[/data-version="(\d+)"/, 1]
 

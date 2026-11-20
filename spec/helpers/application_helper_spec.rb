@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe ApplicationHelper do
   describe "#stream_version" do
     let(:game) { Game.create! }
-    let(:player) { game.players.create!(name: "Alice", color: "#648FFF") }
+    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C") }
 
     def micros(time) = (time.to_r * 1_000_000).to_i
 
