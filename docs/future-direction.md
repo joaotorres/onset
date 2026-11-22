@@ -43,6 +43,19 @@ So until then:
 - Keep logging lost races as `near_tie` lines (§6 Lost races are logged)
 - No custom Action Cable channel (§9)
 
+## Per-address ceiling on in-game actions (parked)
+
+Ticket 60 limits each player's in-game actions on their own (SPEC §5 Rate
+limits), and one address may join 20 times a minute, each join with a full
+allowance. A script that keeps joining can therefore multiply the limits.
+Decided 2026-11-22 (review 20261120-094918): leave it, not a concern now.
+Revisit if load from one address becomes a problem. The fix then: a loose
+per-address ceiling of about 2,500 in-game actions a minute, above a full table
+of 8 at the per-player limits (2,160), since a table shares one Wi-Fi address.
+
+So until then:
+- In-game limits stay per player, by `player_token`, never by IP
+
 ## Solo/practice mode (parked)
 
 Same UI, no claim phase, infinite deck shuffle. A v1 non-goal.
