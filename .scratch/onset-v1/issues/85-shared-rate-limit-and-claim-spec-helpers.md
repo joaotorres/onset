@@ -1,13 +1,13 @@
 # 85: Behind the scenes: one home for the rate limit stub and the stale claim helpers
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the rate limit and stale claim spec helpers each live in one place.
 
 ## Request
 
@@ -58,3 +58,5 @@ Decided: the claims request spec keeps its own `state` and takes only `restart_w
 Decided: the stale claim context runs a shared examples group the including spec names, because the model and the job check different actions (submit and pick, expiry) against the same three situations. Instead of: one shared examples group for both.
 
 Decided: the rate limit context covers every copy of the stub at build time, tickets 62's and 79's included, because both are filed to reuse the same seam and the fix covers the whole flaw. Instead of: only the three files the request names.
+
+Decided: the rate limit context stubs `ActionController::Base.cache_store`, the one store object every controller shares (breaking it turned all 25 limit examples red, players create included), and the superseded situation also runs "<examples> when superseded" for each spec's extra example, because that keeps one stub and one setup per situation. Instead of: a stub per controller, or the extra examples in a second superseded context.

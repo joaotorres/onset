@@ -5,14 +5,11 @@ require "rails_helper"
 RSpec.describe "In-game rate limits" do
   include ActiveSupport::Testing::TimeHelpers
 
-  let(:store) { ActiveSupport::Cache::MemoryStore.new }
+  include_context "rate limits"
+
   let(:game) { Game.create! }
   let(:alice) { join("Alice", "#E74C3C") }
   let(:bob) { join("Bob", "#2ECC71") }
-
-  before do
-    allow(GamesController.cache_store).to receive(:increment) { |*args, **opts| store.increment(*args, **opts) }
-  end
 
   # A browser of its own, so each player has its own cookies; every one shares the IP.
   def join(name, color)

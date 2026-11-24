@@ -331,19 +331,6 @@ RSpec.describe Claim do
 
   # §6 Key invariants: a claim is acted on only while it is the room's current claim.
   describe "a claim that is not the room's current one" do
-    def state
-      game.reload
-      [claim.reload.attributes, player.reload.score, player.locked_until,
-        game.status, game.board, game.deck, game.discard, game.claim_player_id]
-    end
-
-    # The room ends with the claim still pending, then restarts on a known board.
-    def restart_with_known_board
-      game.update!(status: :ended)
-      game.restart!
-      game.update!(board: (0..11).to_a, deck: (12..80).to_a)
-    end
-
     shared_examples "an ignored claim" do
       it "ignores submit! with a valid Set" do
         expect { claim.submit!(find_set_on_board) }.not_to change { state }
@@ -361,36 +348,7 @@ RSpec.describe Claim do
       end
     end
 
-    context "in an ended room" do
-      before do
-        player.update!(score: 2)
-        claim
-        game.update!(status: :ended)
-      end
-
-      include_examples "an ignored claim"
-    end
-
-    context "left from an earlier game" do
-      before do
-        claim
-        restart_with_known_board
-        player.update!(score: 2)
-      end
-
-      include_examples "an ignored claim"
-    end
-
-    context "superseded by its player's newer claim" do
-      let!(:newer) do
-        claim
-        restart_with_known_board
-        player.update!(score: 2)
-        game.try_claim!(player)
-      end
-
-      include_examples "an ignored claim"
-
+    shared_examples "an ignored claim when superseded" do
       it "still judges the newer claim" do
         ids = find_set_on_board
         claim.submit!(ids)
@@ -402,6 +360,8 @@ RSpec.describe Claim do
         expect(player.reload.score).to eq(3)
       end
     end
+
+    include_context "a claim that is not the room's current one", "an ignored claim"
   end
 
   describe "card_ids validation" do

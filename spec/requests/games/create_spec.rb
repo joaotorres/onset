@@ -28,12 +28,7 @@ RSpec.describe "Games" do
     end
 
     context "when rate limited" do
-      # The test env uses a null cache store, so count in a real one.
-      let(:store) { ActiveSupport::Cache::MemoryStore.new }
-
-      before do
-        allow(GamesController.cache_store).to receive(:increment) { |*args, **opts| store.increment(*args, **opts) }
-      end
+      include_context "rate limits"
 
       it "returns 429 after 10 requests a minute" do
         10.times { post games_path }

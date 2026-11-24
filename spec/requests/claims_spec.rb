@@ -158,14 +158,10 @@ RSpec.describe "Claims" do
 
   # §6 Key invariants: a claim left pending by an earlier game is never acted on.
   describe "a leftover claim, from its player" do
+    include_context "restart with a known board"
+
     let(:player) { sign_in }
-    let!(:leftover) do
-      game.try_claim!(player).tap do
-        game.update!(status: :ended)
-        game.restart!
-        game.update!(board: (0..11).to_a, deck: (12..80).to_a)
-      end
-    end
+    let!(:leftover) { game.try_claim!(player).tap { restart_with_known_board } }
 
     def state
       game.reload

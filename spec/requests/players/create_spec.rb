@@ -7,12 +7,7 @@ RSpec.describe "Players" do
     let(:valid_params) { {player: {name: "Alice", color: "#E74C3C"}} }
 
     context "when rate limited" do
-      # The test env uses a null cache store, so count in a real one.
-      let(:store) { ActiveSupport::Cache::MemoryStore.new }
-
-      before do
-        allow(PlayersController.cache_store).to receive(:increment) { |*args, **opts| store.increment(*args, **opts) }
-      end
+      include_context "rate limits"
 
       it "returns 429 after 20 requests a minute" do
         20.times { post game_players_path(game.code), params: {player: {name: "x", color: "#zzz"}} }
