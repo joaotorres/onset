@@ -2,7 +2,6 @@
 
 Status: needs-triage
 Kind: visual
-Design held: 20261120-47
 Blocked by: 68, 70
 Priority:
 Model:
@@ -46,3 +45,9 @@ Rechecked 2026-11-19, third time: still waiting for the design pass. docs/design
 Decided: held for brief 20261120-47, over the 6-board round: 47 alone takes 10 boards, and this ticket's remove control sits on the bot pills and roster rows that brief draws, so it is briefed in the next round, from 47's boards. Instead of: briefing it with 47 in one oversized round.
 
 Rechecked 2026-11-24, fourth time: still waiting for the design pass. docs/design-system.md has no changelog entry for this ticket: v8 (ticket 47) only leaves room for the remove control (Shared: Rules added in v8: after the ✓ on a bot's big screen pill, after the ✓ at a roster row's right end) and v9 is ticket 76's. Brief 20261120-47 has returned, so that hold is over; the brief step drops the `Design held:` line when it takes this ticket. Triage 47's split already moved the blocker to 68 (bots and the big screen add) and 70 (the host's player screen add), so `Blocked by: 68, 70` stands. The spec changes since fit the removal: 47's split (case-insensitive lowest free name, `bot_timer`, which a waiting bot's deleted row takes with it, `host_player_id` following the newest join), 61's unique index on `lower(name)` and 54's on color, both freed by deleting the row, 62's rate limit, which counts `DELETE /bots/:id` with the adds and is blocked by this ticket, 66's and 82's §5 answers, which already list removing a bot, 67's and 71's rail sizes, and 72's and 73's Fit, which keeps the remove control in full on a pill. Play again goes from ended straight to playing, so no removal reaches a bot that has played. Open tickets: 73 changes the same waiting pills and is best drawn with this ticket; the others (74, 76 to 87) touch no waiting room control. Missing from DESIGN: the remove control on a bot's pill on the big screen's waiting state and on a bot's row in the host's player screen roster, in portrait, landscape and computer, both themes, with 8 players, the add-bot control and no page scroll; its focus and hover states; and the waiting states after a removal leaves one person ("Need at least 2 players", "Waiting for more players to join…"). Next: `/design-brief 48 73`.
+
+Decided: briefed with 73 in brief 20261124-48-73, six boards (big screen 1280×800 and 1280×720 with 8 long-name players, the one-person state after a removal at 1920×1080, and the host's player screen in portrait, landscape and computer), and the `Design held: 20261120-47` line dropped, because brief 20261120-47 has returned and 48 and 73 together fit the 6-board round exactly. Instead of: a round of 48 alone, with 73's pill layout drawn later around a remove control already placed.
+
+Decided: one theme per board, alternating light and dark across the six, because a light screen changes colors only (DESIGN Shared: Rules added in v6), so a second theme of the same size would draw the same layout twice and take the round over 6 boards. Instead of: both themes at every size.
+
+Decided: left every existing board alone: `l-big-waiting4`, `l-big-waiting1`, `d-big-waiting4` and `d-big-waiting1` are 1920×1080, which tickets 67, 71 and 72 left as built, and every `bot-*` board draws a screen not built yet (tickets 68 to 70), so the design tool still owns them; the new boards draw beside them. Instead of: redrawing the waiting boards from the code.

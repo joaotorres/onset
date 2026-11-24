@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  design-brief 48, 73: brief 20261124-48-73 written against DESIGN v9, six boards (big screen 1280×800 and 1280×720 with 8 long-name players, the one-person state after a removal, the host's player screen in three layouts), no ticket held. Next: draw it, then design-entry 48, 73.
 - 2026-11-24  deps: patch-level gem updates, 11 gems (bootsnap, connection_pool, net-imap, net-scp, net-sftp, parser, rack, regexp_parser, sshkit, tailwindcss-ruby, thruster), 876 examples green, standardrb clean. Held back jt_telemetry: a git gem on main, whose upstream has moved past 0.3.0 with no patch release, so the whole-bundle --strict --patch run fails; every other gem was named explicitly. Next: none.
 - 2026-11-24  build 87: done, the five static error pages read the theme cookie again on a back-forward cache restore and rebuild the Match device metas, 876 examples (863 plus its 13), one Decided line. Next: auto.
 - 2026-11-24  build 86: done, one `create_player` spec helper with the room's first free preset, used wherever the color is not the point, 863 examples (858 plus its 5), four Decided lines. Next: auto.
