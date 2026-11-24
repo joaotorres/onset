@@ -60,7 +60,7 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
     resize(1280, 860)
     theme!("dark")
     visit root_path
-    expect(style("fieldset > div", "border-top-color")).to eq(color("gray-700"))
+    expect(style("form[action='#{games_path}'] fieldset > div", "border-top-color")).to eq(color("gray-700"))
   end
 
   it "keeps the open settings menu border gray-700 in dark" do
@@ -105,5 +105,15 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
     expect(page).to have_css("#player_name.border-red-500")
     page.execute_script("document.activeElement.blur()")
     expect(style("#player_name", "border-top-color")).to eq(color("red-500"))
+  end
+
+  it "keeps the join page's name error border red-600 in light" do
+    theme!("light")
+    visit new_game_player_path(game.code)
+    fill_in "Your name", with: " "
+    click_button "Join"
+    expect(page).to have_css("#player_name.border-red-500")
+    page.execute_script("document.activeElement.blur()")
+    expect(style("#player_name", "border-top-color")).to eq(color("red-600"))
   end
 end

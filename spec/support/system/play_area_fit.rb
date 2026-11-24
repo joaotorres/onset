@@ -43,7 +43,19 @@ RSpec.shared_context "waiting fit" do
   def expect_waiting_fits
     expect(page).to have_css("#start_button button")
     expect_inside_board("[data-qr-tile]", "[data-join-here]", "[data-hero-text] > p", "#board li", "#start_button")
+    expect_join_link_under_qr
     expect_settings_in_corner
+  end
+
+  # SPEC §8 Big screen, Fit: the QR never under 160px, the link on one line under its tile, no wider than it.
+  def expect_join_link_under_qr
+    expect(rect("[data-qr-tile] svg")["width"]).to be >= 160
+    link = rect("[data-join-here]")
+    qr = rect("[data-qr-tile]")
+    expect(link["top"]).to be >= qr["bottom"]
+    expect(link["width"]).to be <= qr["width"], "link #{link["width"]}px wider than its #{qr["width"]}px tile"
+    line = page.evaluate_script("parseFloat(getComputedStyle(document.querySelector('[data-join-here]')).lineHeight)")
+    expect(link["height"]).to be <= line + 0.5, "link #{link["height"]}px tall, more than one #{line}px line"
   end
 end
 

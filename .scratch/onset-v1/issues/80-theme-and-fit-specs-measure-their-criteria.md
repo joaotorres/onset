@@ -1,13 +1,13 @@
 # 80: Behind the scenes: make the theme and fit specs measure what their criteria name
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the theme and big screen fit tests now check the Game mode toggle itself, the light name error border, and the join link and QR size at every window.
 
 ## Request
 
@@ -84,3 +84,5 @@ Decided: a red window is fixed by stepping the link down through the sizes it al
 Decided: no guard making `style` refuse multi-match selectors, because many examples read the first of several on purpose (`figure .card-edge`, `[data-hero-text] > p`) and ticket 81 reshapes these helpers. Instead of: a guard in the shared helper.
 
 No conflict: no spec change. Ticket 83 renames the height variants the link's classes use, ticket 73 resizes the waiting hero for long names and ticket 81 moves the shared helpers; none contradicts this request, and whichever builds later keeps the others' names and checks green.
+
+Decided: no change to the join link's classes, because the new link and QR check passed at every `FIT_SIZES` window, 1920×1080 and light 1280×720 before any view change (the link is no wider than its tile at 1280×1024 too). Instead of: shrinking it at the 1024 height step.
