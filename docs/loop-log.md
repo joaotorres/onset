@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  request 80: filed from 64's deferral, the theme and fit specs scoped to what their criteria name, behavioural. Next: triage.
 - 2026-11-24  request 79: filed from 60's deferral, the ready and host limits before the game loads and the missing rate limit specs, behavioural. Next: triage.
 - 2026-11-24  request 78: filed from 52's deferral, theme and Color-blind picks last a year on Safari, behavioural. Next: triage.
 - 2026-11-24  request 77: filed from 52's deferral, Back or Forward from the browser's cache syncs the theme and card colors, behavioural. Next: triage.
