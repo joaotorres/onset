@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  triage 87: ready, low, blocked by 84, the five error pages rerun their theme read on a back-forward cache restore, no spec change, eight Decided lines. Next: build after 84.
 - 2026-11-24  request 87: filed from 77's deferral, a static error page restored by Back or Forward takes the current theme, behavioural. Next: triage.
 - 2026-11-24  triage 83: ready, low, blocked by 71, height variants renamed h-under-<N> tallest first, no spec change, six Decided lines. Next: build after 71.
 - 2026-11-24  triage 82: done, SPEC §5 names 406 and 422, §11 judges against the current claim, DESIGN tray slot number 24px, low, six Decided lines. Next: build.
