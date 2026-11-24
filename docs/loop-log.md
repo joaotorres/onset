@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  triage 77: ready, no spec change, reproduced in headless Chrome, scope adds the open menu and connect() sync, error pages deferred, eight Decided lines. Next: build.
 - 2026-11-24  triage 76: ready, no spec change, gate 2 met by DESIGN v9, six Decided lines. Next: build.
 - 2026-11-24  triage 75: wontfix, already met, the three files ran under 8 s in the last two full runs; Chrome 158 now fails every system spec in Capybara's reset. Next: fix the Capybara/Chrome break directly, then build.
 - 2026-11-24  triage 73: still waiting for the design pass, no DESIGN entry covers the long-name pills (v9 was ticket 76's). Next: /design-brief 48 73.
