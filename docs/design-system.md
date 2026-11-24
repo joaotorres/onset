@@ -428,7 +428,7 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Computer: the board on the left; a 248px side column with the scoreboard stacked above the status panel, SET! and its pill
 - Deck: "N cards left in the deck" with the board, or an orange "Deck is empty" pill
 - Claiming (mine): portrait, the claim bar takes the status slot and the 3-slot tray and Submit replace SET! and its pill. Landscape and computer: one yellow block replaces the panel and SET!, and Submit takes the pill slot (v5)
-- Portrait tray (v5): a 128px row of three 72×101 slots, 14px apart, above the 44px pill slot holding Submit, 4px between, 176px in all, the height SET! and its pill take, so nothing else moves. An empty slot is a dashed `gray-700` box with its number (1, 2, 3) centred in display type, 22px/700, in muted text (dark `#7C8390` since v7, light `gray-500`); a filled slot shows the picked card. Slots fill in pick order
+- Portrait tray (v5): a 128px row of three 72×101 slots, 14px apart, above the 44px pill slot holding Submit, 4px between, 176px in all, the height SET! and its pill take, so nothing else moves. An empty slot is a dashed `gray-700` box with its number (1, 2, 3) centred in display type, 24px/700 (`text-2xl`), in muted text (dark `#7C8390` since v7, light `gray-500`); a filled slot shows the picked card. Slots fill in pick order
 - Submitted (v5): the board's cards are disabled, the three picks keep the selected ring, the tray and the n/3 count stay as at 3/3, the countdown ring keeps draining and Submit shows its submitted state. The board never dims, at 3 picks or after the tap
 - Someone else claiming: the disabled SET! shows the seconds large with a small "SET!" label under them, inside the yellow ring
 - Read-only boards (someone else claiming, No Set, locked out) are not dimmed
@@ -482,6 +482,7 @@ None
 
 ## Changelog
 
+- v9, 2026-11-24: ticket 82, the records corrected to the build, nothing new designed: the portrait tray's empty slot number is 24px (`text-2xl`), as built, not 22px.
 - v9, 2026-11-24: ticket 76, a small visual fix, not from a design pass: a locked entry on the player screen's play scoreboard keeps its name and score at full opacity in muted text, secondary on the player's own entry, so both read at 4.5:1 or more in both themes; only the dot stays faded (Components > players/controller/_scoreboard, Shared: Rules added in v9).
 - v8, 2026-11-20: ticket 65, the records corrected to SPEC, nothing new designed: the quoted SPEC §10 Visual system matches SPEC again (the `muted` token bullet, the History line's ending) and the Themes pointer names every bullet the quote leaves out.
 - v8, 2026-11-20: ticket 47, bots: the bot mark after a bot's name in every place a player's name shows, at each place's size and color (Components > Bot mark, Shared: Rules added in v8); the add-bot control, three level buttons in the raised bordered style, on the big screen's waiting rail and under the host's own waiting roster in every layout, with its focus and disabled states (Components > Add-bot control); Start game's "Need a person to play" in `_start_button`; room left for ticket 48's remove control; ten boards in both themes.

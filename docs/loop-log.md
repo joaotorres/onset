@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  triage 82: done, SPEC §5 names 406 and 422, §11 judges against the current claim, DESIGN tray slot number 24px, low, six Decided lines. Next: build.
 - 2026-11-24  triage 81: split into 84 (shared theme spec context), 85 (rate limit stub and stale claim helpers) and 86 (player with the next free preset), no spec change, low, sixteen Decided lines. Next: build.
 - 2026-11-24  triage 80: ready, no spec change, Game mode toggle spec scoped to its form, join link and QR floor checked at every fit window, light name error border tested, selector audit found no other slip, eight Decided lines. Next: build.
 - 2026-11-24  triage 79: ready, no spec change, GamesController's ready and host limits move before set_game plus the missing specs, 62's Scope orders its limit the same way, nine Decided lines. Next: build.
