@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include TracksEvents
+  include RenewsDisplayCookies
 
   # SPEC.md §8, Search engines: every page is noindex unless its controller
   # skips this, so a new page stays out of search results. First, so it

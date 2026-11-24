@@ -1,13 +1,13 @@
 # 78: A theme or Color-blind pick lasts a year on Safari too
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: high
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Your theme and Color-blind picks now last a year on iPhone and Safari too, instead of lapsing after a week.
 
 ## Request
 
@@ -74,3 +74,5 @@ Decided: the fix covers the two cookies only, because a search of the app for st
 Decided: no blocker on 77, 80 or 81, because 77 changes the menu's script and must not touch the server helpers, 80 changes selectors in other spec files and 81 where spec helpers live, and this one only adds a server write; whichever builds second keeps the other's edit. Instead of: blocking on 77.
 
 Decided: Priority high, Feature Themes (ticket 52's), Model and Security left empty, because it is broken behaviour in built work for every Safari and iPhone player who picks, the fix is one server-side write with request specs, and the cookies are display preferences with no identity that §17 Privacy already covers. Instead of: normal, Model: fable or Security: yes.
+
+Decided: "a response that renders a page" is an HTML response with a body, checked in an `after_action`, because every page here renders with the application layout and every non-page answer is a `head`, JSON or a redirect, and a before_action that halts (the rate limits' `head`) skips after_actions anyway. Instead of: a flag the layout sets while rendering.

@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  build 78: done, every page the layout renders sends the accepted theme and card_colors cookies back with a fresh year, one Decided line. Next: auto.
 - 2026-11-24  triage 48: still waiting for the design pass, no DESIGN entry covers the remove control (v8 only leaves room for it), brief 47's hold over, blockers 68 and 70 stand, no spec change. Next: /design-brief 48 73.
 - 2026-11-24  triage 87: ready, low, blocked by 84, the five error pages rerun their theme read on a back-forward cache restore, no spec change, eight Decided lines. Next: build after 84.
 - 2026-11-24  request 87: filed from 77's deferral, a static error page restored by Back or Forward takes the current theme, behavioural. Next: triage.
