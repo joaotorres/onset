@@ -1,13 +1,13 @@
 # 87: A static error page shown again by Back or Forward takes the current theme
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by: 84
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: An error page you come back to with Back or Forward shows the theme you picked meanwhile, or follows your device again.
 
 ## Request
 
@@ -75,3 +75,5 @@ Decided: one test asserts the five scripts are the same text, because the fix li
 Decided: blocked by 84, because 84 moves the cookie writer, the theme-color reader and the window marker into one shared context and reshapes the "static error pages" context this spec uses, so building first would add copies 84 must then remove. Instead of: no blocker.
 
 Decided: Priority low, Feature Themes (77's), Model and Security left empty, because it shows only after a pick in another tab while an error page is open, then Back from another site, in a browser that restores that page, and the change is five copies of a short inline script. Instead of: normal.
+
+Decided: the "set while away" criteria change the cookie just before leaving, because WebDriver sets and deletes cookies only for the page it is on, and on the `data:` page it cannot reach the app's; the restored page has not read the cookie since either way. Instead of: a second tab on the app's host to change it while away.

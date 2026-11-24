@@ -14,14 +14,30 @@
 
     <script>
       (function () {
-        var match = document.cookie.match(/(?:^|; )theme=([^;]*)/);
-        var theme = match && match[1];
-        if (theme !== "light" && theme !== "dark") return;
-        document.documentElement.setAttribute("data-theme", theme);
-        var metas = document.querySelectorAll('meta[name="theme-color"]');
-        metas[0].setAttribute("content", theme === "light" ? "#F9FAFB" : "#030712");
-        metas[0].removeAttribute("media");
-        for (var i = 1; i < metas.length; i++) metas[i].remove();
+        function read() {
+          var match = document.cookie.match(/(?:^|; )theme=([^;]*)/);
+          var theme = match && match[1];
+          var metas = document.querySelectorAll('meta[name="theme-color"]');
+          if (theme !== "light" && theme !== "dark") {
+            document.documentElement.removeAttribute("data-theme");
+            if (metas.length > 1) return;
+            metas[0].setAttribute("content", "#F9FAFB");
+            metas[0].setAttribute("media", "(prefers-color-scheme: light)");
+            var device = document.createElement("meta");
+            device.setAttribute("name", "theme-color");
+            device.setAttribute("content", "#030712");
+            metas[0].parentNode.insertBefore(device, metas[0].nextSibling);
+            return;
+          }
+          document.documentElement.setAttribute("data-theme", theme);
+          metas[0].setAttribute("content", theme === "light" ? "#F9FAFB" : "#030712");
+          metas[0].removeAttribute("media");
+          for (var i = 1; i < metas.length; i++) metas[i].remove();
+        }
+        read();
+        window.addEventListener("pageshow", function (event) {
+          if (event.persisted) read();
+        });
       })();
     </script>
 
