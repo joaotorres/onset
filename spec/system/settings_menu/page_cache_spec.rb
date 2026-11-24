@@ -7,17 +7,17 @@ RSpec.describe "Settings menu and the page cache", type: :system do
 
   it "shows the menu closed after Back from a link followed with it open" do
     visit root_path
-    page.execute_script("window.notReloaded = true")
+    mark_window
     open_settings
 
     # The shield covers the page while the menu is open, so a script click.
     page.execute_script("arguments[0].click()", find_link("How to play"))
     expect(page).to have_current_path(how_to_play_path)
-    expect(page.evaluate_script("window.notReloaded")).to be(true)
+    expect_same_window
 
     page.go_back
     expect(page).to have_current_path(root_path)
-    expect(page.evaluate_script("window.notReloaded")).to be(true)
+    expect_same_window
     expect(page).to have_css('button[aria-label="Settings"]')
     state = page.evaluate_script(<<~JS)
       [document.querySelector("#settings_menu").hidden,

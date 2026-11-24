@@ -23,7 +23,7 @@ RSpec.describe "Settings button on the player screen, portrait", type: :system d
     emulate_color_scheme("dark")
     visit game_controller_path(game.code)
     expect(page_background).to eq(color("gray-950"))
-    page.execute_script("window.sameDocument = true")
+    mark_window
     open_settings
     menu = rect("#settings_menu")
     button = rect('button[aria-label="Settings"]')
@@ -33,7 +33,7 @@ RSpec.describe "Settings button on the player screen, portrait", type: :system d
 
     find("label", text: "Light").click
     expect(page_background).to eq(color("gray-50"))
-    expect(page.evaluate_script("window.sameDocument")).to be(true)
+    expect_same_window
     expect(overflow).to eq([0, 0, 0])
   end
 end

@@ -9,11 +9,6 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
 
   let(:game) { Game.create! }
 
-  def theme!(name)
-    visit root_path
-    theme_cookie!(name)
-  end
-
   it "defines muted once, as a theme token, and no view writes the hex" do
     visit root_path
     expect(token("muted")).to eq("#7c8390")
@@ -23,7 +18,8 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
   [[1280, 860], [375, 667]].each do |width, height|
     it "gives the room code field a muted placeholder and a gray-500 border in dark at #{width}px" do
       resize(width, height)
-      theme!("dark")
+      visit root_path
+      theme_cookie!("dark")
       visit root_path
       expect(pseudo_style("#room_code", "::placeholder", "color")).to eq(muted)
       expect(style("#room_code", "border-top-color")).to eq(color("gray-500"))
@@ -32,14 +28,16 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
 
   it "keeps the error border red in both themes and the placeholder gray-500 in light" do
     resize(1280, 860)
-    theme!("dark")
+    visit root_path
+    theme_cookie!("dark")
     visit root_path
     fill_in "Have a room code?", with: "ZZZZ"
     click_button "Join"
     expect(page).to have_content("Room not found")
     expect(style("#room_code", "border-top-color")).to eq(color("red-500"))
 
-    theme!("light")
+    visit root_path
+    light!
     visit root_path
     expect(pseudo_style("#room_code", "::placeholder", "color")).to eq(color("gray-500"))
     expect(style("#room_code", "border-top-color")).to eq(color("gray-500"))
@@ -51,21 +49,24 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
 
   it "keeps the landing's Join button border gray-700 in dark" do
     resize(1280, 860)
-    theme!("dark")
+    visit root_path
+    theme_cookie!("dark")
     visit root_path
     expect(style("input[type=submit]", "border-top-color")).to eq(color("gray-700"))
   end
 
   it "keeps the Game mode toggle track border gray-700 in dark" do
     resize(1280, 860)
-    theme!("dark")
+    visit root_path
+    theme_cookie!("dark")
     visit root_path
     expect(style("form[action='#{games_path}'] fieldset > div", "border-top-color")).to eq(color("gray-700"))
   end
 
   it "keeps the open settings menu border gray-700 in dark" do
     resize(1280, 860)
-    theme!("dark")
+    visit root_path
+    theme_cookie!("dark")
     visit root_path
     open_settings
     expect(style("#settings_menu", "border-top-color")).to eq(color("gray-700"))
@@ -73,7 +74,8 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
 
   it "draws the disabled Join label gray-500 on gray-800 in dark when the room is full" do
     Player::PRESET_COLORS.each_with_index { |c, i| game.players.create!(name: "P#{i}", color: c, session_token: "t#{i}") }
-    theme!("dark")
+    visit root_path
+    theme_cookie!("dark")
     visit new_game_player_path(game.code)
     join = find("input[type=submit][disabled]")
     expect(style_of(join, "color")).to eq(color("gray-500"))
@@ -82,14 +84,16 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
 
   it "draws the join page's name field, placeholder and hint muted in dark, gray-500 in light" do
     game.players.create!(name: "Ana", color: Player::PRESET_COLORS.first, session_token: "t1")
-    theme!("dark")
+    visit root_path
+    theme_cookie!("dark")
     visit new_game_player_path(game.code)
     page.execute_script("document.activeElement.blur()")
     expect(pseudo_style("#player_name", "::placeholder", "color")).to eq(muted)
     expect(style("#player_name", "border-top-color")).to eq(color("gray-500"))
     expect(style("p.text-sm", "color")).to eq(muted)
 
-    theme!("light")
+    visit root_path
+    light!
     visit new_game_player_path(game.code)
     page.execute_script("document.activeElement.blur()")
     expect(pseudo_style("#player_name", "::placeholder", "color")).to eq(color("gray-500"))
@@ -98,7 +102,8 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
   end
 
   it "keeps the join page's name error border red in dark" do
-    theme!("dark")
+    visit root_path
+    theme_cookie!("dark")
     visit new_game_player_path(game.code)
     fill_in "Your name", with: " "
     click_button "Join"
@@ -108,7 +113,8 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
   end
 
   it "keeps the join page's name error border red-600 in light" do
-    theme!("light")
+    visit root_path
+    light!
     visit new_game_player_path(game.code)
     fill_in "Your name", with: " "
     click_button "Join"

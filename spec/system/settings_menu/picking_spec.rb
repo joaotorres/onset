@@ -8,7 +8,7 @@ RSpec.describe "Picking a theme", type: :system do
   it "writes the cookie, applies at once and keeps the menu open" do
     emulate_color_scheme("dark")
     visit root_path
-    page.execute_script("window.notReloaded = true")
+    mark_window
     record_tracks
     open_settings
     expect(page).to have_checked_field("Match device", visible: :all)
@@ -16,7 +16,7 @@ RSpec.describe "Picking a theme", type: :system do
     choose "Light", allow_label_click: true
     expect(page_background).to eq(color("gray-50"))
     expect(page).to have_css('[role="dialog"]', visible: true)
-    expect(page.evaluate_script("window.notReloaded")).to be(true)
+    expect_same_window
     cookie = theme_cookie
     expect(cookie[:value]).to eq("light")
     expect(cookie[:path]).to eq("/")

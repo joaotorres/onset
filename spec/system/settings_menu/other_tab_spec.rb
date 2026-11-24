@@ -6,34 +6,20 @@ require "rails_helper"
 RSpec.describe "A pick from another tab on a Turbo visit", type: :system do
   include_context "card colors"
 
-  def meta_theme_color
-    page.evaluate_script(<<~JS)
-      [...document.querySelectorAll('meta[name="theme-color"]')].find(m => !m.media || matchMedia(m.media).matches).content
-    JS
-  end
-
   def html_data(name) = page.evaluate_script("document.documentElement.dataset.#{name} ?? null")
-
-  def mark_window = page.execute_script("window.__noReload = true")
-
-  def expect_no_reload = expect(page.evaluate_script("window.__noReload")).to be(true)
-
-  def set_cookie(name, value) = page.driver.browser.manage.add_cookie(name: name, value: value, path: "/")
-
-  def delete_cookie(name) = page.driver.browser.manage.delete_cookie(name)
 
   def to_how_to_play
     mark_window
     click_link "New to Set? How to play →"
     expect(page).to have_current_path(how_to_play_path)
-    expect_no_reload
+    expect_same_window
   end
 
   def to_landing
     mark_window
     click_link "Onset", match: :first
     expect(page).to have_current_path(root_path)
-    expect_no_reload
+    expect_same_window
   end
 
   it "takes a theme set elsewhere on a link visit, and Match device once it is deleted" do
@@ -44,7 +30,7 @@ RSpec.describe "A pick from another tab on a Turbo visit", type: :system do
     expect(html_data("theme")).to eq("light")
     expect(page_background).to eq(color("gray-50"))
     expect(style("html", "color-scheme")).to eq("light")
-    expect(meta_theme_color).to eq("#F9FAFB")
+    expect(theme_color_in_effect).to eq("#F9FAFB")
     open_settings
     expect(page).to have_checked_field("Light", visible: :all)
     find('button[aria-label="Close settings"]').click
@@ -53,7 +39,7 @@ RSpec.describe "A pick from another tab on a Turbo visit", type: :system do
     to_landing
     expect(html_data("theme")).to be_nil
     expect(page_background).to eq(color("gray-950"))
-    expect(meta_theme_color).to eq("#030712")
+    expect(theme_color_in_effect).to eq("#030712")
     open_settings
     expect(page).to have_checked_field("Match device", visible: :all)
   end
@@ -83,10 +69,10 @@ RSpec.describe "A pick from another tab on a Turbo visit", type: :system do
     mark_window
     page.go_back
     expect(page).to have_link("New to Set? How to play →")
-    expect_no_reload
+    expect_same_window
     expect(html_data("theme")).to eq("light")
     expect(page_background).to eq(color("gray-50"))
-    expect(meta_theme_color).to eq("#F9FAFB")
+    expect(theme_color_in_effect).to eq("#F9FAFB")
     expect(html_data("cardColors")).to eq("colorblind")
   end
 
@@ -94,7 +80,7 @@ RSpec.describe "A pick from another tab on a Turbo visit", type: :system do
     emulate_color_scheme("dark")
     visit root_path
     theme_cookie!("blue")
-    set_cookie("card_colors", "x")
+    cookie!("card_colors", "x")
     to_how_to_play
     expect(html_data("theme")).to be_nil
     expect(html_data("cardColors")).to be_nil

@@ -7,12 +7,6 @@ RSpec.describe "Theme from the device and the cookie", type: :system do
 
   let(:game) { Game.create! }
 
-  def meta_theme_color
-    page.evaluate_script(<<~JS)
-      [...document.querySelectorAll('meta[name="theme-color"]')].find(m => !m.media || matchMedia(m.media).matches).content
-    JS
-  end
-
   def color_scheme = style("html", "color-scheme")
 
   it "follows the device with no cookie, live, and gets dark with no preference" do
@@ -20,12 +14,12 @@ RSpec.describe "Theme from the device and the cookie", type: :system do
     visit root_path
     expect(page_background).to eq(color("gray-50"))
     expect(color_scheme).to eq("light")
-    expect(meta_theme_color).to eq("#F9FAFB")
+    expect(theme_color_in_effect).to eq("#F9FAFB")
 
     emulate_color_scheme("dark")
     expect(page_background).to eq(color("gray-950"))
     expect(color_scheme).to eq("dark")
-    expect(meta_theme_color).to eq("#030712")
+    expect(theme_color_in_effect).to eq("#030712")
 
     emulate_color_scheme("")
     visit root_path
@@ -41,7 +35,7 @@ RSpec.describe "Theme from the device and the cookie", type: :system do
       visit path
       expect(page_background).to eq(color("gray-50"))
       expect(color_scheme).to eq("light")
-      expect(meta_theme_color).to eq("#F9FAFB")
+      expect(theme_color_in_effect).to eq("#F9FAFB")
     end
 
     emulate_color_scheme("light")
@@ -50,7 +44,7 @@ RSpec.describe "Theme from the device and the cookie", type: :system do
       visit path
       expect(page_background).to eq(color("gray-950"))
       expect(color_scheme).to eq("dark")
-      expect(meta_theme_color).to eq("#030712")
+      expect(theme_color_in_effect).to eq("#030712")
     end
   end
 end

@@ -1,60 +1,6 @@
-# Theme and settings menu helpers (SPEC §8 Settings menu, §10 Themes).
+# Settings menu helpers (SPEC §8 Settings menu), on the shared theme ones.
 RSpec.shared_context "settings menu" do
-  before { driven_by :selenium, using: :headless_chrome }
-  # Leave the next spec on the suite's default, light (chrome_driver.rb).
-  after { emulate_color_scheme("light") }
-
-  # "light", "dark" or "" (no preference stated).
-  def emulate_color_scheme(value)
-    page.driver.browser.execute_cdp("Emulation.setEmulatedMedia", media: "", features: [{name: "prefers-color-scheme", value: value}])
-  end
-
-  # The computed value of a Tailwind color, through a probe on the page.
-  def color(name)
-    page.evaluate_script(<<~JS)
-      (() => {
-        const probe = document.createElement("div")
-        probe.style.color = "var(--color-#{name})"
-        document.body.append(probe)
-        const value = getComputedStyle(probe).color
-        probe.remove()
-        return value
-      })()
-    JS
-  end
-
-  def style(selector, property)
-    page.evaluate_script("getComputedStyle(document.querySelector(#{selector.to_json})).getPropertyValue(#{property.to_json})")
-  end
-
-  def style_of(element, property)
-    page.evaluate_script("getComputedStyle(arguments[0]).getPropertyValue(#{property.to_json})", element)
-  end
-
-  # The computed value of a Tailwind color at an opacity, as Tailwind mixes it.
-  def mix(name, percent)
-    page.evaluate_script(<<~JS)
-      (() => {
-        const probe = document.createElement("div")
-        probe.style.backgroundColor = "color-mix(in oklab, var(--color-#{name}) #{percent}%, transparent)"
-        document.body.append(probe)
-        const value = getComputedStyle(probe).backgroundColor
-        probe.remove()
-        return value
-      })()
-    JS
-  end
-
-  def page_background = style("body > main", "background-color")
-
-  # Sets the theme cookie; the page must already be on the app's host.
-  def theme_cookie!(value)
-    page.driver.browser.manage.add_cookie(name: "theme", value: value, path: "/")
-  end
-
-  def theme_cookie
-    page.driver.browser.manage.all_cookies.find { |c| c[:name] == "theme" }
-  end
+  include_context "theme"
 
   def record_tracks
     page.execute_script("window.tracks = []; window.jtTrack = (name, props) => window.tracks.push([name, props])")

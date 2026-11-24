@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  build 84: done, one shared "theme" context for the theme spec helpers (driver, styles, cookies, theme-color metas, no-reload marker), 858 examples as before, three Decided lines. Next: auto.
 - 2026-11-24  build 80: done, the Game mode toggle example scoped to its form, a light name error border example, the join link and QR floor checked at every waiting fit window (green, no view change), one Decided line. Next: auto.
 - 2026-11-24  build 79: done, the ready and host limits run before the room lookup so an unknown room code is counted, 16 request examples for refused broadcasts, the No Set limit leaving claims and cookie-less IP counts, one Decided line. Next: auto.
 - 2026-11-24  build 74: done, a failed join re-reads the committed players before re-rendering, so a lost race selects the next free color or says the room is full, five request examples with the winner committed mid-request, one Decided line. Next: auto.

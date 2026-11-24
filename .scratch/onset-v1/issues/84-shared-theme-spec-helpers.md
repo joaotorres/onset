@@ -1,13 +1,13 @@
 # 84: Behind the scenes: one shared "theme" context for the theme spec helpers
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the theme specs share one set of cookie, color, meta and no-reload helpers.
 
 ## Request
 
@@ -72,3 +72,9 @@ Decided: the theme-color list reader gives `nil` for a meta with no media, and t
 Decided: the request spec's `theme_colors` stays, because it reads a response body with Nokogiri and a system context cannot serve it. Instead of: a shared reader for both.
 
 Decided: the cookie reader, `delete_cookie` and `page_background` move too, because they are the same generic cookie and style helpers and the triage of a fix covers the whole flaw. Instead of: only the helpers the request names.
+
+Decided: `rgb` lives in a `ThemeHelpers` module the "theme" context includes, with `ThemeHelpers.rgb` for the static error pages' load-time constants (that file requires `theme.rb` first, since support files load by name), because a shared context's methods do not exist at load time. Instead of: a second `rgb` on `StaticErrorPages`.
+
+Decided: the "static error pages" context includes "theme" rather than "settings menu", and the back-from-another-site spec's `__restored` marker uses the shared `mark_window`/`expect_same_window` too, because neither needs the menu helpers and `__restored` is the same no-reload marker under a fourth name. Instead of: leaving both as they were.
+
+Decided: `spec/system/realtime_sync/claim_spec.rb` and `game_over_spec.rb`, which `bin/test-all` names at 8.0 to 9.4 s, are left alone, because this ticket does not touch them and they ran near the limit before it. Instead of: splitting them here.

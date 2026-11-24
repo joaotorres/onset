@@ -1,6 +1,8 @@
 # The five static error pages in public/ (SPEC §10 Themes, DESIGN v7 Screens >
 # Static error pages): the pages, their titles' brackets and the computed
 # colors of each part in each theme.
+require_relative "theme" # ThemeHelpers.rgb, for the constants below
+
 module StaticErrorPages
   # Each page: the code and name in the title's brackets, and the Rails
   # scaffold's title and message (the paragraph's inner HTML), which stay as is.
@@ -32,15 +34,10 @@ module StaticErrorPages
     }
   }.freeze
 
-  # "#RRGGBB" to the computed "rgb(r, g, b)".
-  def self.rgb(hex)
-    "rgb(#{hex.delete("#").scan(/../).map(&:hex).join(", ")})"
-  end
-
   # The page grounds are the app's theme colors; the text and fill shades are
   # the design system's own.
   DARK_PARTS = {
-    "body" => rgb(ThemesHelper::THEME_COLORS["dark"]),
+    "body" => ThemeHelpers.rgb(ThemesHelper::THEME_COLORS["dark"]),
     "strong" => "rgb(249, 250, 251)",
     "p" => "rgb(209, 213, 219)",
     "#error-id" => "rgb(31, 41, 55)",
@@ -48,7 +45,7 @@ module StaticErrorPages
   }.freeze
 
   LIGHT_PARTS = {
-    "body" => rgb(ThemesHelper::THEME_COLORS["light"]),
+    "body" => ThemeHelpers.rgb(ThemesHelper::THEME_COLORS["light"]),
     "strong" => "rgb(17, 24, 39)",
     "p" => "rgb(55, 65, 81)",
     "#error-id" => "rgb(229, 231, 235)",
@@ -73,18 +70,9 @@ module StaticErrorPages
   def color_scheme = style(":root", "color-scheme")
 
   def data_theme = page.evaluate_script("document.documentElement.getAttribute('data-theme')")
-
-  def theme_colors = page.evaluate_script("[...document.querySelectorAll('meta[name=theme-color]')].map(m => [m.content, m.media])")
-
-  # The cookie is set on the app's host, then the page is loaded again.
-  def visit_with_cookie(path, value)
-    visit path
-    theme_cookie!(value)
-    visit path
-  end
 end
 
 RSpec.shared_context "static error pages" do
-  include_context "settings menu"
+  include_context "theme"
   include StaticErrorPages
 end

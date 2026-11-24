@@ -6,10 +6,6 @@ RSpec.shared_context "player screen theme" do
 
   def settings_button = find('button[aria-label="Settings"]')
 
-  def light!
-    theme_cookie!("light")
-  end
-
   # The settings button sits in the "Room CODE" footer row, outside
   # #controller_status, at the given size, and the screen keeps its fit.
   # right: the button's distance from the viewport's right edge.

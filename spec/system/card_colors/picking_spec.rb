@@ -8,7 +8,7 @@ RSpec.describe "Picking card colors", type: :system do
 
   it "writes the cookie, turns every card and How to play's words at once, keeps the menu open, and deletes it for Classic" do
     visit how_to_play_path
-    page.execute_script("window.notReloaded = true")
+    mark_window
     record_tracks
     open_settings
     expect(page).to have_checked_field("Classic", visible: :all)
@@ -17,7 +17,7 @@ RSpec.describe "Picking card colors", type: :system do
     expect_cards("main", colorblind, marks: true)
     expect(page).to have_text("two blue, one orange")
     expect(page).to have_css('[role="dialog"]', visible: true)
-    expect(page.evaluate_script("window.notReloaded")).to be(true)
+    expect_same_window
     cookie = card_colors_cookie
     expect(cookie[:value]).to eq("colorblind")
     expect(cookie[:path]).to eq("/")

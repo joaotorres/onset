@@ -7,27 +7,17 @@ require "rails_helper"
 RSpec.describe "Back into Onset from another site", type: :system do
   include_context "card colors"
 
-  def meta_theme_color
-    page.evaluate_script(<<~JS)
-      [...document.querySelectorAll('meta[name="theme-color"]')].find(m => !m.media || matchMedia(m.media).matches).content
-    JS
-  end
-
   def html_data(name) = page.evaluate_script("document.documentElement.dataset.#{name} ?? null")
-
-  def set_cookie(name, value) = page.driver.browser.manage.add_cookie(name: name, value: value, path: "/")
-
-  def delete_cookie(name) = page.driver.browser.manage.delete_cookie(name)
 
   # Leaves for another site and comes back, proving the page was restored
   # from the back-forward cache by a window marker that survives.
   def away_and_back
-    page.execute_script("window.__restored = true")
+    mark_window
     visit "data:text/html,<p>away</p>"
     expect(page).to have_text("away")
     page.go_back
     expect(page).to have_link("New to Set? How to play →")
-    expect(page.evaluate_script("window.__restored")).to be(true)
+    expect_same_window
   end
 
   def close_settings = find('button[aria-label="Close settings"]').click
@@ -39,7 +29,7 @@ RSpec.describe "Back into Onset from another site", type: :system do
     away_and_back
     expect(html_data("theme")).to eq("light")
     expect(page_background).to eq(color("gray-50"))
-    expect(meta_theme_color).to eq("#F9FAFB")
+    expect(theme_color_in_effect).to eq("#F9FAFB")
     open_settings
     expect(page).to have_checked_field("Light", visible: :all)
     close_settings
@@ -48,7 +38,7 @@ RSpec.describe "Back into Onset from another site", type: :system do
     away_and_back
     expect(html_data("theme")).to be_nil
     expect(page_background).to eq(color("gray-950"))
-    expect(meta_theme_color).to eq("#030712")
+    expect(theme_color_in_effect).to eq("#030712")
     open_settings
     expect(page).to have_checked_field("Match device", visible: :all)
   end
@@ -73,7 +63,7 @@ RSpec.describe "Back into Onset from another site", type: :system do
     visit root_path
     page.execute_script("document.documentElement.dataset.theme = 'light'; document.documentElement.dataset.cardColors = 'colorblind'")
     theme_cookie!("blue")
-    set_cookie("card_colors", "x")
+    cookie!("card_colors", "x")
     away_and_back
     expect(html_data("theme")).to be_nil
     expect(html_data("cardColors")).to be_nil
@@ -102,7 +92,7 @@ RSpec.describe "Back into Onset from another site", type: :system do
       parent.insertBefore(el, next)
     JS
     expect(page).to have_css("html[data-theme='light'][data-card-colors='colorblind']", visible: :all)
-    expect(meta_theme_color).to eq("#F9FAFB")
+    expect(theme_color_in_effect).to eq("#F9FAFB")
     open_settings
     expect(page).to have_checked_field("Light", visible: :all)
     expect(page).to have_checked_field("Color-blind", visible: :all)

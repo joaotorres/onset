@@ -3,22 +3,8 @@
 RSpec.shared_context "card colors" do
   include_context "settings menu"
 
-  def rgb(hex) = "rgb(#{hex.delete("#").scan(/../).map { |h| h.to_i(16) }.join(", ")})"
-
   def classic = %w[#C1121F #198A1E #5E2CA5].map { |h| rgb(h) }
   def colorblind = %w[#648FFF #FE6100 #DC267F].map { |h| rgb(h) }
-
-  def colorblind!
-    page.driver.browser.manage.add_cookie(name: "card_colors", value: "colorblind", path: "/")
-  end
-
-  def light!
-    theme_cookie!("light")
-  end
-
-  def card_colors_cookie
-    page.driver.browser.manage.all_cookies.find { |c| c[:name] == "card_colors" }
-  end
 
   # Per card color in scope: the computed colors of every shape's stroke, solid
   # fill and hatch line, and of every color mark shown (nil for a hidden one).

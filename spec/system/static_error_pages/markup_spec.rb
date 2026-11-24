@@ -13,17 +13,21 @@ RSpec.describe "Static error pages' metas and graphic", type: :system do
     describe path do
       it "gives the Match device theme-color pair with no cookie" do
         visit path
-        expect(theme_colors).to eq([[light, "(prefers-color-scheme: light)"], [dark, ""]])
+        expect(theme_color_metas).to eq([[light, "(prefers-color-scheme: light)"], [dark, nil]])
       end
 
       it "leaves one theme-color, the light one, with theme=light" do
-        visit_with_cookie(path, "light")
-        expect(theme_colors).to eq([[light, ""]])
+        visit path
+        light!
+        visit path
+        expect(theme_color_metas).to eq([[light, nil]])
       end
 
       it "leaves one theme-color, the dark one, with theme=dark" do
-        visit_with_cookie(path, "dark")
-        expect(theme_colors).to eq([[dark, ""]])
+        visit path
+        theme_cookie!("dark")
+        visit path
+        expect(theme_color_metas).to eq([[dark, nil]])
       end
 
       it "keeps the scaffold's title and message" do

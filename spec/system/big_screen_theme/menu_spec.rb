@@ -13,7 +13,7 @@ RSpec.describe "Settings menu on the big screen", type: :system do
     add_players(2)
     visit_big_screen
     expect(page_background).to eq(color("gray-950"))
-    page.execute_script("window.sameDocument = true")
+    mark_window
     open_settings
     menu = rect("#settings_menu")
     width, height = page.evaluate_script("[window.innerWidth, window.innerHeight]")
@@ -22,7 +22,7 @@ RSpec.describe "Settings menu on the big screen", type: :system do
 
     find("label", text: "Light").click
     expect(page_background).to eq(color("gray-50"))
-    expect(page.evaluate_script("window.sameDocument")).to be(true)
+    expect_same_window
   end
 
   it "stays open with its choice through a join, a claim and a deal" do

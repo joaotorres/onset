@@ -9,10 +9,6 @@ RSpec.shared_context "big screen theme" do
   def settings_button = find('button[aria-label="Settings"]')
   def menu_open? = page.has_css?("#settings_menu", visible: true, wait: 0)
 
-  def light!
-    theme_cookie!("light")
-  end
-
   def add_players(count)
     Player::PRESET_COLORS.first(count).each_with_index.map do |color, i|
       game.players.create!(name: "Player #{i + 1}", color: color, last_seen_at: Time.current)

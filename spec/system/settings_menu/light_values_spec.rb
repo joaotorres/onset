@@ -8,15 +8,11 @@ RSpec.describe "Light theme values", type: :system do
 
   let(:game) { Game.create! }
 
-  def light!
-    visit root_path
-    theme_cookie!("light")
-  end
-
   def card_edge(selector) = style(selector, "box-shadow")
 
   it "draws the landing in light" do
     resize(1280, 860)
+    visit root_path
     light!
     visit root_path
     expect(page_background).to eq(color("gray-50"))
@@ -46,6 +42,7 @@ RSpec.describe "Light theme values", type: :system do
 
   it "draws the join page swatches in light" do
     game.players.create!(name: "Ana", color: Player::PRESET_COLORS.first, session_token: "t1")
+    visit root_path
     light!
     visit join_game_players_path(game.code)
     taken = find("label[title='Taken by Ana']")
@@ -57,6 +54,7 @@ RSpec.describe "Light theme values", type: :system do
   end
 
   it "draws How to play's cards with the light edge" do
+    visit root_path
     light!
     visit how_to_play_path
     expect(page_background).to eq(color("gray-50"))
