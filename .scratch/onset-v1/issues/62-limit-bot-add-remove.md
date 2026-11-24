@@ -24,6 +24,7 @@ Deferred from 60. Limit how often the host may add or remove a bot in a waiting 
 
 - Rails' `rate_limit` on the bots controller that tickets 47 and 48 build, `create` and `destroy` under one count: 30 a minute, with a `name:` of its own, so it is a count apart from the host's Start game and Play again count that ticket 60 adds
 - Keyed exactly as ticket 60 keys the host's Start game and Play again: by the room the `host_game` cookie names, by `request.remote_ip` when the request has no such cookie. Reuse the key ticket 60 writes rather than a second copy of it; if 60 wrote it inline in `GamesController`, move it where both controllers reach it (a concern or `ApplicationController` private method), with 60's specs still green
+- Declare the limit before any `before_action` that looks up the room or the bot, as every in-game controller does (ticket 79), so a refused request makes no model call and a request for an unknown room code is counted
 - Over the limit: `head :too_many_requests`, nothing else. No bot created or deleted, no broadcast, no game write
 - The default store (the app's cache store), as the other limits use
 - Request specs for the limit, using the same seam as the existing limit specs (a `MemoryStore` standing in for the controller's `cache_store` increments, since the test environment's store is `:null_store`)
@@ -69,3 +70,5 @@ Decided: no schema change. Instead of: a counter column.
 Decided: Security: yes, and decided rather than parked, because the limit changes no auth, token, credential, permission or privacy rule, it only refuses a pace no person reaches, and the flag holds the build for the owner's review, as for ticket 60. Instead of: parking it as needs-info.
 
 Decided: Priority normal, as ticket 60's, because it closes the last unlimited POST once bots exist. Instead of: low.
+
+Decided: triage 79 adds the Scope line ordering the limit before the room lookup, because 79 fixes that order in `GamesController` and the bots controller is the one other path of the same kind. Instead of: a follow-up fix after this ticket is built.

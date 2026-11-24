@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  triage 79: ready, no spec change, GamesController's ready and host limits move before set_game plus the missing specs, 62's Scope orders its limit the same way, nine Decided lines. Next: build.
 - 2026-11-24  triage 78: ready, SPEC §10 Themes and Palette say every page renews the theme and card colors cookies for a year, eight Decided lines. Next: build.
 - 2026-11-24  triage 77: ready, no spec change, reproduced in headless Chrome, scope adds the open menu and connect() sync, error pages deferred, eight Decided lines. Next: build.
 - 2026-11-24  triage 76: ready, no spec change, gate 2 met by DESIGN v9, six Decided lines. Next: build.
