@@ -30,3 +30,42 @@ RSpec.shared_context "play area fit" do
 end
 
 FIT_SIZES = [[1280, 720], [1366, 768], [1280, 800], [1440, 900], [1280, 1024]].freeze
+
+# Shared by big_screen_fit/waiting*_spec.rb: 8 players, 4 start votes in.
+RSpec.shared_context "waiting fit" do
+  include_context "play area fit"
+
+  before do
+    add_players(8)
+    game.update!(start_voters: game.players.first(4).map(&:id))
+  end
+
+  def expect_waiting_fits
+    expect(page).to have_css("#start_button button")
+    expect_inside_board("[data-qr-tile]", "[data-join-here]", "[data-hero-text] > p", "#board li", "#start_button")
+    expect_settings_in_corner
+  end
+end
+
+# Shared by big_screen_fit/ended*_spec.rb: 8 players, a long winner name, ended.
+RSpec.shared_context "ended fit" do
+  include_context "play area fit"
+
+  before do
+    players = add_players(8)
+    players[0].update!(name: "Alexandria Pemberton", score: 9)
+    players[1].update!(name: "Samuel Wainwright", score: 7)
+    players[2].update!(name: "Priya Ramanathan", score: 5)
+    game.update!(status: :ended)
+  end
+
+  def expect_ended_fits
+    expect(page).to have_button("Play again")
+    expect_inside_board("#board > p", "#board h2", "#board .w-56", "#board form")
+    headline = page.evaluate_script("(() => { const h = document.querySelector('#board h2'); return [h.scrollWidth, h.clientWidth, getComputedStyle(h).textOverflow, h.textContent]; })()")
+    expect(headline[0]).to be <= headline[1]
+    expect(headline[2]).not_to eq("ellipsis")
+    expect(headline[3]).to include("Alexandria Pemberton")
+    expect_settings_in_corner
+  end
+end
