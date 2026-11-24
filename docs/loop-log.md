@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  request 76: filed from 46's deferral, a locked entry on the player scoreboard at 4.5:1, visual, a small visual fix. Next: its design entry.
 - 2026-11-24  request 75: filed, the three slow single-example system specs brought under 8 s (the four splittable files split in 4ef0768). Next: triage.
 - 2026-11-20  deploy deploy-20261120-1251: 42, 46, 54, 58, 59, 60, 61, 63, 64, 65, 66, 67, 72 deployed. Next: new requests.
 - 2026-11-20  review 20261120-094918: deep, 20 tickets since 20261116-041057-deep-fable, 1 pending decision (a ceiling per address on the in-game tap limits), 8 follow-ups deferred on 46, 52, 60, 64, 66 and 72, Changelog lines of 61 and 72 corrected, no standards breach. Next: file the follow-ups.
