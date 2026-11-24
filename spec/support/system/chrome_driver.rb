@@ -21,6 +21,24 @@ module ChromeDriverDefaults
   end
 end
 
+# Chrome 158 refuses the origin "*" Capybara 3.40 clears storage with after each
+# example ("invalid argument: * is not a valid URL"), which failed every system
+# spec. The same reset, said in a way Chrome takes: every cookie, then the test
+# server's own storage.
+module ChromeResetWithoutWildcardOrigin
+  private
+
+  def execute_cdp(cmd, params = {})
+    return super unless cmd == "Storage.clearDataForOrigin" && params[:origin] == "*"
+
+    super("Network.clearBrowserCookies")
+    origin = Capybara.current_session.server&.base_url
+    super(cmd, params.merge(origin: origin)) if origin
+  end
+end
+
+Capybara::Selenium::Driver::ChromeDriver.prepend(ChromeResetWithoutWildcardOrigin)
+
 # rspec-rails defines driven_by on each example group itself, so the module is
 # prepended: an included one would sit behind it and never run.
 RSpec.configure { |config| config.prepend ChromeDriverDefaults, type: :system }
