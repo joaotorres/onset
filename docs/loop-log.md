@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  triage 73: still waiting for the design pass, no DESIGN entry covers the long-name pills (v9 was ticket 76's). Next: /design-brief 48 73.
 - 2026-11-24  request 83: filed from 72's deferral, the big screen's height variants renamed by threshold, behavioural, alongside 71. Next: triage.
 - 2026-11-24  request 82: filed from 66's deferral, SPEC's answers and Submit wording and the tray slot size matched to the build, behavioural. Next: triage.
 - 2026-11-24  request 81: filed from 64's deferral, one shared home for the repeated theme, rate limit, claim and player spec helpers, behavioural. Next: triage.
