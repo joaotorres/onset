@@ -1,11 +1,12 @@
 class GamesController < ApplicationController
-  before_action :set_game, only: [:show, :start, :restart, :ready]
   rate_limit to: 10, within: 1.minute, only: :create, with: -> {
     flash.now[:alert] = "Too many new games. Try again in a minute."
     render "lobbies/new", status: :too_many_requests
   }
+  # Before the room lookup, so a refused request loads nothing and an unknown room code is counted (§5).
   rate_limit to: 30, within: 1.minute, only: :ready, by: :player_limit_key, name: "ready", with: :refuse_over_limit
   rate_limit to: 30, within: 1.minute, only: [:start, :restart], by: :host_limit_key, name: "host", with: :refuse_over_limit
+  before_action :set_game, only: [:show, :start, :restart, :ready]
 
   def create
     game = Game.create!(mode: (params[:mode] == "quick") ? :quick : :standard)

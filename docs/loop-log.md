@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  build 79: done, the ready and host limits run before the room lookup so an unknown room code is counted, 16 request examples for refused broadcasts, the No Set limit leaving claims and cookie-less IP counts, one Decided line. Next: auto.
 - 2026-11-24  build 74: done, a failed join re-reads the committed players before re-rendering, so a lost race selects the next free color or says the room is full, five request examples with the winner committed mid-request, one Decided line. Next: auto.
 - 2026-11-24  build 77: done, a page restored from the back-forward cache (pageshow persisted) and every settings connect take the theme and card colors from the cookies, and the restore closes the menu, five examples in a new system spec. Next: auto.
 - 2026-11-24  build 76: done, a locked entry on the player scoreboard fades only its dot and takes muted text (gray-400 on the own entry, gray-500/600 in light), contrast measured in two new system specs. Next: auto.

@@ -1,13 +1,13 @@
 # 79: Behind the scenes: finish ticket 60's rate limits
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Rate limits
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: the ready, Start game and Play again limits are checked before the room is looked up, and the in-game limits gain specs for broadcasts and cookie-less counts.
 
 ## Request
 
@@ -69,3 +69,5 @@ Decided: Priority low, because only a script meets a limit and the change is beh
 Decided: Security left empty, because the change reorders two limits and adds specs, leaving who can do or see what as it is, and the counting keys are only read. Instead of: Security: yes as 60 and 62 have, which would hold this build for review.
 
 Decided: no schema change, because the counts stay in the cache store. Instead of: a counter column.
+
+Decided: the two examples that check counts stay apart (No Set at its limit still claims; a player at the limit leaves the IP's count alone) were not shown red by removing the limits, because they can only fail when two keys merge, which commenting out a limit does not cause. Instead of: a contrived key change to force them red.
