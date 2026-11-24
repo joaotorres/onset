@@ -1,4 +1,4 @@
-# Onset design system, version 8
+# Onset design system, version 9
 
 The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, the No Set refusal drawn for ticket 21, the claim's Submit button drawn for ticket 37, the light theme, the settings menu and the two card palettes drawn for tickets 40 and 41, the static error pages drawn for ticket 42, the dark contrast shades drawn for ticket 46 and the bots (the add-bot control and the bot mark) drawn for ticket 47. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
 
@@ -165,6 +165,11 @@ Disabled, rings, outlines and the rest
 - Room for ticket 48's remove control: on a bot's big screen pill, after the ✓ (pills are content-sized and wrap; `bot-big-waiting8-light` leaves a third pill row free at 1280×800); on a roster row, after the ✓ at the row's right end, where it truncates the name further rather than moving anything
 - New dark boards (v8 on) draw muted as `muted` `#7C8390` (the "Room CODE" footer, the player screen settings icon)
 
+## Shared: Rules added in v9
+
+- A locked player's entry quiets its text with a color, never with opacity: text faded by opacity falls under 4.5:1 on its ground. Muted on a plain entry, as the big screen's locked row; secondary on the player's own entry, since muted never sits on `gray-800` (dark) or `gray-100` (light). Only the player's dot keeps the 45% fade
+- Built boards still draw the locked entry at 45% opacity; this file wins
+
 ## Shared: Visual rules
 
 Quoted from `SPEC.md`.
@@ -298,7 +303,7 @@ ERB partials, no component library.
   - enabled, exactly 3 picks: `blue-600`, white text, "Submit", glow `0 0 24px rgba(37, 99, 235, 0.55)` (SET!'s glow without the 8px ring)
   - submitted, from the tap until the resolving broadcast: `blue-600`, white text, disabled, an inline check icon (18px, stroke 3) then "Submitted", `aria-label` "Submitted, waiting for the result". Full strength, not the disabled look, so a frozen screen reads as sent, not as not yet allowed
 ### players/controller/_scoreboard
-- `players/controller/_scoreboard` (v2): the play scoreboard, every player in score order. Portrait: chips, 4 per row, at most 2 rows, the Locked tag a red badge on the chip's top-right corner. Landscape and computer: one row per player, the Locked tag inline before the score. Own entry `gray-800` with a `gray-500` border; claiming entry solid `yellow-400` with `gray-950` text; locked entry content at 45% opacity
+- `players/controller/_scoreboard` (v2): the play scoreboard, every player in score order. Portrait: chips, 4 per row, at most 2 rows, the Locked tag a red badge on the chip's top-right corner. Landscape and computer: one row per player, the Locked tag inline before the score. Own entry `gray-800` with a `gray-500` border; claiming entry solid `yellow-400` with `gray-950` text; locked entry (v9): the dot at 45% opacity, the name and score at full opacity in muted text on a plain entry (dark `muted` on `gray-900`, 4.65:1; light `gray-500` on white, 4.84:1) and in secondary text on the player's own entry (dark `gray-400` on `gray-800`, 5.77:1; light `gray-600` on `gray-100`, 6.88:1), in the chips and both row layouts; the bot mark and "you" take the same color; the red Locked tag unchanged. Never the whole entry faded (Shared: Rules added in v9)
 ### players/controller/_status_panel
 - `players/controller/_status_panel` (v2): one fixed slot above SET!, portrait 64px tall, landscape 144×104, computer 248×76. Variants:
   - claim bar: `yellow-400`, ring, "Your SET!", "Tap 3 cards", n/3
@@ -477,6 +482,7 @@ None
 
 ## Changelog
 
+- v9, 2026-11-24: ticket 76, a small visual fix, not from a design pass: a locked entry on the player screen's play scoreboard keeps its name and score at full opacity in muted text, secondary on the player's own entry, so both read at 4.5:1 or more in both themes; only the dot stays faded (Components > players/controller/_scoreboard, Shared: Rules added in v9).
 - v8, 2026-11-20: ticket 65, the records corrected to SPEC, nothing new designed: the quoted SPEC §10 Visual system matches SPEC again (the `muted` token bullet, the History line's ending) and the Themes pointer names every bullet the quote leaves out.
 - v8, 2026-11-20: ticket 47, bots: the bot mark after a bot's name in every place a player's name shows, at each place's size and color (Components > Bot mark, Shared: Rules added in v8); the add-bot control, three level buttons in the raised bordered style, on the big screen's waiting rail and under the host's own waiting roster in every layout, with its focus and disabled states (Components > Add-bot control); Start game's "Need a person to play" in `_start_button`; room left for ticket 48's remove control; ten boards in both themes.
 - v7, 2026-11-19: ticket 42, the static error pages in Onset's dark and light: page, the bold first sentence in primary and the rest in body, faint numerals in the subtle border shade and the status name in the red text shade, layout and messages as the scaffold has them (Screens > Static error pages), with boards of 404 on a phone and 500 on a computer in both themes.
