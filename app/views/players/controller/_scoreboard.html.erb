@@ -10,16 +10,21 @@
               elsif p.id == player.id then "border-gray-500 bg-gray-800 light:bg-gray-100"
               else "border-gray-800 bg-gray-900 light:border-gray-200 light:bg-white"
               end %>
+    <%# Locked: only the dot fades; the name and score take a muted color that keeps 4.5:1 on the entry (§10 Text). %>
     <% fade = "opacity-45" if locked %>
+    <% dim = if !locked then nil
+             elsif p.id == player.id then "text-gray-400 light:text-gray-600"
+             else "text-muted light:text-gray-500"
+             end %>
     <li class="relative flex h-[30px] w-[calc((100%-18px)/4)] min-w-0 shrink-0 items-center gap-[5px] rounded-lg border px-[7px] landscape:max-lg:h-7 landscape:max-lg:w-full landscape:max-lg:gap-1.5 landscape:max-lg:px-2 lg:h-7 lg:w-full lg:gap-2 lg:px-2.5 <%= look %>">
-      <span data-entry-content class="flex min-w-0 flex-1 items-center gap-[5px] landscape:max-lg:gap-1.5 lg:gap-2 <%= fade %>">
-        <span class="size-2 shrink-0 rounded-full lg:size-2.5" style="background-color: <%= p.color %>;"></span>
-        <span data-name class="min-w-0 flex-1 truncate text-xs font-medium landscape:max-lg:text-[13px] lg:text-sm"><%= p.name %></span>
+      <span data-entry-content class="flex min-w-0 flex-1 items-center gap-[5px] landscape:max-lg:gap-1.5 lg:gap-2">
+        <span class="size-2 shrink-0 rounded-full lg:size-2.5 <%= fade %>" style="background-color: <%= p.color %>;"></span>
+        <span data-name class="min-w-0 flex-1 truncate text-xs font-medium landscape:max-lg:text-[13px] lg:text-sm <%= dim %>"><%= p.name %></span>
       </span>
       <% if locked %>
         <span data-locked-tag class="shrink-0 rounded-md bg-red-600 px-[5px] py-px text-[9px] font-bold uppercase leading-tight tracking-wide text-white portrait:max-lg:absolute portrait:max-lg:-top-2 portrait:max-lg:right-1 landscape:max-lg:static landscape:max-lg:rounded-[5px] landscape:max-lg:px-1 lg:rounded-[5px] lg:px-1.5 lg:text-[10px]">Locked</span>
       <% end %>
-      <span data-score class="shrink-0 font-display text-[15px] font-bold tabular-nums lg:text-[17px] <%= fade %>"><%= p.score %></span>
+      <span data-score class="shrink-0 font-display text-[15px] font-bold tabular-nums lg:text-[17px] <%= dim %>"><%= p.score %></span>
     </li>
   <% end %>
 </ol>

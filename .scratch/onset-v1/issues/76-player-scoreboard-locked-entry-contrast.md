@@ -1,13 +1,13 @@
 # 76: A locked entry on the player screen's scoreboard reads at 4.5:1 in both themes
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Priority: normal
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: A locked-out player's name and score on your phone's scoreboard are now easy to read in both themes.
 
 ## Request
 

@@ -23,7 +23,11 @@ RSpec.describe "Games" do
       bob.update!(locked_until: 5.seconds.from_now)
       s = status
       expect(entry(s, "Bob").text).to include("Locked")
-      expect(entry(s, "Bob").at_css("[data-entry-content]")["class"]).to include("opacity-45")
+      content = entry(s, "Bob").at_css("[data-entry-content]")
+      expect(content["class"]).not_to include("opacity-")
+      expect(content.element_children.first["class"]).to include("opacity-45")
+      expect(content.at_css("[data-name]")["class"]).to include("text-muted", "light:text-gray-500")
+      expect(content.at_css("[data-name]")["class"]).not_to include("opacity-")
       expect(entry(s, "Cleo").text).not_to include("Locked")
     end
 

@@ -23,7 +23,8 @@ RSpec.describe "Games" do
         expect(tag["class"]).to include("portrait:max-lg:absolute", "landscape:max-lg:static")
         kids = li.element_children
         expect(kids.index(tag)).to be < kids.index(li.at_css("[data-score]"))
-        expect(li.at_css("[data-score]")["class"]).to include("opacity-45")
+        expect(li.at_css("[data-score]")["class"]).to include("text-muted", "light:text-gray-500")
+        expect(li.at_css("[data-score]")["class"]).not_to include("opacity-")
         expect(tag["class"]).not_to include("opacity-45")
       end
 
