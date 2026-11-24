@@ -11,9 +11,24 @@ export default class extends Controller {
   static targets = ["button", "menu", "shield"]
   static values = { themeColors: Object }
 
+  // A document served again from the HTTP cache on Back or Forward carries
+  // stale server-rendered <html> attributes, so connect takes the cookies first.
   connect() {
+    this.syncFromCookies()
     this.syncRadios()
     this.applyThemeColor(this.theme)
+  }
+
+  // §10 Themes, §8 Closing it: a page the browser restores from its own
+  // back-forward cache (Back from another site) gets no Turbo render, so it
+  // takes the cookies here and shows the menu closed.
+  restore(event) {
+    if (!event.persisted) return
+
+    this.syncFromCookies()
+    this.applyThemeColor(this.theme)
+    this.syncRadios()
+    this.close(false)
   }
 
   // §10 Themes: every Turbo render (a link or form visit, its preview, Back

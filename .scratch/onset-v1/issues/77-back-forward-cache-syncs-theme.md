@@ -1,13 +1,13 @@
 # 77: Back or Forward into Onset from another site shows the current theme and card colors
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: normal
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Going Back to Onset from another site now shows the theme and card colors you picked meanwhile in another tab, with the settings menu closed.
 
 ## Request
 

@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  build 77: done, a page restored from the back-forward cache (pageshow persisted) and every settings connect take the theme and card colors from the cookies, and the restore closes the menu, five examples in a new system spec. Next: auto.
 - 2026-11-24  build 76: done, a locked entry on the player scoreboard fades only its dot and takes muted text (gray-400 on the own entry, gray-500/600 in light), contrast measured in two new system specs. Next: auto.
 - 2026-11-24  build 78: done, every page the layout renders sends the accepted theme and card_colors cookies back with a fresh year, one Decided line. Next: auto.
 - 2026-11-24  triage 48: still waiting for the design pass, no DESIGN entry covers the remove control (v8 only leaves room for it), brief 47's hold over, blockers 68 and 70 stand, no spec change. Next: /design-brief 48 73.

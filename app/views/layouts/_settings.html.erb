@@ -13,7 +13,7 @@
      big_screen: {button: "size-14 rounded-2xl #{bordered}", icon: "size-[26px]", menu: "bottom-full mb-3"}
    }.fetch(local_assigns.fetch(:variant, :default)) %>
 <% button_look, icon_size, menu_place = look.values_at(:button, :icon, :menu) %>
-<div data-controller="settings" data-settings-theme-colors-value="<%= theme_color_values %>" data-action="keydown.esc@document->settings#escape turbo:before-cache@document->settings#dismiss turbo:before-render@document->settings#syncFromCookies" class="<%= local_assigns[:class] || "relative" %>">
+<div data-controller="settings" data-settings-theme-colors-value="<%= theme_color_values %>" data-action="keydown.esc@document->settings#escape turbo:before-cache@document->settings#dismiss turbo:before-render@document->settings#syncFromCookies pageshow@window->settings#restore" class="<%= local_assigns[:class] || "relative" %>">
   <button type="button" aria-label="Settings" aria-expanded="false" aria-controls="settings_menu" aria-haspopup="dialog"
           data-settings-target="button" data-action="settings#toggle"
           class="grid cursor-pointer place-items-center transition hover:text-gray-50 aria-expanded:text-gray-50 light:hover:text-gray-900 light:aria-expanded:text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 <%= button_look %>">
