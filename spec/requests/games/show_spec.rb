@@ -18,11 +18,12 @@ RSpec.describe "Games" do
     def qr_svgs = Nokogiri::HTML(response.body).css("svg[shape-rendering='crispEdges']")
     def room_tile = Nokogiri::HTML(response.body).at_css("#room_tile")
 
-    it "shows only the hero QR and no room tile while waiting" do
+    it "shows only the hero QR and, in the room tile's place, the add-bot control while waiting" do
       get game_path(game.code)
       expect(qr_svgs.size).to eq(1)
       expect(qr_svgs.first["class"]).to include("size-72")
-      expect(room_tile.text.strip).to be_empty
+      expect(room_tile.text).not_to include("Room", game.code, "www.example.com")
+      expect(room_tile.at_css("[aria-label='Add a bot']")).to be_present
     end
 
     it "keeps the QR modules dark on a white tile" do

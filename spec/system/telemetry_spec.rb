@@ -50,14 +50,14 @@ RSpec.describe "Telemetry", type: :system do
     on("phone2") { click_button "I'm ready" }
     on("phone1") { expect(page).to have_button("SET!") }
     on("phone2") { expect(page).to have_button("SET!") }
-    on("phone1") { expect(tracked.last).to eq(["game_started", {"mode" => "standard", "player_count" => 2}]) }
+    on("phone1") { expect(tracked.last).to eq(["game_started", {"mode" => "standard", "player_count" => 2, "bot_count" => 0}]) }
 
     game.reload.update!(status: :ended)
     on("phone1") do
       expect(page).to have_button("Play again")
       name, props = tracked.last
       expect(name).to eq("game_finished")
-      expect(props).to include("mode" => "standard", "player_count" => 2, "end_reason" => "deck_exhausted", "is_tie" => true)
+      expect(props).to include("mode" => "standard", "player_count" => 2, "bot_count" => 0, "end_reason" => "deck_exhausted", "is_tie" => true)
       expect(props["duration_seconds"]).to be_between(0, 60)
     end
 

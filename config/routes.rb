@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     resources :players, only: [:new, :create] do
       collection { get :join }
     end
+    resources :bots, only: [:create]
     resource :controller, only: [:show], controller: "controllers"
     resources :claims, only: [:create, :update] do
       member { post :submit }

@@ -1,6 +1,10 @@
-<%# Hidden while waiting: the join hero carries the code and the only QR (§8, Big screen). %>
-<div id="room_tile" data-version="<%= stream_version(game) %>">
-  <% unless game.waiting? %>
+<%# While waiting the join hero carries the code and the only QR (§8, Big screen), so the add-bot control
+    takes the room tile's place. It shows whether a color is free, so the waiting root carries the room's
+    players' version and a join replaces it (§7); once play starts the tile shows game state alone. %>
+<div id="room_tile" data-version="<%= game.waiting? ? stream_version(game, *game.players) : stream_version(game) %>">
+  <% if game.waiting? %>
+    <%= render "games/add_bot", game: game %>
+  <% else %>
     <div class="rounded-3xl bg-gray-900 p-5 short:p-4 light:bg-white light:shadow-[inset_0_0_0_1px_var(--color-gray-200)]">
       <p class="text-lg uppercase tracking-widest text-gray-400 light:text-gray-600">Room</p>
       <p class="font-display text-5xl font-bold leading-none tracking-wider"><%= game.code %></p>

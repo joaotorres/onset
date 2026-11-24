@@ -4,6 +4,9 @@ class Player < ApplicationRecord
 
   belongs_to :game
 
+  # Nil for a person. A bot is a player Onset plays itself (SPEC, AI opponent).
+  enum :bot_level, {easy: 0, medium: 1, hard: 2}, prefix: :bot
+
   validates :name, presence: true, length: {maximum: 20}
   validates :color, presence: true, format: {with: COLOR_FORMAT}, uniqueness: {scope: :game_id, message: "has already been taken in this game"}
   # On create only: a room live before this rule may hold a non-preset row.
@@ -15,7 +18,21 @@ class Player < ApplicationRecord
   after_create_commit :broadcast_player_joined
   after_update_commit :broadcast_controller_status
 
-  def active? = last_seen_at.present? && last_seen_at > 30.seconds.ago
+  # The lowest free name of a level, "Easy bot", "Easy bot 2", ..., matched
+  # case-insensitively against the names taken in the room, people's included.
+  def self.bot_name(level, taken_names)
+    taken = taken_names.map(&:downcase)
+    base = "#{level.to_s.capitalize} bot"
+    (1..).each do |n|
+      name = (n == 1) ? base : "#{base} #{n}"
+      return name unless taken.include?(name.downcase)
+    end
+  end
+
+  def bot? = bot_level.present?
+
+  # A bot is never active, so every vote that counts active players counts people only (SPEC §2 Edge cases).
+  def active? = !bot? && last_seen_at.present? && last_seen_at > 30.seconds.ago
 
   # Bookkeeping only: skips callbacks because a heartbeat broadcast would
   # show nothing new (SPEC §7).

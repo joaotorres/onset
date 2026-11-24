@@ -5,14 +5,15 @@ module TrackingHelper
   end
 
   # The game state events a player screen sends (game_events_controller.js).
-  # Every player's screen keeps track of the status; only the player at the
-  # top of the standings reports, so each event is counted once.
+  # Every player's screen keeps track of the status; only the person at the
+  # top of the standings reports (a bot has no screen), so each event is
+  # counted once.
   def game_events_tag(game, player)
     tag.div(hidden: true, data: {
       controller: "game-events",
       game_events_code_value: game.code,
       game_events_status_value: game.status,
-      game_events_reporter_value: game.standings.first == player,
+      game_events_reporter_value: game.standings.find { |p| !p.bot? } == player,
       game_events_props_value: game_event_props(game).to_json
     })
   end
@@ -20,7 +21,7 @@ module TrackingHelper
   private
 
   def game_event_props(game)
-    props = {mode: game.mode, player_count: game.players.size}
+    props = {mode: game.mode, player_count: game.players.size, bot_count: game.players.to_a.count(&:bot?)}
     return props unless game.ended?
 
     props.merge(end_reason: end_reason(game), is_tie: game.winner.nil?)

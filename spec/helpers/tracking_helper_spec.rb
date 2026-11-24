@@ -10,7 +10,33 @@ RSpec.describe TrackingHelper do
   it "names the end of a quick game won at #{Game::QUICK_WIN_SCORE} points" do
     alice.update!(score: Game::QUICK_WIN_SCORE)
     game.update!(status: :ended)
-    expect(props).to eq("mode" => "quick", "player_count" => 2, "end_reason" => "quick_win", "is_tie" => false)
+    expect(props).to eq("mode" => "quick", "player_count" => 2, "bot_count" => 0, "end_reason" => "quick_win", "is_tie" => false)
+  end
+
+  it "counts the bots among the players, waiting, playing and ended" do
+    game.add_bot!("easy")
+    game.add_bot!("hard")
+    expect(props).to eq("mode" => "quick", "player_count" => 4, "bot_count" => 2)
+    game.start!
+    expect(props).to include("player_count" => 4, "bot_count" => 2)
+    game.update!(status: :ended)
+    expect(props).to include("player_count" => 4, "bot_count" => 2)
+  end
+
+  it "makes the first person the reporter, never a bot first in join order" do
+    room = Game.create!
+    bot = room.add_bot!("easy")
+    carol = room.players.create!(name: "Carol", color: "#2ECC71")
+    dave = room.players.create!(name: "Dave", color: "#F1C40F")
+    expect(room.standings.first).to eq(bot)
+    expect(helper.game_events_tag(room, carol)).to include('data-game-events-reporter-value="true"')
+    expect(helper.game_events_tag(room, dave)).to include('data-game-events-reporter-value="false"')
+  end
+
+  it "keeps a person the reporter when a bot leads the standings" do
+    bot = game.add_bot!("hard")
+    bot.update!(score: 3)
+    expect(helper.game_events_tag(game, alice)).to include('data-game-events-reporter-value="true"')
   end
 
   it "names the end every active player voted for" do

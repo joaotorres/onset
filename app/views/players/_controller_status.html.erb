@@ -44,7 +44,7 @@
           <% if total < 2 %>
             <p class="<%= ready_box %> grid place-items-center border-2 border-gray-700 px-3 text-center font-semibold text-gray-400 light:border-gray-300 light:text-gray-600">Waiting for more players to join…</p>
           <% elsif game.start_voters.include?(player.id) %>
-            <p class="<%= ready_box %> grid place-items-center border-2 border-green-700 bg-green-700/12 px-3 text-center text-[17px] font-semibold text-green-300 landscape:max-lg:text-base lg:text-lg light:bg-green-50 light:text-green-800">Ready ✓ · waiting for <%= total - game.start_voters.size %> more</p>
+            <p class="<%= ready_box %> grid place-items-center border-2 border-green-700 bg-green-700/12 px-3 text-center text-[17px] font-semibold text-green-300 landscape:max-lg:text-base lg:text-lg light:bg-green-50 light:text-green-800">Ready ✓ · waiting for <%= game.ready_waiting_count %> more</p>
           <% else %>
             <%= button_to "I'm ready", ready_game_path(game.code), method: :post,
                   form_class: "contents", data: {turbo_submits_with: "…"},

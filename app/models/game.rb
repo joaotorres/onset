@@ -61,14 +61,57 @@ class Game < ApplicationRecord
     end
   end
 
+  # The host adds a bot (SPEC, AI opponent > Adding a bot): only while waiting, checked under the
+  # lock as starting is, at one of the three levels and with a preset color free. Nil when ignored,
+  # a lost race for the color or the name at its index included: a join takes no game lock.
+  def add_bot!(level)
+    return nil unless level.is_a?(String) && Player.bot_levels.key?(level)
+
+    with_lock do
+      return nil unless waiting?
+
+      taken = players.reload.to_a
+      color = (Player::PRESET_COLORS - taken.map(&:color)).first
+      return nil unless color
+
+      players.create!(name: Player.bot_name(level, taken.map(&:name)), color: color, bot_level: level)
+    end
+  rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
+    nil
+  end
+
+  # Every preset color taken: no join and no bot fits (SPEC §4, The 8-player cap).
+  def full?
+    (Player::PRESET_COLORS - players.map(&:color)).empty?
+  end
+
+  # A bot counts as voted from the moment it joins.
+  def ready?(player)
+    player.bot? || start_voters.include?(player.id)
+  end
+
+  def ready_count
+    players.to_a.count { |p| ready?(p) }
+  end
+
+  # The people still to vote: "waiting for n more" never counts a bot.
+  def ready_waiting_count
+    players.to_a.count { |p| !ready?(p) }
+  end
+
+  # 2 or more players, bots included, at least one a person: nobody else could call No Set or vote to end.
+  def startable?
+    people, bots = players.to_a.partition { |p| !p.bot? }
+    people.any? && people.size + bots.size >= 2
+  end
+
   def vote_start!(player)
     with_lock do
       return nil unless waiting?
       return self if start_voters.include?(player.id)
 
-      new_voters = start_voters + [player.id]
-      update!(start_voters: new_voters)
-      start! if players.count >= 2 && (players.pluck(:id) - new_voters).empty?
+      update!(start_voters: start_voters + [player.id])
+      start! if startable? && ready_waiting_count.zero?
       self
     end
   end
@@ -94,6 +137,11 @@ class Game < ApplicationRecord
     broadcast_replace_to "game:#{code}",
       target: "board",
       partial: "games/board",
+      locals: {game: self}
+    # The waiting room tile holds the add-bot control, which the last free color's join disables.
+    broadcast_replace_to "game:#{code}",
+      target: "room_tile",
+      partial: "games/room_tile",
       locals: {game: self}
     broadcast_replace_to "game:#{code}",
       target: "scoreboard",

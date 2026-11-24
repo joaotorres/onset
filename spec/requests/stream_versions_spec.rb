@@ -10,7 +10,7 @@ RSpec.describe "Stream versions on the hook roots" do
     Nokogiri::HTML(response.body).at_css("##{id}")&.[]("data-version")
   end
 
-  it "stamps the waiting board and start button with the room's players' version, the game-only roots with the game's" do
+  it "stamps the waiting board, start button and room tile with the room's players' version, the game-only roots with the game's" do
     create_player(game, name: "Alice")
     create_player(game, name: "Bob")
     get game_path(game.code)
@@ -18,15 +18,14 @@ RSpec.describe "Stream versions on the hook roots" do
     room = stream_version(game, *game.players)
     expect(room).to be > stream_version(game)
 
-    %w[board start_button scoreboard].each do |id|
+    # The waiting room tile holds the add-bot control, which a join can disable.
+    %w[board start_button scoreboard room_tile].each do |id|
       expect(version_of(id)).to eq(room.to_s), "##{id}"
     end
-    %w[announcement room_tile].each do |id|
-      expect(version_of(id)).to eq(stream_version(game).to_s), "##{id}"
-    end
+    expect(version_of("announcement")).to eq(stream_version(game).to_s)
   end
 
-  it "stamps the playing board with the game's version even when players were written later" do
+  it "stamps the playing board and room tile with the game's version even when players were written later" do
     create_player(game, name: "Alice")
     create_player(game, name: "Bob")
     game.start!
@@ -36,6 +35,7 @@ RSpec.describe "Stream versions on the hook roots" do
     expect(stream_version(game, *game.players)).to be > stream_version(game)
 
     expect(version_of("board")).to eq(stream_version(game).to_s)
+    expect(version_of("room_tile")).to eq(stream_version(game).to_s)
   end
 
   it "stamps the player screen's controller_status with the room's players' version" do

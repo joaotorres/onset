@@ -1,6 +1,6 @@
 # 68: The host adds bots to a waiting room from the big screen
 
-Status: ready-for-agent
+Status: done
 Kind: visual
 Blocked by:
 Priority: normal
@@ -8,7 +8,7 @@ Feature: AI opponent
 Model: fable
 Security: yes
 Effort:
-Changelog:
+Changelog: The host can add Easy, Medium and Hard bots to a waiting room from the big screen; they show in the room with a bot mark and count as ready, but do not play yet.
 
 ## Request
 
@@ -79,3 +79,15 @@ Tests first:
 Decided: split from 47 as its first child, with the schema, the add route, the vote and start rules and the telemetry, because every later child builds on bots existing. Instead of: the big screen control in a ticket apart from the route.
 
 Decided: Model fable and Security yes, because it adds a host-only action checked by the `host_game` cookie and a new kind of player whose `session_token` must never be reachable by a request. Instead of: no flags.
+
+Decided: the big screen's add-bot tile renders inside `#room_tile` while waiting, which then carries the room's players' version and is replaced on every join with the waiting `#board` (SPEC §7, Screens ignore broadcasts older than what they show, edited to say so), because the tile sits in the room tile's place and must disable when a join takes the last color. Instead of: a new hook root of its own in the rail.
+
+Decided: a bot's ready vote is computed (`Game#ready?`: a bot, or an id in `start_voters`), never written into `start_voters`, because removing a bot (48) then leaves no stale id behind and Play again's vote, which shares the column, never sees one. Instead of: appending the bot's id to `start_voters` when it is added.
+
+Decided: a No Set call by the only person in a room with bots keeps its 15-second countdown, as a call by the only active player always has, because the caller's call is already their agreement, nobody else is there to agree, and SPEC (AI opponent, How a bot plays) has the call still meet the bot's timer; resolving it at once would also break seven existing specs of the sole caller's countdown and hand a lone player free cards against the bots. The criterion "resolves when the person agrees" is met as: the bot never holds a call up, so it resolves as soon as every other person has agreed. Instead of: resolving the call the moment it is made when the caller is the only active player.
+
+Decided: the bot mark is not added to the big screen's rail scoreboard rows while waiting, though board `bot-big-waiting8-light` draws it there, because Scope gives this ticket the waiting pills and the player screen's waiting roster and leaves both scoreboards to 69. Instead of: marking the rail rows now.
+
+Decided: the system specs' Chrome reset is fixed in `spec/support/system/chrome_driver.rb`, in a commit of its own with no trailer, because Chrome 158 refuses the origin "*" Capybara 3.40 clears storage with after each example, which failed every system spec in the suite before any change of this ticket's. Instead of: leaving the Verification command red.
+
+Security note for the owner: `POST /games/:code/bots` answers `403` unless the browser's encrypted `host_game` cookie names this room, checked before anything is read from the request, as Start game checks it; the level is taken only when it is one of the three strings. A bot gets a random `session_token` from the same generator as a person, set in no cookie, so a request with no player cookie (a nil token) matches no bot. No rate limit yet: that is ticket 62.

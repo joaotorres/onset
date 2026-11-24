@@ -23,7 +23,7 @@ class GamesController < ApplicationController
     unless cookies.encrypted[:host_game] == @game.code
       head :forbidden and return
     end
-    @game.start! if @game.players.count >= 2
+    @game.start! if @game.startable?
     head :no_content
   end
 

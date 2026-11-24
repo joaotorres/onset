@@ -1,14 +1,15 @@
 <div id="start_button" data-version="<%= stream_version(game, *game.players) %>" class="flex items-center gap-8">
   <% if game.waiting? %>
     <% total = game.players.count %>
-    <% if total >= 2 %>
+    <% if game.startable? %>
       <%= button_to "Start game", start_game_path(game.code), method: :post,
             form_class: "contents",
             class: "h-24 snug:h-20 cramped:h-16 rounded-3xl bg-green-700 text-white hover:bg-green-800 active:scale-95 transition px-16 font-display text-4xl font-bold" %>
-      <p class="text-3xl text-gray-400 light:text-gray-600"><span class="font-display font-bold text-white light:text-gray-900"><%= game.start_voters.size %></span> of <%= total %> ready</p>
+      <p class="text-3xl text-gray-400 light:text-gray-600"><span class="font-display font-bold text-white light:text-gray-900"><%= game.ready_count %></span> of <%= total %> ready</p>
     <% else %>
-      <button type="button" disabled class="h-24 snug:h-20 cramped:h-16 cursor-not-allowed rounded-3xl bg-gray-800 px-16 font-display text-4xl font-bold text-gray-500 light:bg-gray-200 light:text-gray-600">Start game</button>
-      <p class="text-3xl text-gray-400 light:text-gray-600">Need at least 2 players</p>
+      <%# Under 2 players, or every player a bot: nobody could call No Set or vote to end (SPEC, AI opponent). %>
+      <button type="button" disabled aria-describedby="start_why" class="h-24 snug:h-20 cramped:h-16 cursor-not-allowed rounded-3xl bg-gray-800 px-16 font-display text-4xl font-bold text-gray-500 light:bg-gray-200 light:text-gray-600">Start game</button>
+      <p id="start_why" class="text-3xl text-gray-400 light:text-gray-600"><%= (total >= 2) ? "Need a person to play" : "Need at least 2 players" %></p>
     <% end %>
   <% end %>
 </div>

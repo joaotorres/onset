@@ -19,10 +19,11 @@
     <% if game.players.any? %>
       <ul class="flex flex-wrap gap-4 compact:gap-3">
         <% game.players.each do |p| %>
-          <% ready = game.start_voters.include?(p.id) %>
+          <% ready = game.ready?(p) %>
           <li class="flex items-center gap-3 rounded-2xl bg-gray-900 px-6 py-4 text-3xl snug:px-5 snug:py-3 snug:text-2xl compact:py-2 cramped:py-1.5 font-semibold light:bg-white light:shadow-[inset_0_0_0_1px_var(--color-gray-200)] <%= "text-gray-400 light:text-gray-600" unless ready %>">
             <span class="size-5 snug:size-4 rounded-full" style="background-color: <%= p.color %>;"></span>
             <%= p.name %>
+            <% if p.bot? %><%= render "players/bot_mark", size: "size-[26px] snug:size-[22px]" %><% end %>
             <% if ready %><span class="text-2xl snug:text-xl text-green-400 light:text-green-700">✓</span><% end %>
           </li>
         <% end %>

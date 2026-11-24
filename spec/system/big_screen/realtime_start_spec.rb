@@ -9,7 +9,7 @@ RSpec.describe "Big screen", type: :system do
     visit game_path(game.code)
     expect(page).to have_css("turbo-cable-stream-source[connected]", visible: :all)
     expect(page).to have_css("svg[shape-rendering='crispEdges']", count: 1)
-    expect(page).not_to have_css("#room_tile p")
+    expect(page).not_to have_css("#room_tile p", text: game.code)
 
     %w[Alice Bob].each_with_index do |name, i|
       Capybara.using_session("phone#{i}") do

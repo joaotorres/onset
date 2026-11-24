@@ -1,0 +1,23 @@
+<%# The add-bot control's big screen tile (DESIGN v8, Components > Add-bot control; SPEC, AI opponent > Adding a bot).
+    Shown on every big screen, accepted from the host only. One tap adds one bot; the 204 changes nothing
+    and the broadcast shows the bot. Disabled with its reason when every color is taken. %>
+<% full = game.full? %>
+<% button = "flex h-14 w-full items-center justify-center gap-1.5 rounded-[14px] border text-[22px] font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500" %>
+<% look = full ? "cursor-not-allowed border-gray-800 bg-gray-800 text-gray-500 light:border-gray-200 light:bg-gray-200 light:text-gray-600" : "cursor-pointer border-gray-700 bg-gray-800 text-gray-50 light:border-gray-300 light:bg-gray-100 light:text-gray-900" %>
+<section role="group" aria-label="Add a bot" data-controller="add-bot" class="rounded-3xl bg-gray-900 p-5 short:p-4 light:bg-white light:shadow-[inset_0_0_0_1px_var(--color-gray-200)]">
+  <div class="flex items-baseline justify-between gap-3">
+    <p class="text-lg uppercase tracking-widest text-gray-400 light:text-gray-600">Add a bot</p>
+    <% if full %><p id="add_bot_full" class="text-lg text-gray-400 light:text-gray-600">Room full</p><% end %>
+  </div>
+  <div class="mt-3 flex gap-2.5">
+    <% Player.bot_levels.each_key do |level| %>
+      <%= button_to game_bots_path(game.code), method: :post, params: {level: level},
+            form_class: "min-w-0 flex-1", class: "#{button} #{look}", disabled: full,
+            aria: {label: "Add #{level.capitalize} bot", describedby: ("add_bot_full" if full)},
+            data: {action: "click->add-bot#track", add_bot_level_param: level} do %>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" class="size-[18px] shrink-0"><path d="M12 5v14M5 12h14"></path></svg>
+        <span><%= level.capitalize %></span>
+      <% end %>
+    <% end %>
+  </div>
+</section>
