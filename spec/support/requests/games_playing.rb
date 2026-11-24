@@ -8,8 +8,8 @@ RSpec.shared_context "games while playing" do
   end
 
   let!(:alice) { sign_in_player }
-  let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
-  let!(:cleo) { game.players.create!(name: "Cleo", color: "#F1C40F", last_seen_at: Time.current) }
+  let!(:bob) { create_player(game, name: "Bob", last_seen_at: Time.current) }
+  let!(:cleo) { create_player(game, name: "Cleo", last_seen_at: Time.current) }
 
   before { game.start! }
 

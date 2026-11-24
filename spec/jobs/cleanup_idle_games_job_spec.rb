@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe CleanupIdleGamesJob do
   def game_with_claim
     game = Game.create!
-    player = game.players.create!(name: "Alice", color: "#E74C3C")
+    player = create_player(game, name: "Alice")
     game.claims.create!(player: player, started_at: Time.current)
     game
   end

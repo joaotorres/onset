@@ -5,8 +5,8 @@ RSpec.describe "Games" do
     let(:game) { Game.create! }
 
     before do
-      game.players.create!(name: "Alice", color: "#E74C3C")
-      game.players.create!(name: "Bob", color: "#2ECC71")
+      create_player(game, name: "Alice")
+      create_player(game, name: "Bob")
     end
 
     def page = Nokogiri::HTML(response.body)

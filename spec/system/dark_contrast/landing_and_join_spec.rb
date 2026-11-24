@@ -83,7 +83,7 @@ RSpec.describe "Dark muted text and field borders on the landing and join page",
   end
 
   it "draws the join page's name field, placeholder and hint muted in dark, gray-500 in light" do
-    game.players.create!(name: "Ana", color: Player::PRESET_COLORS.first, session_token: "t1")
+    create_player(game, name: "Ana", session_token: "t1")
     visit root_path
     theme_cookie!("dark")
     visit new_game_player_path(game.code)

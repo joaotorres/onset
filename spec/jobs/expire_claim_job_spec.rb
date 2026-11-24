@@ -4,7 +4,7 @@ RSpec.describe ExpireClaimJob do
   let(:game) {
     Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
   }
-  let(:player) { game.players.create!(name: "Alice", color: "#E74C3C") }
+  let(:player) { create_player(game, name: "Alice") }
 
   def valid_set_ids
     game.board_cards.combination(3).find { |trio| Card.valid_set?(*trio) }.map(&:id)

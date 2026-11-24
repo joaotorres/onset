@@ -7,8 +7,8 @@ RSpec.describe UnblockNoSetJob do
   let(:game) {
     Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
   }
-  let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
-  let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
+  let!(:alice) { create_player(game, name: "Alice", last_seen_at: Time.current) }
+  let!(:bob) { create_player(game, name: "Bob", last_seen_at: Time.current) }
 
   describe "#perform" do
     it "broadcasts the announcement to the game and controller_status to each player" do

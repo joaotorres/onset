@@ -70,7 +70,7 @@ RSpec.describe "Claims" do
     it "logs no near-tie for a locked-out player while another claim runs" do
       player = sign_in
       player.update!(locked_until: 5.seconds.from_now)
-      other = game.players.create!(name: "Bob", color: "#2ECC71")
+      other = create_player(game, name: "Bob")
       game.try_claim!(other)
       lines = near_tie_lines { post game_claims_path(game.code) }
       expect(response).to have_http_status(:no_content)
@@ -314,7 +314,7 @@ RSpec.describe "Claims" do
       submitted = capture_turbo_stream_broadcasts("game:#{game.code}") { submit(claim, ids) }
 
       other_game = Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
-      other_claim = other_game.try_claim!(other_game.players.create!(name: "Cy", color: "#E74C3C"))
+      other_claim = other_game.try_claim!(create_player(other_game, name: "Cy"))
       other_claim.pick!(ids)
       expired = capture_turbo_stream_broadcasts("game:#{other_game.code}") { ExpireClaimJob.new.perform(other_claim) }
 

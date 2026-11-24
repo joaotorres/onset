@@ -21,8 +21,7 @@ RSpec.shared_context "waiting invite" do
   def add_players(count)
     names = ["Alexandria Pemberton", "Samuel Wainwright", "Priya Ramanathan", "Jonas Oppenheimer",
       "Mei Lin Takahashi", "Tomás Villanueva", "Leopold Fairweather"]
-    free = Player::PRESET_COLORS - game.players.pluck(:color)
-    free.zip(names - game.players.pluck(:name)).first(count).each { |color, name| game.players.create!(name: name, color: color) }
+    (names - game.players.pluck(:name)).first(count).each { |name| create_player(game, name: name) }
   end
 
   def expect_no_page_scroll

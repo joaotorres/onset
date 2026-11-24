@@ -15,7 +15,7 @@ RSpec.describe "EndGames" do
   describe "POST /games/:code/end_game" do
     it "records the vote and answers 204 so the page is not reloaded" do
       player = sign_in
-      game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current)
+      create_player(game, name: "Bob", last_seen_at: Time.current)
       post game_end_game_path(game.code)
       expect(game.reload.end_game_voters).to eq([player.id])
       expect(response).to have_http_status(:no_content)

@@ -18,7 +18,7 @@ RSpec.describe "Games" do
 
     context "with two players" do
       let!(:alice) { sign_in_player }
-      let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71") }
+      let!(:bob) { create_player(game, name: "Bob") }
 
       it "shows the room code and the host line" do
         invite = status.at_css("[data-controller='invite']")

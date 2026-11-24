@@ -2,8 +2,8 @@ require "rails_helper"
 
 RSpec.describe TrackingHelper do
   let(:game) { Game.create!(mode: :quick) }
-  let!(:alice) { game.players.create!(name: "Alice", color: "#E74C3C") }
-  let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71") }
+  let!(:alice) { create_player(game, name: "Alice") }
+  let!(:bob) { create_player(game, name: "Bob") }
 
   def props = JSON.parse(helper.game_events_tag(game.reload, alice)[/data-game-events-props-value="([^"]*)"/, 1].gsub("&quot;", '"'))
 

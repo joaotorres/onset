@@ -93,8 +93,8 @@ RSpec.describe "Card colors" do
 
   context "on the big screen" do
     before do
-      game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current)
-      game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current)
+      create_player(game, name: "Alice", last_seen_at: Time.current)
+      create_player(game, name: "Bob", last_seen_at: Time.current)
       game.start!
     end
 

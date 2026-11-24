@@ -17,8 +17,8 @@ RSpec.describe "Games" do
     end
 
     let!(:alice) { sign_in_player }
-    let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71") }
-    let!(:cleo) { game.players.create!(name: "Cleo", color: "#F1C40F") }
+    let!(:bob) { create_player(game, name: "Bob") }
+    let!(:cleo) { create_player(game, name: "Cleo") }
 
     def rows(status)
       status.css("[data-standings] li")

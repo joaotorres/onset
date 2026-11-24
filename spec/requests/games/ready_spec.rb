@@ -11,7 +11,7 @@ RSpec.describe "Games" do
 
     it "records the player's vote without starting the game when others haven't voted" do
       player = sign_in_player
-      game.players.create!(name: "Bob", color: "#2ECC71")
+      create_player(game, name: "Bob")
       post ready_game_path(game.code)
       expect(game.reload.start_voters).to include(player.id)
       expect(game.reload).to be_waiting
@@ -20,7 +20,7 @@ RSpec.describe "Games" do
 
     it "starts the game when all players have voted" do
       sign_in_player
-      bob = game.players.create!(name: "Bob", color: "#2ECC71", session_token: SecureRandom.hex)
+      bob = create_player(game, name: "Bob", session_token: SecureRandom.hex)
       post ready_game_path(game.code)  # Alice votes via cookie
       game.vote_start!(bob)            # Bob votes directly
       expect(game.reload).to be_playing
@@ -28,14 +28,14 @@ RSpec.describe "Games" do
 
     it "does not start the game when only some players have voted" do
       sign_in_player
-      game.players.create!(name: "Bob", color: "#2ECC71")
+      create_player(game, name: "Bob")
       post ready_game_path(game.code)
       expect(game.reload).to be_waiting
     end
 
     context "once ended" do
       let!(:alice) { sign_in_player }
-      let!(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
+      let!(:bob) { create_player(game, name: "Bob", last_seen_at: Time.current) }
 
       before { game.start! && game.update!(status: :ended, deck: []) }
 
@@ -80,7 +80,7 @@ RSpec.describe "Games" do
 
     it "changes nothing while playing" do
       sign_in_player
-      game.players.create!(name: "Bob", color: "#2ECC71")
+      create_player(game, name: "Bob")
       game.start!
       post ready_game_path(game.code)
       expect(response).to have_http_status(:no_content)

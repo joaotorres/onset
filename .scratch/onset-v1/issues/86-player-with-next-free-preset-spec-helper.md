@@ -1,13 +1,13 @@
 # 86: Behind the scenes: one spec helper for a player with the room's next free color
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Themes
 Model:
 Effort:
-Changelog:
+Changelog: Behind the scenes: specs build their players with one helper that takes the room's next free color.
 
 ## Request
 
@@ -60,3 +60,11 @@ Decided: the helper names an unnamed player "Player <n>", because names must be 
 Decided: a literal color stays wherever the example's expectations name or read it, because swapping those for the helper would hide what the example checks. Instead of: the helper everywhere with the expected color read back from the player.
 
 Decided: no blocking edge on 68, 69 or 70, because the helper helps their specs whichever builds first and item 2 covers their builds when they come first. Instead of: blocked by the bot tickets.
+
+Decided: the helper is `create_player(game, **attrs)` in `spec/support/create_player.rb`, its spec in `spec/spec_support/`, because a `_spec.rb` under `spec/support/` would be loaded as support by `rails_helper`. Instead of: a spec beside the helper.
+
+Decided: a model-built player that exists before a join request posting a fixed color keeps its literal color (`no_sets`, `claims` Bob, `card_colors` Bob, and the players `controller`, `controller_theme`, `no_set_countdown`, `no_set_refusal` specs), because the helper would take the join's posted color and the join would fail; the color is the point there. Instead of: reordering those examples or changing the colors their joins post.
+
+Decided: the `Player.create!(valid_attrs)` builds in `player_spec` that check name or color validation, uniqueness or a pre-rule row stay literal; the rest use the helper. Instead of: the helper in the validation examples.
+
+Decided: `spec/system/realtime_sync/claim_spec.rb` and `game_over_spec.rb` run over 8 s in both Verification runs, but this ticket does not touch them (they build players only through joins) and they were already slow, so splitting them is left out of this ticket. Instead of: splitting them here, outside Scope.

@@ -6,13 +6,13 @@ RSpec.describe Player do
 
   describe "session token generation" do
     it "generates a session token on create" do
-      player = Player.create!(valid_attrs)
+      player = create_player(game, name: "Alice")
       expect(player.session_token).to be_present
     end
 
     it "generates unique session tokens" do
-      p1 = Player.create!(valid_attrs)
-      p2 = Player.create!(valid_attrs.merge(name: "Bob", color: "#2ECC71"))
+      p1 = create_player(game, name: "Alice")
+      p2 = create_player(game, name: "Bob")
       expect(p1.session_token).not_to eq(p2.session_token)
     end
   end
@@ -120,14 +120,14 @@ RSpec.describe Player do
 
   describe "#host?" do
     it "returns true when the player is the game's host" do
-      player = Player.create!(valid_attrs)
+      player = create_player(game, name: "Alice")
       game.update!(host_player_id: player.id)
       expect(player.host?).to be true
     end
 
     it "returns false when the player is not the host" do
-      player = Player.create!(valid_attrs)
-      other = Player.create!(valid_attrs.merge(name: "Bob", color: "#2ECC71"))
+      player = create_player(game, name: "Alice")
+      other = create_player(game, name: "Bob")
       game.update!(host_player_id: other.id)
       expect(player.host?).to be false
     end
@@ -135,7 +135,7 @@ RSpec.describe Player do
 
   describe "#seen!" do
     let(:game) { Game.create! }
-    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C") }
+    let(:player) { create_player(game, name: "Alice") }
 
     it "records last_seen_at without broadcasting the controller" do
       player
@@ -147,7 +147,7 @@ RSpec.describe Player do
 
   describe "#lockout_reason" do
     let(:game) { Game.create!.tap(&:start!) }
-    let(:player) { game.players.create!(name: "Alice", color: "#E74C3C") }
+    let(:player) { create_player(game, name: "Alice") }
 
     it "is nil without a failed claim" do
       expect(player.lockout_reason).to be_nil
@@ -169,7 +169,7 @@ RSpec.describe Player do
 
     it "stamps a lockout's controller_status with the player's time, and the room's scoreboard after it" do
       game.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: [])
-      player = Player.create!(valid_attrs)
+      player = create_player(game, name: "Alice")
       game_version = micros(game.reload.updated_at)
 
       streams = capture_turbo_stream_broadcasts("player:#{player.id}") do

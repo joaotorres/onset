@@ -47,7 +47,7 @@ RSpec.describe "Games" do
 
       it "keeps the join link when a player joins" do
         streams = capture_turbo_stream_broadcasts("game:#{game.code}") do
-          game.players.create!(name: "Alice", color: "#E74C3C")
+          create_player(game, name: "Alice")
         end
         board = streams.find { |s| s["target"] == "board" }
         expect(join_link(board.to_html)["href"]).to eq(join_game_players_path(game.code))
@@ -79,7 +79,7 @@ RSpec.describe "Games" do
       end
 
       it "asks to agree on your screen during a No Set call" do
-        alice = game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current)
+        alice = create_player(game, name: "Alice", last_seen_at: Time.current)
         game.update!(no_set_caller_id: alice.id, no_set_started_at: Time.current, no_set_voters: [alice.id])
         get game_path(game.code)
         expect(response.body).to include("Agree on your screen, or find one first")
@@ -88,7 +88,7 @@ RSpec.describe "Games" do
 
       it "reads the No Set ring's duration from NO_SET_TIMEOUT" do
         stub_const("Game::NO_SET_TIMEOUT", 20)
-        alice = game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current)
+        alice = create_player(game, name: "Alice", last_seen_at: Time.current)
         game.update!(no_set_caller_id: alice.id, no_set_started_at: Time.current, no_set_voters: [alice.id])
         get game_path(game.code)
         ring = Nokogiri::HTML(response.body).at_css("#announcement [data-controller=countdown]")
@@ -98,7 +98,7 @@ RSpec.describe "Games" do
       context "during the block after a refusal" do
         include ActiveSupport::Testing::TimeHelpers
 
-        let(:bob) { game.players.create!(name: "Bob", color: "#2ECC71", last_seen_at: Time.current) }
+        let(:bob) { create_player(game, name: "Bob", last_seen_at: Time.current) }
         let(:band) { Nokogiri::HTML(response.body).at_css("#announcement") }
 
         before { game.update!(no_set_refuser_id: bob.id, no_set_refused_at: 3.seconds.ago) }
@@ -134,7 +134,7 @@ RSpec.describe "Games" do
       end
 
       context "after a wrong claim or a time's up" do
-        let(:alice) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
+        let(:alice) { create_player(game, name: "Alice", last_seen_at: Time.current) }
 
         def flash(result, card_ids)
           claim = game.claims.create!(player: alice, result: result, card_ids: card_ids, started_at: Time.current, resolved_at: Time.current)

@@ -4,7 +4,7 @@ RSpec.describe ExpireNoSetJob do
   let(:game) {
     Game.create!.tap { |g| g.update!(status: :playing, board: (0..11).to_a, deck: (12..80).to_a, discard: []) }
   }
-  let(:player) { game.players.create!(name: "Alice", color: "#E74C3C", last_seen_at: Time.current) }
+  let(:player) { create_player(game, name: "Alice", last_seen_at: Time.current) }
 
   describe "#perform" do
     it "deals 3 cards and clears no_set fields" do
