@@ -1,13 +1,13 @@
 # 74: A join that loses the race re-renders with fresh colors
 
-Status: ready-for-agent
+Status: done
 Kind: behavioural
 Blocked by:
 Priority: low
 Feature: Waiting room
 Model:
 Effort:
-Changelog:
+Changelog: A join that loses a split-second race for a color now comes back with the next free color picked, or says the room is full when that was the last one.
 
 ## Request
 
@@ -56,3 +56,5 @@ Decided: reload the taken colors on every failed save, in `create`'s failure bra
 Decided: no spec change, because SPEC §8 Join page already says a color taken between render and submit comes back with the next free color selected and a room with every color taken comes back full; the code falls short of it. Instead of: adding a sentence that a re-render reads the colors afresh.
 
 Decided: Priority low, because only joins landing in the same instant hit it, and the cost is a re-rendered page that offers a taken color, whose next submit answers correctly. Instead of: high, for broken behaviour in built work.
+
+Decided: `set_color_owners` queries `Player.where(game: @game)` instead of `@game.players`, because once `create` builds the join on the association its cached target holds the unsaved player and not the players committed since, so a reload through it would draw the loser's own color as taken and miss the winner. Instead of: `@game.players.reload`, which drops the built player from the association as a side effect.

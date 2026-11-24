@@ -28,6 +28,8 @@ class PlayersController < ApplicationController
       track_event("player_joined", player_count: @game.players.count, is_creator: creator?, mode: @game.mode)
       redirect_to game_controller_path(@game.code)
     else
+      # Another join may have committed since the before_action loaded them.
+      set_color_owners
       @player.color = color_for_rerender(@player.color)
       render :new, status: :unprocessable_entity
     end
@@ -50,7 +52,8 @@ class PlayersController < ApplicationController
   end
 
   def set_color_owners
-    @color_owners = @game.players.index_by(&:color)
+    # A fresh query: the association's cache holds the unsaved join, not later ones.
+    @color_owners = Player.where(game: @game).index_by(&:color)
   end
 
   def creator? = cookies.encrypted[:host_game] == @game.code

@@ -124,6 +124,84 @@ RSpec.describe "Players" do
       expect(checked_colors).to eq([presets[1]])
     end
 
+    context "when the winner commits during the request" do
+      def swatch_initial(hex) = radio_for(hex).ancestors("label").first.at_css("span").text
+
+      def fill_room_but(hex)
+        presets.reject { |c| c == hex }.each_with_index { |c, i| game.players.create!(name: "p#{i}", color: c) }
+      end
+
+      def win_then_raise(name:, color:)
+        allow_any_instance_of(Player).to receive(:save) do
+          game.players.create!(name: name, color: color)
+          raise ActiveRecord::RecordNotUnique
+        end
+      end
+
+      def win_then_save(name:, color:)
+        allow_any_instance_of(Player).to receive(:save).and_wrap_original do |original, *args|
+          game.players.create!(name: name, color: color)
+          original.call(*args)
+        end
+      end
+
+      it "selects the next free color when the race at the color index is lost" do
+        game.players.create!(name: "a", color: presets[3])
+        win_then_raise(name: "Wanda", color: presets[2])
+        expect { post game_players_path(game.code), params: {player: {name: "Bob", color: presets[2]}} }
+          .to change(Player, :count).by(1)
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include("has already been taken in this game")
+        expect(game.players.where(name: "Bob")).to be_empty
+        expect(checked_colors).to eq([presets[4]])
+        expect(radio_for(presets[2])["disabled"]).to be_present
+        expect(radio_for(presets[2])["checked"]).to be_nil
+        expect(swatch_initial(presets[2])).to eq("W")
+      end
+
+      it "says the room is full when the lost race was for the last color" do
+        fill_room_but(presets[5])
+        win_then_raise(name: "Wanda", color: presets[5])
+        post game_players_path(game.code), params: {player: {name: "Bob", color: presets[5]}}
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Nokogiri::HTML(response.body).at_css("[role=alert]").text).to include("This room is full")
+        expect(checked_colors).to be_empty
+        expect(Nokogiri::HTML(response.body).at_css("input[type=submit]")["disabled"]).to be_present
+      end
+
+      it "keeps a free color and draws the winner's taken when the race on the name is lost" do
+        win_then_raise(name: "Alex", color: presets[0])
+        post game_players_path(game.code), params: {player: {name: "alex", color: presets[1]}}
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include("Name has already been taken in this game")
+        expect(checked_colors).to eq([presets[1]])
+        expect(radio_for(presets[0])["disabled"]).to be_present
+        expect(swatch_initial(presets[0])).to eq("A")
+      end
+
+      it "answers as a taken color when the validations see the winner" do
+        win_then_save(name: "Wanda", color: presets[6])
+        expect { post game_players_path(game.code), params: {player: {name: "Bob", color: presets[6]}} }
+          .to change(Player, :count).by(1)
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.body).to include("has already been taken in this game")
+        expect(checked_colors).to eq([presets[7]])
+        expect(radio_for(presets[6])["disabled"]).to be_present
+        expect(radio_for(presets[6])["checked"]).to be_nil
+        expect(swatch_initial(presets[6])).to eq("W")
+      end
+
+      it "says the room is full when the validations see the winner on the last color" do
+        fill_room_but(presets[0])
+        win_then_save(name: "Wanda", color: presets[0])
+        post game_players_path(game.code), params: {player: {name: "Bob", color: presets[0]}}
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(Nokogiri::HTML(response.body).at_css("[role=alert]").text).to include("This room is full")
+        expect(checked_colors).to be_empty
+        expect(Nokogiri::HTML(response.body).at_css("input[type=submit]")["disabled"]).to be_present
+      end
+    end
+
     it "answers a plain taken name with the name error" do
       game.players.create!(name: "Alex", color: presets[0])
       post game_players_path(game.code), params: {player: {name: "ALEX", color: presets[1]}}
