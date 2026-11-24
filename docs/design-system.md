@@ -1,6 +1,6 @@
-# Onset design system, version 9
+# Onset design system, version 10
 
-The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, the No Set refusal drawn for ticket 21, the claim's Submit button drawn for ticket 37, the light theme, the settings menu and the two card palettes drawn for tickets 40 and 41, the static error pages drawn for ticket 42, the dark contrast shades drawn for ticket 46 and the bots (the add-bot control and the bot mark) drawn for ticket 47. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
+The tokens, components and visual rules the views use, and the devices-first screens drawn for tickets 07, 08, 09 and 10, the No Set refusal drawn for ticket 21, the claim's Submit button drawn for ticket 37, the light theme, the settings menu and the two card palettes drawn for tickets 40 and 41, the static error pages drawn for ticket 42, the dark contrast shades drawn for ticket 46, the bots (the add-bot control and the bot mark) drawn for ticket 47, and the remove control and the big screen's long-name pills drawn for tickets 48 and 73. Kind: visual tickets wait for an entry under `## Changelog` that covers them (loop-rules gate 2).
 
 Boards for every screen and state are on the canvas named in `docs/design-handoff.md`. Where this file and a board differ, this file wins; tell the design tool in the next brief.
 
@@ -29,7 +29,7 @@ Player colors (`Player::PRESET_COLORS`): `#E74C3C #2ECC71 #F1C40F #9B59B6 #1ABC9
 
 Byline logo colours (v3, `--wm-*`): light on `:root` green `#009C3B`, blue `#002776`, red `#C60B1E`, gold `#E08A00`; dark on `.byline-footer` in the dark theme: green `#22C35E`, blue `#5B8CFF`, red `#FF4F5E`, gold `#FFD21F`; under the light theme (`@variant light`) `.byline-footer` takes the light values again (SPEC §8 Byline footer, Logo colours).
 
-v2 adds no tokens: every new color is from the Tailwind default palette. v7 adds `muted`, the one color outside it. v8 adds none: the bot mark and the add-bot control use existing roles (secondary text, raised bordered, the disabled gray button, the focus outline, the band name colors).
+v2 adds no tokens: every new color is from the Tailwind default palette. v7 adds `muted`, the one color outside it. v8 adds none: the bot mark and the add-bot control use existing roles (secondary text, raised bordered, the disabled gray button, the focus outline, the band name colors). v10 adds none: the remove control uses secondary and primary text, the raised borderless surface and the focus outline.
 
 ## Shared: Themes (v6)
 
@@ -162,13 +162,19 @@ Disabled, rings, outlines and the rest
 - A bot shows the bot mark (Components > Bot mark) right after its name everywhere a player's name shows: big screen pills, rail scoreboard rows, the announcement band, the ended headline and the podium; player screen roster, play scoreboard chips and rows, the status panel, the found-set banner, the winner line and the standings. It comes after "you" where both show, and before the ✓, the Locked tag and the score, so it never moves those
 - The mark takes secondary text (`gray-400` dark, `gray-600` light); on a claim-filled entry (`yellow-400`) the entry's `gray-950` text; in a band the band's name color
 - The add-bot control (Components > Add-bot control) sits on the big screen's waiting rail and under the host's own waiting roster, nowhere else. It exists only while waiting, so it never moves SET!, the pill slot or the board
-- Room for ticket 48's remove control: on a bot's big screen pill, after the ✓ (pills are content-sized and wrap; `bot-big-waiting8-light` leaves a third pill row free at 1280×800); on a roster row, after the ✓ at the row's right end, where it truncates the name further rather than moving anything
+- Room for ticket 48's remove control: on a bot's big screen pill, after the ✓ (pills are content-sized and wrap); on a roster row, after the ✓ at the row's right end, where it truncates the name further rather than moving anything. Drawn in v10 (Components > Remove control)
 - New dark boards (v8 on) draw muted as `muted` `#7C8390` (the "Room CODE" footer, the player screen settings icon)
 
 ## Shared: Rules added in v9
 
 - A locked player's entry quiets its text with a color, never with opacity: text faded by opacity falls under 4.5:1 on its ground. Muted on a plain entry, as the big screen's locked row; secondary on the player's own entry, since muted never sits on `gray-800` (dark) or `gray-100` (light). Only the player's dot keeps the 45% fade
 - Built boards still draw the locked entry at 45% opacity; this file wins
+
+## Shared: Rules added in v10
+
+- The remove control (Components > Remove control) sits on a bot's big screen pill and on a bot's row in the host's own waiting roster, last after the ✓, nowhere else, never on a person. It exists only while waiting, so it never moves SET!, the pill slot or the board. It is never red or green, in any state: red means wrong or locked, green means ready
+- On a pill or a roster row the name is the only part that gives: it truncates with an ellipsis (`min-width: 0`, one line) while the dot, the bot mark, the ✓ and the remove control are `flex: none` and always show in full
+- The remove control's hover look applies only where the device hovers (`@media (hover: hover)`: the big screen and the computer player screen), so a tap on a phone leaves no stuck hover look
 
 ## Shared: Visual rules
 
@@ -315,7 +321,7 @@ ERB partials, no component library.
 ### players/controller/_found_banner
 - `players/controller/_found_banner` (v2): `green-950` panel with a `green-500` border, the 3 cards small, the caller's dot, "Alex found a Set" and "+1" in `green-400`. Absolutely positioned over the top of the board area, over the scoreboard in portrait. `pointer-events: none`, `.found-set-flash`
 ### players/controller/_roster
-- `players/controller/_roster` (v2): the Waiting roster, two columns, each a dot, the name, "you" for the player and a `green-400` ✓ once ready. v8: a bot's row carries the bot mark after the name, and its ✓ from the start
+- `players/controller/_roster` (v2): the Waiting roster, two columns, each a dot, the name, "you" for the player and a `green-400` ✓ once ready. v8: a bot's row carries the bot mark after the name, and its ✓ from the start. v10: on the host's own screen a bot's row ends with the remove control after the ✓ (Components > Remove control); the name truncates further, no row height changes
 ### players/controller/_invite
 - `players/controller/_invite` (v2): the room code in display type, "or open onset.joaotorr.es and enter the code" (`join_host`), the link button (Copy link, Copied ✓, Couldn't copy, Share link), a Show QR button and the "Show on a big screen →" text link
 ### players/controller/_qr_sheet
@@ -346,7 +352,7 @@ ERB partials, no component library.
   - Claiming band: light `yellow-800` on `yellow-50`, 6.6:1; dark `yellow-400` on its 10% tint, about 11:1
   - Found-set banner: `gray-400` on `green-950`, 5.8:1; `gray-600` on `green-50`, 7.2:1
 - Sizes, per place; the gap to the name is the row's own (4 to 12px):
-  - Big screen waiting pills: 26px at 1920 (30px names), 22px at 1280 (24px names)
+  - Big screen waiting pills: 26px at 1920 (30px names), 22px at 1280 (24px names), 18px on the small pill (20px names, v10: Screens > Big screen, Waiting pills)
   - Big screen rail scoreboard rows: 26px
   - Big screen announcement band (Claiming, Correct): 44px inline in the 60px headline, `vertical-align: -4px`, between the name and the rest, in the band's name color (Claiming `yellow-400` dark, `yellow-800` light; Correct `green-400` dark, `green-700` light)
   - Big screen ended headline: 72px between the name and "wins", in secondary text (the headline stays primary)
@@ -366,6 +372,28 @@ ERB partials, no component library.
   - Pressed or pending: none. The action answers 204 and the broadcast adds the bot; the control does not change
   - Disabled, every color taken: all three take the disabled gray button (`gray-800` + `gray-500` dark, `gray-200` + `gray-600` light, 6.10:1; labels exempt), the border set to the fill so nothing resizes, `disabled` and `aria-describedby` on the reason. The reason sits at the right of the big screen tile's label row (18px, secondary) and under "Add a bot" in the player screen's label column (12px, secondary) (boards `bot-big-waiting8-light`, `bot-waiting-p8-dark`)
   - No size moves between states
+### Remove control
+- Remove control (v10, ticket 48): an icon-only `<button>` on a bot's big screen pill and on a bot's row in the host's own waiting roster; nowhere else, never on a person. Rules: Shared: Rules added in v10. What a tap does, its rate limit and its accessible name's words: SPEC, AI opponent, Removing a bot
+  - Glyph: the Lucide-style "x" (`M18 6 6 18M6 6l12 12`), inline stroke SVG, 24 viewBox, stroke 2.5, round caps, `stroke="currentColor"`, `aria-hidden="true"`: the same weight as the add-bot control's "+", so add and remove read as a pair
+  - Accessible name: `aria-label="Remove Easy bot"`, the bot's name after "Remove"
+  - Place: last in the pill or row, after the ✓. A bot's pill reads dot, name, bot mark, ✓, remove control. On a roster row the ✓ keeps its `margin-left: auto` and the control follows it
+  - Box and hit area: a square, transparent at rest, that is both the hit area and what hover and focus draw on, `flex: none`, every size at least 24×24 CSS px (WCAG 2.2 AA, 2.5.8). The negative vertical margins keep a pill at its height; the negative right margin lets the box overhang the pill's padding or the row's right end by its own inner padding, so the glyph sits where the text edge would (on a roster row it ends where a person's ✓ ends):
+
+  | Place | Box and hit area | Glyph | Radius | Margin |
+  |---|---|---|---|---|
+  | Big screen pill, 30px names (1080px tall and up, as at 1920×1080) | 44×44 | 24px | 12 | `-4px -10px -4px -4px` |
+  | Big screen pill, 24px names (under 1080px tall, the built pill sizes) | 36×36 | 20px | 10 | `-2px -8px -2px -4px` |
+  | Big screen pill, small size (20px names, Screens > Big screen, Waiting pills) | 28×28 | 16px | 8 | `0 -6px 0 -4px` |
+  | Host's player screen, portrait (28px rows) | 28×28 | 14px | 8 | `0 -7px 0 -6px` |
+  | Host's player screen, landscape (26px rows) | 26×26 | 13px | 8 | `0 -6px 0 -5px` |
+  | Host's player screen, computer (36px rows) | 32×32 | 16px | 8 | `0 -8px 0 -4px` |
+
+  - The phone rows have no room for a 44px target: the roster rows are 28px and 26px tall, 6px and 4px apart, and the control takes the row's full height. The 36×36 control on a 24px pill is derived from the table, not drawn: boards draw the 28×28 and the 44×44
+  - Resting: no fill, the glyph in secondary text. Dark `gray-400` `#9CA3AF`: 6.99:1 on `gray-900` (big screen pill, computer roster panel), 7.93:1 on `gray-950` (portrait and landscape roster). Light `gray-600` `#4B5563`: 7.56:1 on white (big screen pill, computer roster panel), 7.23:1 on `gray-50` (portrait and landscape roster)
+  - Hover (the big screen and the computer player screen only, none on phones): the box fills with Raised, borderless and the glyph goes to primary text. Dark `gray-800` `#1F2937` fill, glyph white on the big screen (14.68:1), `gray-50` on the player screen (14.05:1). Light `gray-200` `#E5E7EB` fill, glyph `gray-900` `#111827` (14.33:1)
+  - Keyboard focus: the 2px `blue-500` outline at 2px offset on the box, glyph as resting. The ring is 3.68:1 on white, 3.52:1 on `gray-50`, 4.83:1 on `gray-900`, 5.48:1 on `gray-950`. On the small pill (34px tall) and on the roster rows the ring passes the pill's or row's edge by 1 to 4px into the gap between rows; nothing moves
+  - Pressed, pending, disabled: none. The action answers 204 and the broadcast removes the bot, as the add-bot control. No error state: a refused or stale removal shows nothing
+  - No size moves between states. Boards `bot-big-long800-light`, `bot-big-long720-dark`, `bot-big-one-light` (the 1920 callout), `bot-remove-p8-dark`, `bot-remove-l7-light`, `bot-remove-c7-dark`
 ### Stimulus controllers
 - Stimulus: `card-selection` (picks sent to the server, tray, count, Submit and the freeze after it), `countdown` (rings and seconds), `settings` (v6: the settings button and menu, writes the `theme` and `card_colors` cookies)
 
@@ -405,19 +433,37 @@ Drawn for v2. Sizes are the boards': portrait 375×667, landscape 667×375, comp
 - Top to bottom: the nav row ("← Back", the "Onset" wordmark, the settings button), the header, Every card has four features (four panels), What makes a Set (two green-ringed panels), Almost, but not a Set (a red-ringed panel, then Quick check and Tip on blue tints), Playing Onset (four numbered panels, then No Set on the table? and End of the game), Ready to play?, the byline footer
 - Color captions and the Not a Set row name the card colors of the current setting (Shared: Rules added in v6); `cb-htp-d-dark` and `cb-htp-d-light` draw the Color-blind words
 
-### Big screen (tickets 21, 40, 47)
+### Big screen (tickets 21, 40, 47, 48, 73)
 
 - Drawn in light for every state (`l-big-*`, `BigScreenTh`), and in dark for waiting and ended (`d-big-waiting4`, `d-big-waiting1`, `d-big-ended`), which had no dark board before v6
 - The room tile, the player pills and the QR tile get the light inset edge; band panels follow the light tinted panel rows; the podium ★ is `yellow-700` in light
 - Bots (v8): `bot-big-waiting8-light` (1280×800, 8 players with 3 bots, add-bot control disabled), `bot-big-botsonly-dark` (bots only, "Need a person to play", add-bot control focused), `bot-big-claiming-light` (Claiming band and rail row of a bot), `bot-big-ended-dark` (a bot wins, a bot on the podium). Waiting: the add-bot tile heads the rail, the Players scoreboard under it. Each board is self-contained and imports no themed component
-- `bot-big-waiting8-light` draws the 1280×800 waiting state smaller than 1920: room code 80px, hero text 24px and 20px, pills 24px with 16px dots, Start game 80px tall, rail rows 52px (padding 8px 16px, 36px scores, 6px gaps) so 8 rows fit under the add-bot tile and clear the settings button. The code is the truth for how the built hero and rail shrink; the rail's clearance at 1280: SPEC §8 Big screen, Scoreboard (triage 67)
+- `bot-big-waiting8-light` draws the 1280×800 waiting state smaller than 1920: room code 80px, hero text 24px and 20px, pills 24px with 16px dots, Start game 80px tall, rail rows 52px (padding 8px 16px, 36px scores, 6px gaps) so 8 rows fit under the add-bot tile and clear the settings button. The code is the truth for how the built hero and rail shrink; the rail's clearance at 1280: SPEC §8 Big screen, Scoreboard (triage 67). v10: the board draws the hero from before ticket 72 (288px QR, 24px link, 24px pills for 8 players); the built hero and the long-name pills are `bot-big-long800-light` and `bot-big-long720-dark`, which win where they differ. The rail is the same on both
+- Waiting pills, the long-name layout (v10, ticket 73): pills stay content-sized and wrap, as built. Two things are added, both keyed on what CSS knows (the window's height and the number of pills), never on measuring names
+  - A cap on every pill's width, at every height, so 8 pills never take more rows than the window has room for. Under 1080px tall, half the row: `max-width: calc((100% - <the list's gap>) / 2)`; at 1280px wide the row is 744px, so 369px with the 6px gap, 366px with the built 12px gap; 8 pills take at most 4 rows, 6 pills at most 3. At 1080px tall and up, a third of the row: `calc((100% - 2 × 16px) / 3)`, 450px at 1920×1080 (8 pills at most 3 rows; not drawn, a proposal on ticket 73). Only the name gives (Shared: Rules added in v10)
+  - The small pill: 34px tall, 20px semibold text on a 28px line, padding 3px 16px, radius 12, 10px between its parts, dot 14px, bot mark 18px, ✓ 18px, remove control 28×28, 6px between pills across and down (4 rows are 154px). Not-ready pills keep secondary text, the light pill its inset edge. Pills of rooms of up to 6 players keep the built pill (24px text, 16px dot; 48px tall under 820px, 44px under 740px, 12px gaps) with the cap, at most 3 rows. Where it applies, and the 1440×900 step below, SPEC §8 Big screen, Fit decides: the board draws 7 or 8 players on windows under 820px tall (`bot-big-long800-light`, `bot-big-long720-dark`)
+  - What each window takes with 7 or 8 players (the play area is the window's height less 248px: two 40px paddings, the 24px gap, the 9rem band; the room for pills is that less the built hero, the two gaps and Start game, computed from `app/views/games/_board.html.erb`, not measured):
 
-### Player screen, Waiting (tickets 10, 47)
+  | Window | Play area | Hero, gaps, Start game | Room for pills | Pills | Pill block |
+  |---|---|---|---|---|---|
+  | 1280×720 | 472px | 224 + 8 + 8 + 64 | 168px | small, cap half | 154px (4 rows) |
+  | 1366×768 | 520px | 240 + 20 + 20 + 80 | 160px | small, cap half | 154px |
+  | 1280×800 | 552px | 240 + 20 + 20 + 80 | 192px | small, cap half | 154px |
+  | 1440×900 | 652px | 300 + 24 + 24 + 80 | 224px | 24px text, 44px tall (6px top and bottom, the built under-740 pill), 12px gaps, cap half | 212px |
+  | 1280×1024 | 776px | 336 + 32 + 32 + 80 | 296px | as built (24px text, 56px tall, 16px gaps), cap half | 272px |
+  | 1920×1080 | 832px | 384 + 48 + 48 + 96 | 256px | as built (30px text, 68px tall, 16px gaps), cap a third | 236px (3 rows) |
+
+  - Where a name truncates: small pill at 1280px wide (cap 369px), a person's name has about 290px once ready and about 313px before, so every 20-character name in ordinary mixed case shows whole at 20px semibold ("Bartholomew Nakamura", the widest drawn, is about 226px) and only a name of wide capitals is cut (twenty W's, about 380px, end in an ellipsis after about 15). A bot's pill has about 234px for its name: "Medium bot 2" (about 129px) shows whole. Built 24px pill, cap half, at 1280px wide (up to 6 players at 1280×800 and 1280×720, 8 at 1280×1024): about 270px for a person's name, so a name wider than about 11em loses its last character or two. 1920×1080, cap a third (450px): about 334px for a person's name at 30px, the same threshold; names of up to 10 characters are untouched and a bot's pill with its remove control (about 400px for "Medium bot 2") fits whole
+  - Boards 1 and 2 draw the hero as built (ticket 72): at 1280×800 a 176px QR on a 16px-padded tile, 16px link, 80px code, 80px Start game (36px text) and "6 of 8 ready" at 30px; at 1280×720 a 160px QR, 14px link, 64px code, 64px Start game and 8px gaps. The QR floor of 160px, the one-line link under its tile and the 9rem band stay. The 1280×720 board draws the rail with ticket 71's orientation sizes (12px under the add-bot tile, 6px under the label, 44px rows with 24px names and 30px scores, 4px apart): the code is the truth there
+- Waiting after a removal (v10, ticket 48): `bot-big-one-light` draws 1920×1080 with one person left: no bots, Start game disabled with "Need at least 2 players", the add-bot control enabled (the removal freed a color), no remove control anywhere. It centres the play area above the 144px band as the code does (`bot-big-botsonly-dark` centres it in the full height). The remove control at 1920 is the 44×44 one, drawn in the board's callout beside the screen, outside its 1920×1080 frame
+
+### Player screen, Waiting (tickets 10, 47, 48)
 
 - Header, then "You're in", the roster, the invite and I'm ready (`green-700`). Once voted: "Ready ✓ · waiting for n more" as outlined `green-700` text on a 12% `green-700` tint, `green-300` text
 - Landscape and computer put the roster and the invite side by side
 - Host's screen (v8): the add-bot control's row right under the roster, before the invite in portrait, in the roster column in landscape and inside the roster panel on computer; no page scroll with 8 players in portrait and 7 in landscape and computer (the two-column roster is 4 rows at 7 as at 8). Boards `bot-waiting-p-alone-light`, `bot-waiting-p8-dark`, `bot-waiting-l7-dark`, `bot-waiting-c7-light`. Other players' screens: the roster as those boards draw it, bots with their mark and ✓, and no add-bot row (the roster runs straight into the invite)
-- Host alone (v8): `bot-waiting-p-alone-light` draws "Waiting for more players to join…" as plain secondary text centred in the 56px I'm ready slot; the built `waiting-p-1` look wins where it differs
+- Host alone (v8): `bot-waiting-p-alone-light` draws "Waiting for more players to join…" as plain secondary text centred in the 56px I'm ready slot; the built `waiting-p-1` look wins where it differs. v10: it also stands as the host-alone state after a removal leaves one person, with the add-bot control enabled and no remove control, since no bot is left
+- Remove control on the host's roster (v10, ticket 48): a bot's row ends dot, name, bot mark, ✓, remove control (Components > Remove control); the name truncates further, nothing else moves and no row height changes. In portrait (a 164px column) "Easy bot" and "Easy bot 2" still show whole and "Medium bot 2" is cut ("Medium bo…"). No page scroll with the controls: boards `bot-remove-p8-dark` (375×667, 8 players with 3 bots, I'm ready, add-bot control disabled with "Room full", one remove control focused), `bot-remove-l7-light` (667×375, 7 players with 2 bots, add-bot control enabled) and `bot-remove-c7-dark` (1024×640, 7 players with 2 bots, one remove control hovered and one focused). Other players' screens: no remove control and no add-bot row, bots with their mark and ✓ as the v8 boards draw them (no board)
 - The link button's feedback states (Copied ✓, Couldn't copy) stay neutral gray
 - The QR sheet is `_qr_sheet`; the "Room CODE" footer stays
 
@@ -477,11 +523,16 @@ None
 - Answered by triage 40: the player screen settings button stays 40×28 (40×32 in the computer Waiting and Game over footers), above the WCAG 2.2 AA 24px minimum; the footer does not grow, so the board keeps its size
 - A 20-character name at 1280px wide pushes a big screen headline (No Set, claiming) to three lines and out of the 9rem band. The design tool recommends truncating the name with an ellipsis so the headline stays within two lines. Triage 21 took it for the Refused headline in SPEC §8; the No Set and claiming headlines wait for a request of their own
 - Answered by triage 07 in SPEC §8 Player screen > 8. Game over: a tied rank stays a plain "1st", and the winner line reads "★ You win with 7" when the viewer wins, as the code already does. Redraw the -win boards to match in the next brief that touches game over
+- 1366×768 with 5 or 6 long names (v10, ticket 73): three rows of the built pill (48px, 12px gaps: 168px) are 8px more than the 160px of room the waiting play area has there, 4px past its box at top and bottom, nothing reaching the band. It needs 5 or 6 names all over about 13 characters. Left as built. Dropping the list's row gap to 8px under 820px tall would close it (160px) and move 1280×800 rooms by 4px when their pills wrap
+- Between the named windows (v10, ticket 73): at 740px to 761px tall the hero and Start game leave under 154px, and at 820px to 887px under 212px, so the pill block is tighter than the room. The long-name rule fits every window the spec names; a fit at every height would need the hero's steps changed, which ticket 73's brief leaves alone
+- A window 1080px tall or more but narrow, under about 1770px wide (v10, ticket 73): not a window the spec names, and a third of its row is too little for a bot's pill at 30px. Whether the cap there should be half the row instead is open
 
 ---
 
 ## Changelog
 
+- v10, 2026-11-24: ticket 48, the remove control: an "×" icon button on a bot's big screen pill and on a bot's row in the host's own waiting roster, last after the ✓, transparent at rest in secondary text, a raised borderless fill and primary glyph on hover (where the device hovers), the focus outline on keyboard focus, never red or green, at 44, 36 and 28px on the big screen and 28, 26 and 32px on the host's roster in portrait, landscape and computer, all at least 24px (Components > Remove control, Shared: Rules added in v10, Screens > Big screen, Screens > Player screen, Waiting); the one-person state after a removal; six boards in both themes.
+- v10, 2026-11-24: ticket 73, the big screen's waiting pills for long names: a cap on every pill's width (half the row under 1080px tall, a third from 1080px), the name truncating with an ellipsis while the dot, bot mark, ✓ and remove control stay in full, the small 34px pill with 20px text and an 18px bot mark, and what 1280×720, 1366×768, 1280×800, 1440×900, 1280×1024 and 1920×1080 take with 7 or 8 players (Screens > Big screen, Waiting pills; the 18px bot mark in Components > Bot mark), on `bot-big-long800-light` and `bot-big-long720-dark`.
 - v9, 2026-11-24: ticket 82, the records corrected to the build, nothing new designed: the portrait tray's empty slot number is 24px (`text-2xl`), as built, not 22px.
 - v9, 2026-11-24: ticket 76, a small visual fix, not from a design pass: a locked entry on the player screen's play scoreboard keeps its name and score at full opacity in muted text, secondary on the player's own entry, so both read at 4.5:1 or more in both themes; only the dot stays faded (Components > players/controller/_scoreboard, Shared: Rules added in v9).
 - v8, 2026-11-20: ticket 65, the records corrected to SPEC, nothing new designed: the quoted SPEC §10 Visual system matches SPEC again (the `muted` token bullet, the History line's ending) and the Themes pointer names every bullet the quote leaves out.

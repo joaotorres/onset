@@ -5,7 +5,7 @@ Where the design tool's work lives and what it was last given.
 ## Design links
 
 - Canvas: https://claude.ai/artifact/123TNq7nwcKGoXDaroSGcM (private, created 2026-10-12)
-- Handed off: docs/design-system.md v8, 2026-11-20 (return in `.scratch/onset-v1/design/20261120-47/return.md`)
+- Handed off: docs/design-system.md v10, 2026-11-24 (return in `.scratch/onset-v1/design/20261124-48-73/return.md`)
 - Components (each also a board): Main (landing), Join, Waiting, PlayPortrait, PlayLandscape, PlayComputer, PlayPortraitRefusal, PlayLandscapeRefusal, PlayComputerRefusal, GameOver, BigScreen. Themed components (v6, props for theme, palette, state and menu; each a board at light and Classic): LandingTh, JoinTh, HowToPlayTh, WaitingTh, PlayPortraitTh, PlayLandscapeTh, PlayComputerTh, GameOverTh, BigScreenTh, and SettingsMenu. Every other board imports one of them with a state, but the `bot-*` boards (v8), which are self-contained. Board files are `project/<name>.dc.html`
 
 | Screen | Tickets | Boards | State |
@@ -42,3 +42,5 @@ Where the design tool's work lives and what it was last given.
 | Static error pages, dark and light | 42 | err-404-p-dark, err-404-p-light, err-500-d-dark, err-500-d-light | built |
 | Bots: big screen waiting, claiming and ended | 47 | bot-big-waiting8-light, bot-big-botsonly-dark, bot-big-claiming-light, bot-big-ended-dark | exploring |
 | Bots: player screen waiting (host), play and game over | 47 | bot-waiting-p-alone-light, bot-waiting-p8-dark, bot-waiting-l7-dark, bot-waiting-c7-light, bot-play-p8-other-dark, bot-gameover-p-light | exploring |
+| Bots: big screen waiting, remove control and long-name pills | 48, 73 | bot-big-long800-light, bot-big-long720-dark, bot-big-one-light (a callout of a bot pill at 1920 beside the screen) | exploring |
+| Bots: player screen waiting (host), remove control | 48 | bot-remove-p8-dark, bot-remove-l7-light, bot-remove-c7-dark | exploring |

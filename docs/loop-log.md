@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  design-entry 48, 73: design-system v10, six boards (the remove control on bot pills and the host's roster, the long-name pills, the one-person state), four Design proposes and three Design questions on the tickets, no conflict. Next: triage 48, 73.
 - 2026-11-24  build 68: done, the host adds bots from the big screen's waiting tile, bots count as ready and never vote, five Decided lines, a Chrome 158 fix for the system specs committed apart. Next: build 69.
 - 2026-11-24  design-brief 48, 73: brief 20261124-48-73 written against DESIGN v9, six boards (big screen 1280×800 and 1280×720 with 8 long-name players, the one-person state after a removal, the host's player screen in three layouts), no ticket held. Next: draw it, then design-entry 48, 73.
 - 2026-11-24  deps: patch-level gem updates, 11 gems (bootsnap, connection_pool, net-imap, net-scp, net-sftp, parser, rack, regexp_parser, sshkit, tailwindcss-ruby, thruster), 876 examples green, standardrb clean. Held back jt_telemetry: a git gem on main, whose upstream has moved past 0.3.0 with no patch release, so the whole-bundle --strict --patch run fails; every other gem was named explicitly. Next: none.
