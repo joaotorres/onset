@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  request 82: filed from 66's deferral, SPEC's answers and Submit wording and the tray slot size matched to the build, behavioural. Next: triage.
 - 2026-11-24  request 81: filed from 64's deferral, one shared home for the repeated theme, rate limit, claim and player spec helpers, behavioural. Next: triage.
 - 2026-11-24  request 80: filed from 64's deferral, the theme and fit specs scoped to what their criteria name, behavioural. Next: triage.
 - 2026-11-24  request 79: filed from 60's deferral, the ready and host limits before the game loads and the missing rate limit specs, behavioural. Next: triage.
