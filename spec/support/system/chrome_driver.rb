@@ -24,3 +24,22 @@ end
 # rspec-rails defines driven_by on each example group itself, so the module is
 # prepended: an included one would sit behind it and never run.
 RSpec.configure { |config| config.prepend ChromeDriverDefaults, type: :system }
+
+# Capybara 3.40 resets the session between examples with
+# `Storage.clearDataForOrigin origin: "*"`, which Chrome 158 refuses ("* is not
+# a valid URL"), failing every system example. Clear the cookies for the whole
+# browser and the rest for the app server's origin instead. Drop this once a
+# Capybara release stops sending "*".
+module ChromeStorageResetForAnyOrigin
+  def execute_cdp(cmd, params = {})
+    return super unless cmd == "Storage.clearDataForOrigin" && params[:origin] == "*"
+
+    types = params[:storageTypes].to_s.split(",")
+    super("Storage.clearCookies") if types.delete("cookies")
+    server = Capybara.current_session.server
+    return if types.empty? || server.nil?
+
+    super(cmd, origin: server.base_url, storageTypes: types.join(","))
+  end
+end
+Capybara::Selenium::Driver::ChromeDriver.prepend ChromeStorageResetForAnyOrigin
