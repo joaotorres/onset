@@ -2,6 +2,7 @@
 
 What the skills-loop steps did, newest first.
 
+- 2026-11-24  request 77: filed from 52's deferral, Back or Forward from the browser's cache syncs the theme and card colors, behavioural. Next: triage.
 - 2026-11-24  design-entry 76: v9, the locked scoreboard entry in muted text (secondary on the own entry) instead of 45% opacity, small visual fix. Next: triage.
 - 2026-11-24  request 76: filed from 46's deferral, a locked entry on the player scoreboard at 4.5:1, visual, a small visual fix. Next: its design entry.
 - 2026-11-24  request 75: filed, the three slow single-example system specs brought under 8 s (the four splittable files split in 4ef0768). Next: triage.
