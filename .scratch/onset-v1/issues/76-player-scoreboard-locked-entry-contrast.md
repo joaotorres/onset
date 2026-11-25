@@ -1,6 +1,6 @@
 # 76: A locked entry on the player screen's scoreboard reads at 4.5:1 in both themes
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Priority: normal

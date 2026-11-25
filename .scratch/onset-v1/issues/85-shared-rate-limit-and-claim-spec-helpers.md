@@ -1,6 +1,6 @@
 # 85: Behind the scenes: one home for the rate limit stub and the stale claim helpers
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

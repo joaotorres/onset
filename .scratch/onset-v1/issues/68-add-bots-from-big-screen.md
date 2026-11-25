@@ -1,6 +1,6 @@
 # 68: The host adds bots to a waiting room from the big screen
 
-Status: done
+Status: deployed
 Kind: visual
 Blocked by:
 Priority: normal

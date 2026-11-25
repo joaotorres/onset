@@ -1,6 +1,6 @@
 # 80: Behind the scenes: make the theme and fit specs measure what their criteria name
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

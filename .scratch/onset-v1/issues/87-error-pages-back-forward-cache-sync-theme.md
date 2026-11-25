@@ -1,6 +1,6 @@
 # 87: A static error page shown again by Back or Forward takes the current theme
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by: 84
 Priority: low

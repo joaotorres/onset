@@ -1,6 +1,6 @@
 # 86: Behind the scenes: one spec helper for a player with the room's next free color
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

@@ -1,6 +1,6 @@
 # 84: Behind the scenes: one shared "theme" context for the theme spec helpers
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

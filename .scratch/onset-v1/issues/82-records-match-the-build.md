@@ -1,6 +1,6 @@
 # 82: Behind the scenes: bring three records in line with what is built
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

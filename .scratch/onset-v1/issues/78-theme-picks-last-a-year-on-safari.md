@@ -1,6 +1,6 @@
 # 78: A theme or Color-blind pick lasts a year on Safari too
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: high

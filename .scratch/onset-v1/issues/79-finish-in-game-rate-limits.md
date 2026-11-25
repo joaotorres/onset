@@ -1,6 +1,6 @@
 # 79: Behind the scenes: finish ticket 60's rate limits
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

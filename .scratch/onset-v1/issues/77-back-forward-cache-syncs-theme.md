@@ -1,6 +1,6 @@
 # 77: Back or Forward into Onset from another site shows the current theme and card colors
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: normal

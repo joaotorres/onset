@@ -1,6 +1,6 @@
 # 74: A join that loses the race re-renders with fresh colors
 
-Status: done
+Status: deployed
 Kind: behavioural
 Blocked by:
 Priority: low

@@ -2,6 +2,21 @@
 
 What each deploy shipped, newest first, from the tickets' Changelog: lines.
 
+## 2026-11-25, deploy-20261125-1633
+
+- The host can add Easy, Medium and Hard bots to a waiting room from the big screen; they show in the room with a bot mark and count as ready, but do not play yet. (68)
+- A join that loses a split-second race for a color now comes back with the next free color picked, or says the room is full when that was the last one. (74)
+- A locked-out player's name and score on your phone's scoreboard are now easy to read in both themes. (76)
+- Going Back to Onset from another site now shows the theme and card colors you picked meanwhile in another tab, with the settings menu closed. (77)
+- Your theme and Color-blind picks now last a year on iPhone and Safari too, instead of lapsing after a week. (78)
+- An error page you come back to with Back or Forward shows the theme you picked meanwhile, or follows your device again. (87)
+- Behind the scenes: the ready, Start game and Play again limits are checked before the room is looked up, and the in-game limits gain specs for broadcasts and cookie-less counts. (79)
+- Behind the scenes: the theme and big screen fit tests now check the Game mode toggle itself, the light name error border, and the join link and QR size at every window. (80)
+- Behind the scenes: the spec names every answer a screen action can get, says a late submit is judged against the room's current claim, and the design system gives the tray slot number its built 24px. (82)
+- Behind the scenes: the theme specs share one set of cookie, color, meta and no-reload helpers. (84)
+- Behind the scenes: the rate limit and stale claim spec helpers each live in one place. (85)
+- Behind the scenes: specs build their players with one helper that takes the room's next free color. (86)
+
 ## 2026-11-20, deploy-20261120-1251
 
 - The error pages (such as page not found) now use Onset's own light and dark colors, following your device or the theme you picked in Onset. (42)
